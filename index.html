@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Pro – Family Wealth Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0d1117 0%, #090c10 50%, #0a0e14 100%);
+            --card-gradient: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+            --accent: #2dd4bf;
+            --accent-dark: #14b8a6;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text-primary: #f0f6fc;
+            --text-secondary: #8b949e;
+            --border-color: #30363d;
+            --card-bg: #161b22;
+            --input-bg: #21262d;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+        }
+
+        .navbar-custom {
+            background: rgba(22,27,34,0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .brand-icon {
+            width:40px; height:40px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            border-radius:12px;
+            display:flex; align-items:center; justify-content:center;
+        }
+
+        .nav-tabs-custom {
+            background: rgba(33,38,45,0.5);
+            border-radius:12px;
+            padding:4px;
+        }
+
+        .nav-tabs-custom .nav-link {
+            color: var(--text-secondary);
+            border:none;
+            border-radius:8px;
+            padding:10px 24px;
+            font-weight:500;
+            transition:all 0.2s;
+        }
+
+        .nav-tabs-custom .nav-link:hover { color:var(--text-primary); background:rgba(45,212,191,0.1); }
+        .nav-tabs-custom .nav-link.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color:#0d1117;
+        }
+
+        .card-glass, .card-glass-static {
+            background: var(--card-gradient);
+            border:1px solid var(--border-color);
+            border-radius:16px;
+            box-shadow:0 4px 16px rgba(0,0,0,0.4);
+        }
+
+        .card-glass:hover {
+            transform:translateY(-4px);
+            border-color:rgba(45,212,191,0.3);
+            box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(45,212,191,0.15);
+        }
+
+        .stat-value {
+            font-size:2.5rem;
+            font-weight:700;
+            background: linear-gradient(135deg, var(--accent) 0%, #5eead4 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            background-clip:text;
+        }
+
+        .pill-success {
+            background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
+            color:white;
+            padding:6px 14px;
+            border-radius:50px;
+            font-size:0.875rem;
+            font-weight:500;
+            display:inline-flex; align-items:center; gap:4px;
+        }
+
+        .pill-danger {
+            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+            color:white;
+            padding:6px 14px;
+            border-radius:50px;
+            font-size:0.875rem;
+            font-weight:500;
+            display:inline-flex; align-items:center; gap:4px;
+        }
+
+        .btn-accent {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+            color:#0d1117;
+            border:none;
+            padding:12px 24px;
+            border-radius:10px;
+            font-weight:600;
+            transition:all 0.2s;
+            box-shadow:0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-accent:hover {
+            transform:translateY(-2px);
+            box-shadow:0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(45,212,191,0.3);
+            color:#0d1117;
+        }
+
+        .btn-secondary-custom {
+            background:var(--input-bg);
+            color:var(--text-primary);
+            border:1px solid var(--border-color);
+            padding:12px 24px;
+            border-radius:10px;
+            font-weight:600;
+            transition:all 0.2s;
+        }
+
+        .btn-secondary-custom:hover {
+            background:var(--card-bg);
+            border-color:rgba(45,212,191,0.3);
+            color:var(--text-primary);
+        }
+
+        .form-control-dark {
+            background:var(--input-bg);
+            border:1px solid var(--border-color);
+            color:var(--text-primary);
+            border-radius:10px;
+            padding:12px 16px;
+            transition:all 0.2s;
+        }
+
+        .form-control-dark:focus {
+            background:var(--input-bg);
+            border-color:var(--accent);
+            color:var(--text-primary);
+            box-shadow:0 0 0 2px rgba(45,212,191,0.2);
+        }
+
+        .form-control-dark::placeholder { color:var(--text-secondary); }
+
+        .modal-content-dark {
+            background:var(--card-gradient);
+            border:1px solid var(--border-color);
+            border-radius:20px;
+        }
+
+        .modal-header-dark { border-bottom:1px solid var(--border-color); }
+
+        .dropdown-menu-dark-custom {
+            background:var(--card-bg);
+            border:1px solid var(--border-color);
+            border-radius:10px;
+            box-shadow:0 8px 32px rgba(0,0,0,0.5);
+        }
+
+        .dropdown-item-custom:hover { background:var(--input-bg); }
+
+        .text-muted-custom { color:var(--text-secondary) !important; }
+
+        .empty-state { text-align:center; padding:60px 20px; }
+        .empty-state i { font-size:4rem; color:var(--text-secondary); margin-bottom:20px; }
+
+        .chart-container { width:140px; height:140px; }
+
+        .asset-dot {
+            width:12px; height:12px;
+            border-radius:50%;
+            display:inline-block;
+        }
+
+        .table-dark-custom {
+            --bs-table-bg:transparent;
+            --bs-table-color:var(--text-primary);
+        }
+
+        .table-dark-custom th {
+            color:var(--text-secondary);
+            font-weight:500;
+            border-bottom:1px solid var(--border-color);
+        }
+
+        .table-dark-custom td { border-bottom:1px solid rgba(48,54,61,0.5); }
+
+        .bg-accent-subtle { background:rgba(45,212,191,0.1); }
+
+        .text-success-custom { color:var(--success) !important; }
+        .text-accent { color:var(--accent) !important; }
+
+        @media (max-width:768px) {
+            .stat-value { font-size:1.75rem; }
+            .chart-container { width:120px; height:120px; margin:0 auto; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-custom sticky-top">
+        <div class="container">
+            <div class="d-flex align-items-center gap-3">
+                <div class="brand-icon">
+                    <i class="bi bi-wallet2 text-dark fs-5"></i>
+                </div>
+                <div>
+                    <h1 class="h5 mb-0 fw-bold">Portfolio Pro</h1>
+                    <small class="text-muted-custom">Family Wealth Overview</small>
+                </div>
+            </div>
+            <ul class="nav nav-tabs-custom" id="mainTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="projections-tab" data-bs-toggle="tab" data-bs-target="#projections" type="button">Projections</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container py-4">
+        <div class="tab-content" id="mainTabContent">
+
+            <!-- Overview Tab -->
+            <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                <!-- Net Worth Card -->
+                <div class="card-glass-static p-4 p-md-5 mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-7">
+                            <p class="text-muted-custom text-uppercase small mb-2 letter-spacing-1">Family Net Worth</p>
+                            <h2 class="stat-value mb-4" id="currentValue">₹0</h2>
+                            <div class="d-flex flex-wrap gap-4">
+                                <div>
+                                    <p class="text-muted-custom small mb-1">Total Invested</p>
+                                    <p class="fs-5 fw-semibold mb-0" id="totalInvested">₹0</p>
+                                </div>
+                                <div>
+                                    <p class="text-muted-custom small mb-1">Overall Returns</p>
+                                    <span id="returnPill" class="pill-success">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                        <span id="returnPercentage">0.00%</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-5 mt-4 mt-lg-0">
+                            <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
+                                <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#portfolioModal" onclick="openAddPortfolio()">
+                                    <i class="bi bi-plus-lg me-2"></i>Add Portfolio
+                                </button>
+                                <button class="btn btn-secondary-custom" data-bs-toggle="modal" data-bs-target="#returnsModal">
+                                    <i class="bi bi-cash-coin me-2"></i>Total Returns
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Portfolios Grid -->
+                <div id="portfoliosContainer" class="row g-4"></div>
+            </div>
+
+            <!-- Projections Tab -->
+            <div class="tab-pane fade" id="projections" role="tabpanel">
+                <!-- CAGR Settings -->
+                <div class="card-glass-static p-4 mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <i class="bi bi-gear text-accent"></i>
+                        <h5 class="mb-0 fw-semibold">CAGR Assumptions (Expected Future Returns)</h5>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label text-muted-custom small">Equity (%)</label>
+                            <input type="number" class="form-control form-control-dark" id="cagrEquity" value="13" step="0.5" onchange="updateProjections()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted-custom small">Debt (%)</label>
+                            <input type="number" class="form-control form-control-dark" id="cagrDebt" value="7.5" step="0.5" onchange="updateProjections()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted-custom small">Gold (%)</label>
+                            <input type="number" class="form-control form-control-dark" id="cagrGold" value="9" step="0.5" onchange="updateProjections()">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-muted-custom small">Others (%)</label>
+                            <input type="number" class="form-control form-control-dark" id="cagrOthers" value="2" step="0.5" onchange="updateProjections()">
+                        </div>
+                    </div>
+                    <p class="text-muted-custom small mt-3 mb-0">
+                        * Categories detected from asset names. Use keywords like: Equity, Debt, Gold, etc.
+                    </p>
+                </div>
+
+                <!-- Projections Tables -->
+                <div id="projectionsContainer"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Portfolio Modal -->
+    <div class="modal fade" id="portfolioModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content modal-content-dark">
+                <div class="modal-header modal-header-dark border-0 pb-0">
+                    <h5 class="modal-title fw-semibold" id="portfolioModalTitle">Add Portfolio</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="portfolioForm">
+                        <input type="hidden" id="editingPortfolioId">
+                        <div class="mb-4">
+                            <label class="form-label text-muted-custom small">Portfolio Name</label>
+                            <input type="text" class="form-control form-control-dark" id="portfolioName" placeholder="e.g., My Retirement Fund" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-muted-custom small">Total Invested Amount (₹)</label>
+                            <input type="number" class="form-control form-control-dark" id="portfolioAmount" placeholder="Enter amount" min="1" required oninput="recalculateAssetAmounts()">
+                        </div>
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <label class="form-label text-muted-custom small mb-0">Asset Allocation</label>
+                                <span id="allocationTotal" class="small fw-medium text-warning">Total: 0%</span>
+                            </div>
+                            <div id="assetsContainer"></div>
+                            <button type="button" class="btn btn-link text-accent text-decoration-none p-0 mt-2" onclick="addAssetRow()">
+                                <i class="bi bi-plus-lg me-1"></i>Add Asset
+                            </button>
+                        </div>
+                        <div id="portfolioError" class="alert alert-danger d-none"></div>
+                    </form>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" onclick="savePortfolio()">Save Portfolio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Returns Modal -->
+    <div class="modal fade" id="returnsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content modal-content-dark">
+                <div class="modal-header modal-header-dark border-0 pb-0">
+                    <h5 class="modal-title fw-semibold">
+                        <i class="bi bi-graph-up-arrow text-accent me-2"></i>Total Returns / Unrealized Gain/Loss
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <label class="form-label text-muted-custom small">Total Profit/Loss Across All Portfolios (₹)</label>
+                        <input type="number" class="form-control form-control-dark" id="totalReturnsInput" placeholder="Enter total returns (can be negative)" oninput="previewReturns()">
+                        <small class="text-muted-custom">Positive = profit/gain • Negative = loss</small>
+                    </div>
+                    <div class="bg-dark rounded-3 p-3">
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted-custom">Total Invested</span>
+                            <span id="previewInvested">₹0</span>
+                        </div>
+                        <div class="d-flex justify-content-between small mb-2">
+                            <span class="text-muted-custom">Returns</span>
+                            <span id="previewReturns" class="text-success-custom">+₹0</span>
+                        </div>
+                        <hr class="border-secondary my-2">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted-custom">Current Value</span>
+                            <span id="previewValue" class="fw-bold">₹0</span>
+                        </div>
+                        <div class="d-flex justify-content-between small mt-2">
+                            <span class="text-muted-custom">Return %</span>
+                            <span id="previewReturnPct" class="pill-success">+0.00%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-accent" onclick="saveReturns()">Save Returns</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
+            authDomain: "portfolio-f938c.firebaseapp.com",
+            projectId: "portfolio-f938c",
+            storageBucket: "portfolio-f938c.firebasestorage.app",
+            messagingSenderId: "963544931671",
+            appId: "1:963544931671:web:ff0210cc532428ea227212",
+            measurementId: "G-C41JE44L43"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        enableIndexedDbPersistence(db).catch((err) => {
+            if (err.code === 'failed-precondition') {
+                console.warn("Persistence failed: multiple tabs open");
+            } else if (err.code === 'unimplemented') {
+                console.warn("Browser does not support persistence");
+            }
+        });
+
+        const DOC_REF = doc(db, "shared", "family-portfolio-data");
+
+        const CHART_COLORS = [
+            '#2dd4bf', '#22c55e', '#f59e0b', '#d97706',
+            '#a855f7', '#ef4444', '#3b82f6', '#ec4899'
+        ];
+
+        let appState = {
+            portfolios: [],
+            totalReturns: 0
+        };
+
+        let chartInstances = {};
+        let isSaving = false;
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 0
+            }).format(Math.round(amount));
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substring(2, 9);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getTotalInvested() {
+            return appState.portfolios.reduce((sum, p) => sum + (p.totalInvested || 0), 0);
+        }
+
+        function getCurrentValue() {
+            return getTotalInvested() + appState.totalReturns;
+        }
+
+        function getReturnPercentage() {
+            const invested = getTotalInvested();
+            return invested > 0 ? (appState.totalReturns / invested) * 100 : 0;
+        }
+
+        function calculateFutureValue(principal, rate, years) {
+            return principal * Math.pow(1 + rate / 100, years);
+        }
+
+        function getAssetCategory(assetName) {
+            const name = assetName.toLowerCase();
+            if (name.includes('equity') || name.includes('stock') || name.includes('share') ||
+                name.includes('mf') || name.includes('mutual fund') || name.includes('nifty') ||
+                name.includes('sensex') || name.includes('midcap') || name.includes('smallcap')) {
+                return 'equity';
+            }
+            if (name.includes('debt') || name.includes('bond') || name.includes('fd') ||
+                name.includes('fixed deposit') || name.includes('ppf') || name.includes('rd') ||
+                name.includes('corporate bond') || name.includes('gilt')) {
+                return 'debt';
+            }
+            if (name.includes('gold') || name.includes('sgb') || name.includes('gold etf') ||
+                name.includes('gold fund') || name.includes('digital gold')) {
+                return 'gold';
+            }
+            return 'others';
+        }
+
+        async function loadState() {
+            try {
+                const snap = await getDoc(DOC_REF);
+                if (snap.exists()) {
+                    appState = snap.data();
+                }
+            } catch (e) {
+                console.error("Error loading from Firestore:", e);
+            }
+        }
+
+        async function saveState() {
+            if (isSaving) return;
+            isSaving = true;
+            try {
+                await setDoc(DOC_REF, appState);
+            } catch (e) {
+                console.error("Error saving to Firestore:", e);
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        function updateNetWorthDisplay() {
+            document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
+            document.getElementById('currentValue').textContent = formatCurrency(getCurrentValue());
+
+            const returnPct = getReturnPercentage();
+            const isPositive = returnPct >= 0;
+            const pill = document.getElementById('returnPill');
+            const pctEl = document.getElementById('returnPercentage');
+
+            pill.className = isPositive ? 'pill-success' : 'pill-danger';
+            pill.innerHTML = `
+                <i class="bi bi-graph-${isPositive ? 'up' : 'down'}-arrow"></i>
+                <span>${isPositive ? '+' : ''}${returnPct.toFixed(2)}%</span>
+            `;
+        }
+
+        function renderPortfolios() {
+            const container = document.getElementById('portfoliosContainer');
+
+            if (appState.portfolios.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="card-glass-static empty-state">
+                            <i class="bi bi-briefcase"></i>
+                            <h4 class="fw-semibold mb-2">No Portfolios Yet</h4>
+                            <p class="text-muted-custom mb-4">Start building your family wealth dashboard by adding your first portfolio.</p>
+                            <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#portfolioModal" onclick="openAddPortfolio()">
+                                Add Your First Portfolio
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = appState.portfolios.map(p => `
+                <div class="col-lg-6">
+                    <div class="card-glass p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h5 class="fw-semibold mb-0">${escapeHtml(p.name)}</h5>
+                            <div class="dropdown">
+                                <button class="btn btn-link text-muted-custom p-1" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark-custom dropdown-menu-end">
+                                    <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="editPortfolio('${p.id}')">
+                                        <i class="bi bi-pencil me-2"></i>Edit
+                                    </a></li>
+                                    <li><a class="dropdown-item dropdown-item-custom text-danger" href="#" onclick="deletePortfolio('${p.id}')">
+                                        <i class="bi bi-trash me-2"></i>Delete
+                                    </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="text-muted-custom small mb-1">Total Invested</p>
+                        <p class="fs-4 fw-bold mb-4">${formatCurrency(p.totalInvested)}</p>
+                        <div class="row align-items-center">
+                            <div class="col-5">
+                                <div class="chart-container">
+                                    <canvas id="chart-${p.id}"></canvas>
+                                </div>
+                            </div>
+                            <div class="col-7">
+                                <p class="text-muted-custom small mb-2">Asset Breakdown</p>
+                                ${p.assets.map((a, i) => `
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="asset-dot" style="background:${CHART_COLORS[i % CHART_COLORS.length]}"></span>
+                                            <span class="small">${escapeHtml(a.name)}</span>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="small fw-medium">${a.percentage}%</span>
+                                            <span class="small text-muted-custom ms-1">(${formatCurrency(a.amount)})</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            setTimeout(() => {
+                appState.portfolios.forEach(p => renderChart(p));
+            }, 50);
+        }
+
+        function renderChart(portfolio) {
+            const canvas = document.getElementById(`chart-${portfolio.id}`);
+            if (!canvas) return;
+
+            if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
+
+            chartInstances[portfolio.id] = new Chart(canvas, {
+                type: 'pie',
+                data: {
+                    labels: portfolio.assets.map(a => a.name),
+                    datasets: [{
+                        data: portfolio.assets.map(a => a.percentage),
+                        backgroundColor: portfolio.assets.map((_,i) => CHART_COLORS[i % CHART_COLORS.length]),
+                        borderColor: '#161b22',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#21262d',
+                            titleColor: '#f0f6fc',
+                            bodyColor: '#8b949e',
+                            borderColor: '#30363d',
+                            borderWidth: 1,
+                            padding: 12,
+                            cornerRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+
+        function openAddPortfolio() {
+            document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
+            document.getElementById('editingPortfolioId').value = '';
+            document.getElementById('portfolioName').value = '';
+            document.getElementById('portfolioAmount').value = '';
+            document.getElementById('portfolioError').classList.add('d-none');
+
+            document.getElementById('assetsContainer').innerHTML = '';
+            addAssetRow();
+        }
+
+        function editPortfolio(id) {
+            const p = appState.portfolios.find(x => x.id === id);
+            if (!p) return;
+
+            document.getElementById('portfolioModalTitle').textContent = 'Edit Portfolio';
+            document.getElementById('editingPortfolioId').value = id;
+            document.getElementById('portfolioName').value = p.name;
+            document.getElementById('portfolioAmount').value = p.totalInvested;
+            document.getElementById('portfolioError').classList.add('d-none');
+
+            const container = document.getElementById('assetsContainer');
+            container.innerHTML = '';
+            p.assets.forEach(a => addAssetRow(a.name, a.percentage));
+
+            recalculateAssetAmounts();
+            new bootstrap.Modal(document.getElementById('portfolioModal')).show();
+        }
+
+        function addAssetRow(name = '', percentage = '') {
+            const container = document.getElementById('assetsContainer');
+            const id = generateId();
+            const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
+            const amount = (parseFloat(percentage) || 0) / 100 * total;
+
+            const row = document.createElement('div');
+            row.className = 'row g-2 mb-2 asset-row';
+            row.id = `asset-${id}`;
+            row.innerHTML = `
+                <div class="col">
+                    <input type="text" class="form-control form-control-dark form-control-sm asset-name" placeholder="Asset name (e.g., Equity, Debt)" value="${escapeHtml(name)}">
+                </div>
+                <div class="col-3">
+                    <input type="number" class="form-control form-control-dark form-control-sm asset-percentage text-center" placeholder="0%" min="0" max="100" value="${percentage}" oninput="updateAllocationTotal()">
+                </div>
+                <div class="col-3">
+                    <input type="text" class="form-control form-control-dark form-control-sm asset-amount text-end" value="${amount > 0 ? formatCurrency(amount) : ''}" disabled>
+                </div>
+                <div class="col-auto">
+                    <button type="button" class="btn btn-link text-muted-custom p-2" onclick="removeAssetRow('${id}')">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(row);
+            updateAllocationTotal();
+        }
+
+        function removeAssetRow(id) {
+            const rows = document.querySelectorAll('.asset-row');
+            if (rows.length > 1) {
+                document.getElementById(`asset-${id}`).remove();
+                updateAllocationTotal();
+            }
+        }
+
+        function updateAllocationTotal() {
+            let total = 0;
+            document.querySelectorAll('.asset-percentage').forEach(el => {
+                total += parseFloat(el.value) || 0;
+            });
+            const el = document.getElementById('allocationTotal');
+            const valid = Math.abs(total - 100) <= 0.01;
+            el.textContent = `Total: ${total.toFixed(1)}%`;
+            el.className = `small fw-medium ${valid ? 'text-success-custom' : 'text-warning'}`;
+            recalculateAssetAmounts();
+        }
+
+        function recalculateAssetAmounts() {
+            const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
+            document.querySelectorAll('.asset-row').forEach(row => {
+                const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
+                const amt = pct / 100 * total;
+                row.querySelector('.asset-amount').value = amt > 0 ? formatCurrency(amt) : '';
+            });
+        }
+
+        async function savePortfolio() {
+            const err = document.getElementById('portfolioError');
+            err.classList.add('d-none');
+
+            const id = document.getElementById('editingPortfolioId').value;
+            const name = document.getElementById('portfolioName').value.trim();
+            const totalInvested = parseFloat(document.getElementById('portfolioAmount').value);
+
+            if (!name) { err.textContent = 'Portfolio name is required'; err.classList.remove('d-none'); return; }
+            if (!totalInvested || totalInvested <= 0) { err.textContent = 'Total invested must be > 0'; err.classList.remove('d-none'); return; }
+
+            const assets = [];
+            document.querySelectorAll('.asset-row').forEach(row => {
+                const n = row.querySelector('.asset-name').value.trim();
+                const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
+                if (n && pct > 0) {
+                    assets.push({
+                        id: generateId(),
+                        name: n,
+                        percentage: pct,
+                        amount: pct / 100 * totalInvested
+                    });
+                }
+            });
+
+            if (assets.length === 0) { err.textContent = 'At least one asset required'; err.classList.remove('d-none'); return; }
+
+            const sumPct = assets.reduce((s,a)=>s+a.percentage,0);
+            if (Math.abs(sumPct - 100) > 0.01) {
+                err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`;
+                err.classList.remove('d-none');
+                return;
+            }
+
+            const portfolio = { id: id || generateId(), name, totalInvested, assets };
+
+            if (id) {
+                const idx = appState.portfolios.findIndex(p => p.id === id);
+                if (idx !== -1) appState.portfolios[idx] = portfolio;
+            } else {
+                appState.portfolios.push(portfolio);
+            }
+
+            await saveState();
+            renderPortfolios();
+            updateNetWorthDisplay();
+            updateProjections();
+            bootstrap.Modal.getInstance(document.getElementById('portfolioModal')).hide();
+        }
+
+        async function deletePortfolio(id) {
+            if (!confirm('Delete this portfolio?')) return;
+            appState.portfolios = appState.portfolios.filter(p => p.id !== id);
+            if (chartInstances[id]) {
+                chartInstances[id].destroy();
+                delete chartInstances[id];
+            }
+            await saveState();
+            renderPortfolios();
+            updateNetWorthDisplay();
+            updateProjections();
+        }
+
+        function previewReturns() {
+            const ret = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
+            const inv = getTotalInvested();
+            const val = inv + ret;
+            const pct = inv > 0 ? (ret / inv) * 100 : 0;
+            const pos = ret >= 0;
+
+            document.getElementById('previewInvested').textContent = formatCurrency(inv);
+            document.getElementById('previewReturns').textContent = `${pos ? '+' : ''}${formatCurrency(ret)}`;
+            document.getElementById('previewReturns').className = pos ? 'text-success-custom' : 'text-danger';
+            document.getElementById('previewValue').textContent = formatCurrency(val);
+
+            const pctEl = document.getElementById('previewReturnPct');
+            pctEl.className = pos ? 'pill-success' : 'pill-danger';
+            pctEl.textContent = `${pos ? '+' : ''}${pct.toFixed(2)}%`;
+        }
+
+        async function saveReturns() {
+            appState.totalReturns = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
+            await saveState();
+            updateNetWorthDisplay();
+            updateProjections();
+            bootstrap.Modal.getInstance(document.getElementById('returnsModal')).hide();
+        }
+
+        document.getElementById('returnsModal').addEventListener('show.bs.modal', () => {
+            document.getElementById('totalReturnsInput').value = appState.totalReturns;
+            previewReturns();
+        });
+
+        function updateProjections() {
+            const container = document.getElementById('projectionsContainer');
+
+            if (appState.portfolios.length === 0) {
+                container.innerHTML = `
+                    <div class="card-glass-static empty-state">
+                        <i class="bi bi-graph-up-arrow"></i>
+                        <h4 class="fw-semibold mb-2">No Portfolios Yet</h4>
+                        <p class="text-muted-custom">Add portfolios in Overview to see projections.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const rates = {
+                equity: parseFloat(document.getElementById('cagrEquity').value) || 13,
+                debt:   parseFloat(document.getElementById('cagrDebt').value)   || 7.5,
+                gold:   parseFloat(document.getElementById('cagrGold').value)   || 9,
+                others: parseFloat(document.getElementById('cagrOthers').value) || 2
+            };
+
+            let grand = { current: 0, y5: 0, y10: 0, y15: 0 };
+
+            const html = appState.portfolios.map(p => {
+                const totalInvAll = getTotalInvested();
+                const share = totalInvAll > 0 ? p.totalInvested / totalInvAll : 0;
+                const portReturns = appState.totalReturns * share;
+                const portCurrent = p.totalInvested + portReturns;
+
+                const assetProj = p.assets.map(a => {
+                    const cat = getAssetCategory(a.name);
+                    const r = rates[cat];
+                    return {
+                        ...a,
+                        category: cat,
+                        rate: r,
+                        y5: calculateFutureValue(a.amount, r, 5),
+                        y10: calculateFutureValue(a.amount, r, 10),
+                        y15: calculateFutureValue(a.amount, r, 15)
+                    };
+                });
+
+                const wCagr = assetProj.reduce((s,a) => {
+                    return s + (a.rate * (a.amount / p.totalInvested));
+                }, 0) || 0;
+
+                const pY5  = calculateFutureValue(portCurrent, wCagr, 5);
+                const pY10 = calculateFutureValue(portCurrent, wCagr, 10);
+                const pY15 = calculateFutureValue(portCurrent, wCagr, 15);
+
+                grand.current += portCurrent;
+                grand.y5      += pY5;
+                grand.y10     += pY10;
+                grand.y15     += pY15;
+
+                const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5,0);
+                const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10,0);
+                const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15,0);
+
+                return `
+                    <div class="card-glass-static p-4 mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="fw-semibold mb-0">${escapeHtml(p.name)}</h5>
+                            <span class="text-muted-custom small">
+                                Weighted CAGR: <span class="text-accent fw-medium">${wCagr.toFixed(1)}%</span>
+                            </span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-dark-custom mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Asset</th>
+                                        <th class="text-end">Category</th>
+                                        <th class="text-end">CAGR</th>
+                                        <th class="text-end">Invested</th>
+                                        <th class="text-end">5 Yr</th>
+                                        <th class="text-end">10 Yr</th>
+                                        <th class="text-end">15 Yr</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${assetProj.map(a => `
+                                        <tr>
+                                            <td>${escapeHtml(a.name)}</td>
+                                            <td class="text-end text-muted-custom">${a.category}</td>
+                                            <td class="text-end text-accent">${a.rate}%</td>
+                                            <td class="text-end text-muted-custom">${formatCurrency(a.amount)}</td>
+                                            <td class="text-end">${formatCurrency(a.y5)}</td>
+                                            <td class="text-end">${formatCurrency(a.y10)}</td>
+                                            <td class="text-end">${formatCurrency(a.y15)}</td>
+                                        </tr>
+                                    `).join('')}
+                                    <tr class="bg-dark">
+                                        <td colspan="3" class="fw-semibold">Asset-level totals (from invested)</td>
+                                        <td class="text-end fw-semibold">${formatCurrency(p.totalInvested)}</td>
+                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(assetSumY5)}</td>
+                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(assetSumY10)}</td>
+                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(assetSumY15)}</td>
+                                    </tr>
+                                    <tr class="bg-accent-subtle">
+                                        <td colspan="3" class="fw-semibold">Portfolio projection (from current value)</td>
+                                        <td class="text-end fw-semibold">${formatCurrency(portCurrent)}</td>
+                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(pY5)}</td>
+                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(pY10)}</td>
+                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(pY15)}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <small class="text-muted-custom d-block mt-3">
+                            • Future values compound today's current value (${formatCurrency(portCurrent)}) at ${wCagr.toFixed(1)}% weighted CAGR<br>
+                            • Past returns already included in current value
+                        </small>
+                    </div>
+                `;
+            }).join('');
+
+            const grandHtml = `
+                <div class="card-glass-static p-4 mb-4">
+                    <h5 class="fw-semibold mb-3">Total Family Wealth Projection (Compounded from Today)</h5>
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Metric</th>
+                                    <th class="text-end">Current Value</th>
+                                    <th class="text-end">5 Years</th>
+                                    <th class="text-end">10 Years</th>
+                                    <th class="text-end">15 Years</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="bg-accent-subtle">
+                                    <td class="fw-semibold">All Portfolios</td>
+                                    <td class="text-end fw-medium">${formatCurrency(grand.current)}</td>
+                                    <td class="text-end fw-medium text-success-custom">${formatCurrency(grand.y5)}</td>
+                                    <td class="text-end fw-medium text-success-custom">${formatCurrency(grand.y10)}</td>
+                                    <td class="text-end fw-medium text-success-custom">${formatCurrency(grand.y15)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="text-muted-custom d-block mt-3">
+                        • Starting from current net worth: ${formatCurrency(getCurrentValue())}<br>
+                        • Each portfolio compounds at its own weighted expected CAGR
+                    </small>
+                </div>
+            `;
+
+            container.innerHTML = grandHtml + html;
+        }
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadState();
+            updateNetWorthDisplay();
+            renderPortfolios();
+            updateProjections();
+
+            document.getElementById('projections-tab').addEventListener('shown.bs.tab', updateProjections);
+        });
+
+        // Expose functions to window (for onclick attributes)
+        window.openAddPortfolio = openAddPortfolio;
+        window.editPortfolio = editPortfolio;
+        window.deletePortfolio = deletePortfolio;
+        window.addAssetRow = addAssetRow;
+        window.removeAssetRow = removeAssetRow;
+        window.updateAllocationTotal = updateAllocationTotal;
+        window.savePortfolio = savePortfolio;
+        window.saveReturns = saveReturns;
+    </script>
+</body>
+</html>
