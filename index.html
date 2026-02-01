@@ -29,7 +29,7 @@
             background: var(--bg-gradient);
             min-height: 100vh;
             color: var(--text-primary);
-            touch-action: pan-y; /* improves swipe feel */
+            touch-action: pan-y;
         }
         .navbar-custom {
             background: rgba(22,27,34,0.8);
@@ -186,8 +186,6 @@
             .stat-value { font-size:1.75rem; }
             .chart-container { width:120px; height:120px; margin:0 auto; }
         }
-
-        /* Prevent text selection during swipe */
         .no-select {
             user-select: none;
             -webkit-user-select: none;
@@ -196,8 +194,6 @@
     </style>
 </head>
 <body>
-
-    <!-- Navbar -->
     <nav class="navbar navbar-custom sticky-top">
         <div class="container">
             <div class="d-flex align-items-center gap-3">
@@ -206,12 +202,12 @@
                 </div>
                 <div>
                     <h1 class="h5 mb-0 fw-bold">Portfolio Pro</h1>
-                    <small class="text-muted-custom">Family Wealth Overview</small>
+                    <small class="text-muted-custom">Family Wealth Dashboard</small>
                 </div>
             </div>
             <ul class="nav nav-tabs-custom" id="mainTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button>
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Dashboard</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="projections-tab" data-bs-toggle="tab" data-bs-target="#projections" type="button">Projections</button>
@@ -220,12 +216,9 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
     <main class="container py-4 no-select" id="swipeArea">
         <div class="tab-content" id="mainTabContent">
-            <!-- Overview Tab -->
             <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                <!-- Net Worth Card -->
                 <div class="card-glass-static p-4 p-md-5 mb-4">
                     <div class="row align-items-center">
                         <div class="col-lg-7">
@@ -256,13 +249,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- Portfolios Grid -->
                 <div id="portfoliosContainer" class="row g-4"></div>
             </div>
 
-            <!-- Projections Tab -->
             <div class="tab-pane fade" id="projections" role="tabpanel">
-                <!-- CAGR Settings -->
                 <div class="card-glass-static p-4 mb-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
                         <i class="bi bi-gear text-accent"></i>
@@ -271,32 +261,30 @@
                     <div class="row g-3">
                         <div class="col-md-3">
                             <label class="form-label text-muted-custom small">Equity (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrEquity" value="13" step="0.5" onchange="updateProjections()">
+                            <input type="number" class="form-control form-control-dark" id="cagrEquity" step="0.5" min="0" max="30">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label text-muted-custom small">Debt (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrDebt" value="7.5" step="0.5" onchange="updateProjections()">
+                            <input type="number" class="form-control form-control-dark" id="cagrDebt" step="0.5" min="0" max="15">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label text-muted-custom small">Gold (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrGold" value="9" step="0.5" onchange="updateProjections()">
+                            <input type="number" class="form-control form-control-dark" id="cagrGold" step="0.5" min="0" max="20">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label text-muted-custom small">Others (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrOthers" value="2" step="0.5" onchange="updateProjections()">
+                            <input type="number" class="form-control form-control-dark" id="cagrOthers" step="0.5" min="-5" max="15">
                         </div>
                     </div>
                     <p class="text-muted-custom small mt-3 mb-0">
                         * Categories detected from asset names. Use keywords like: Equity, Debt, Gold, etc.
                     </p>
                 </div>
-                <!-- Projections Tables -->
                 <div id="projectionsContainer"></div>
             </div>
         </div>
     </main>
 
-    <!-- Modals remain unchanged -->
     <!-- Add/Edit Portfolio Modal -->
     <div class="modal fade" id="portfolioModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -416,19 +404,22 @@
 
         let appState = {
             portfolios: [],
-            totalReturns: 0
+            totalReturns: 0,
+            cagrAssumptions: {
+                equity: 13,
+                debt: 7.5,
+                gold: 9,
+                others: 2
+            }
         };
 
         let chartInstances = {};
         let isSaving = false;
 
-        // ────────────────────────────────────────────────
         // Swipe support
-        // ────────────────────────────────────────────────
         let touchStartX = 0;
         let touchEndX = 0;
-        const swipeThreshold = 60; // pixels
-
+        const swipeThreshold = 60;
         const swipeArea = document.getElementById('swipeArea');
 
         swipeArea.addEventListener('touchstart', e => {
@@ -442,24 +433,16 @@
 
         function handleSwipe() {
             const diff = touchStartX - touchEndX;
-            const tab = bootstrap.Tab.getInstance(document.querySelector('.nav-tabs-custom .nav-link.active')) 
-                      || new bootstrap.Tab(document.getElementById('overview-tab'));
-
             if (Math.abs(diff) < swipeThreshold) return;
-
             if (diff > 0) {
-                // swipe left → next tab (Projections)
-                const nextTab = document.getElementById('projections-tab');
-                if (nextTab) bootstrap.Tab.getOrCreateInstance(nextTab).show();
+                bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
             } else {
-                // swipe right → previous tab (Overview)
-                const prevTab = document.getElementById('overview-tab');
-                if (prevTab) bootstrap.Tab.getOrCreateInstance(prevTab).show();
+                bootstrap.Tab.getOrCreateInstance(document.getElementById('overview-tab')).show();
             }
         }
 
         // ────────────────────────────────────────────────
-        // Rest of your original JavaScript (unchanged)
+        // Helpers
         // ────────────────────────────────────────────────
 
         function formatCurrency(amount) {
@@ -501,26 +484,35 @@
             const name = assetName.toLowerCase();
             if (name.includes('equity') || name.includes('stock') || name.includes('share') ||
                 name.includes('mf') || name.includes('mutual fund') || name.includes('nifty') ||
-                name.includes('sensex') || name.includes('midcap') || name.includes('smallcap')) {
-                return 'equity';
-            }
+                name.includes('sensex') || name.includes('midcap') || name.includes('smallcap')) return 'equity';
             if (name.includes('debt') || name.includes('bond') || name.includes('fd') ||
                 name.includes('fixed deposit') || name.includes('ppf') || name.includes('rd') ||
-                name.includes('corporate bond') || name.includes('gilt')) {
-                return 'debt';
-            }
+                name.includes('corporate bond') || name.includes('gilt')) return 'debt';
             if (name.includes('gold') || name.includes('sgb') || name.includes('gold etf') ||
-                name.includes('gold fund') || name.includes('digital gold')) {
-                return 'gold';
-            }
+                name.includes('gold fund') || name.includes('digital gold')) return 'gold';
             return 'others';
         }
+
+        function getCagrAssumptions() {
+            return appState.cagrAssumptions || {
+                equity: 13, debt: 7.5, gold: 9, others: 2
+            };
+        }
+
+        // ────────────────────────────────────────────────
+        // Firestore
+        // ────────────────────────────────────────────────
 
         async function loadState() {
             try {
                 const snap = await getDoc(DOC_REF);
                 if (snap.exists()) {
-                    appState = snap.data();
+                    const data = snap.data();
+                    appState.portfolios = data.portfolios || [];
+                    appState.totalReturns = data.totalReturns || 0;
+                    appState.cagrAssumptions = data.cagrAssumptions || {
+                        equity: 13, debt: 7.5, gold: 9, others: 2
+                    };
                 }
             } catch (e) {
                 console.error("Error loading from Firestore:", e);
@@ -539,6 +531,24 @@
             }
         }
 
+        async function saveCagrAssumptions() {
+            if (isSaving) return;
+            isSaving = true;
+            try {
+                await setDoc(DOC_REF, {
+                    cagrAssumptions: appState.cagrAssumptions
+                }, { merge: true });
+            } catch (e) {
+                console.error("Error saving CAGR:", e);
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        // ────────────────────────────────────────────────
+        // UI Updates
+        // ────────────────────────────────────────────────
+
         function updateNetWorthDisplay() {
             document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
             document.getElementById('currentValue').textContent = formatCurrency(getCurrentValue());
@@ -547,9 +557,7 @@
             const pill = document.getElementById('returnPill');
             const pctEl = document.getElementById('returnPercentage');
             pill.className = isPositive ? 'pill-success' : 'pill-danger';
-            pill.innerHTML = `
-                <span>${isPositive ? '+' : ''}${returnPct.toFixed(2)}%</span>
-            `;
+            pctEl.textContent = `${isPositive ? '+' : ''}${returnPct.toFixed(2)}%`;
         }
 
         function renderPortfolios() {
@@ -569,6 +577,7 @@
                 `;
                 return;
             }
+
             container.innerHTML = appState.portfolios.map(p => `
                 <div class="col-lg-6">
                     <div class="card-glass p-4">
@@ -615,6 +624,7 @@
                     </div>
                 </div>
             `).join('');
+
             setTimeout(() => {
                 appState.portfolios.forEach(p => renderChart(p));
             }, 50);
@@ -624,6 +634,7 @@
             const canvas = document.getElementById(`chart-${portfolio.id}`);
             if (!canvas) return;
             if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
+
             chartInstances[portfolio.id] = new Chart(canvas, {
                 type: 'pie',
                 data: {
@@ -653,6 +664,10 @@
                 }
             });
         }
+
+        // ────────────────────────────────────────────────
+        // Portfolio CRUD
+        // ────────────────────────────────────────────────
 
         function openAddPortfolio() {
             document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
@@ -684,6 +699,7 @@
             const id = generateId();
             const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
             const amount = (parseFloat(percentage) || 0) / 100 * total;
+
             const row = document.createElement('div');
             row.className = 'row g-2 mb-2 asset-row';
             row.id = `asset-${id}`;
@@ -739,11 +755,14 @@
         async function savePortfolio() {
             const err = document.getElementById('portfolioError');
             err.classList.add('d-none');
+
             const id = document.getElementById('editingPortfolioId').value;
             const name = document.getElementById('portfolioName').value.trim();
             const totalInvested = parseFloat(document.getElementById('portfolioAmount').value);
+
             if (!name) { err.textContent = 'Portfolio name is required'; err.classList.remove('d-none'); return; }
             if (!totalInvested || totalInvested <= 0) { err.textContent = 'Total invested must be > 0'; err.classList.remove('d-none'); return; }
+
             const assets = [];
             document.querySelectorAll('.asset-row').forEach(row => {
                 const n = row.querySelector('.asset-name').value.trim();
@@ -757,6 +776,7 @@
                     });
                 }
             });
+
             if (assets.length === 0) { err.textContent = 'At least one asset required'; err.classList.remove('d-none'); return; }
             const sumPct = assets.reduce((s,a)=>s+a.percentage,0);
             if (Math.abs(sumPct - 100) > 0.01) {
@@ -764,13 +784,16 @@
                 err.classList.remove('d-none');
                 return;
             }
+
             const portfolio = { id: id || generateId(), name, totalInvested, assets };
+
             if (id) {
                 const idx = appState.portfolios.findIndex(p => p.id === id);
                 if (idx !== -1) appState.portfolios[idx] = portfolio;
             } else {
                 appState.portfolios.push(portfolio);
             }
+
             await saveState();
             renderPortfolios();
             updateNetWorthDisplay();
@@ -791,16 +814,22 @@
             updateProjections();
         }
 
+        // ────────────────────────────────────────────────
+        // Returns Modal
+        // ────────────────────────────────────────────────
+
         function previewReturns() {
             const ret = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
             const inv = getTotalInvested();
             const val = inv + ret;
             const pct = inv > 0 ? (ret / inv) * 100 : 0;
             const pos = ret >= 0;
+
             document.getElementById('previewInvested').textContent = formatCurrency(inv);
             document.getElementById('previewReturns').textContent = `${pos ? '+' : ''}${formatCurrency(ret)}`;
             document.getElementById('previewReturns').className = pos ? 'text-success-custom' : 'text-danger';
             document.getElementById('previewValue').textContent = formatCurrency(val);
+
             const pctEl = document.getElementById('previewReturnPct');
             pctEl.className = pos ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${pos ? '+' : ''}${pct.toFixed(2)}%`;
@@ -819,6 +848,21 @@
             previewReturns();
         });
 
+        // ────────────────────────────────────────────────
+        // Projections + CAGR saving + Family Weighted CAGR
+        // ────────────────────────────────────────────────
+
+        async function updateAndSaveCagr() {
+            appState.cagrAssumptions = {
+                equity: parseFloat(document.getElementById('cagrEquity').value) || 13,
+                debt:   parseFloat(document.getElementById('cagrDebt').value)   || 7.5,
+                gold:   parseFloat(document.getElementById('cagrGold').value)   || 9,
+                others: parseFloat(document.getElementById('cagrOthers').value) || 2
+            };
+            updateProjections();
+            await saveCagrAssumptions();
+        }
+
         function updateProjections() {
             const container = document.getElementById('projectionsContainer');
             if (appState.portfolios.length === 0) {
@@ -831,18 +875,17 @@
                 `;
                 return;
             }
-            const rates = {
-                equity: parseFloat(document.getElementById('cagrEquity').value) || 13,
-                debt: parseFloat(document.getElementById('cagrDebt').value) || 7.5,
-                gold: parseFloat(document.getElementById('cagrGold').value) || 9,
-                others: parseFloat(document.getElementById('cagrOthers').value) || 2
-            };
-            let grand = { current: 0, y5: 0, y10: 0, y15: 0 };
-            const html = appState.portfolios.map(p => {
+
+            const rates = getCagrAssumptions();
+
+            let grand = { current: 0, y5: 0, y10: 0, y15: 0, wCagr: 0 };
+
+            const portfolioProjections = appState.portfolios.map(p => {
                 const totalInvAll = getTotalInvested();
                 const share = totalInvAll > 0 ? p.totalInvested / totalInvAll : 0;
                 const portReturns = appState.totalReturns * share;
                 const portCurrent = p.totalInvested + portReturns;
+
                 const assetProj = p.assets.map(a => {
                     const cat = getAssetCategory(a.name);
                     const r = rates[cat];
@@ -855,76 +898,47 @@
                         y15: calculateFutureValue(a.amount, r, 15)
                     };
                 });
-                const wCagr = assetProj.reduce((s,a) => {
+
+                const portWCagr = assetProj.reduce((s,a) => {
                     return s + (a.rate * (a.amount / p.totalInvested));
                 }, 0) || 0;
-                const pY5 = calculateFutureValue(portCurrent, wCagr, 5);
-                const pY10 = calculateFutureValue(portCurrent, wCagr, 10);
-                const pY15 = calculateFutureValue(portCurrent, wCagr, 15);
+
+                const pY5  = calculateFutureValue(portCurrent, portWCagr, 5);
+                const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
+                const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
+
                 grand.current += portCurrent;
-                grand.y5 += pY5;
+                grand.y5  += pY5;
                 grand.y10 += pY10;
                 grand.y15 += pY15;
-                const assetSumY5 = assetProj.reduce((s,a)=>s+a.y5,0);
+
+                // Accumulate for family weighted CAGR
+                grand.wCagr += portWCagr * (portCurrent / (grand.current || 1)); // avoid div by zero
+
+                const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5, 0);
                 const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10,0);
                 const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15,0);
-                return `
-                    <div class="card-glass-static p-4 mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-semibold mb-0">${escapeHtml(p.name)}</h5>
-                            <span class="text-muted-custom small">
-                                Weighted CAGR: <span class="text-accent fw-medium">${wCagr.toFixed(1)}%</span>
-                            </span>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-dark-custom mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Asset</th>
-                                        <th class="text-end">Category</th>
-                                        <th class="text-end">CAGR</th>
-                                        <th class="text-end">Invested</th>
-                                        <th class="text-end">5 Yr</th>
-                                        <th class="text-end">10 Yr</th>
-                                        <th class="text-end">15 Yr</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${assetProj.map(a => `
-                                        <tr>
-                                            <td>${escapeHtml(a.name)}</td>
-                                            <td class="text-end text-muted-custom">${a.category}</td>
-                                            <td class="text-end text-accent">${a.rate}%</td>
-                                            <td class="text-end text-muted-custom">${formatCurrency(a.amount)}</td>
-                                            <td class="text-end">${formatCurrency(a.y5)}</td>
-                                            <td class="text-end">${formatCurrency(a.y10)}</td>
-                                            <td class="text-end">${formatCurrency(a.y15)}</td>
-                                        </tr>
-                                    `).join('')}
-                                    <tr class="bg-dark">
-                                        <td colspan="3" class="fw-semibold">Asset-level totals (from invested)</td>
-                                        <td class="text-end fw-semibold">${formatCurrency(p.totalInvested)}</td>
-                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(assetSumY5)}</td>
-                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(assetSumY10)}</td>
-                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(assetSumY15)}</td>
-                                    </tr>
-                                    <tr class="bg-accent-subtle">
-                                        <td colspan="3" class="fw-semibold">Portfolio projection (from current value)</td>
-                                        <td class="text-end fw-semibold">${formatCurrency(portCurrent)}</td>
-                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(pY5)}</td>
-                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(pY10)}</td>
-                                        <td class="text-end fw-semibold text-success-custom">${formatCurrency(pY15)}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <small class="text-muted-custom d-block mt-3">
-                            • Future values compound today's current value (${formatCurrency(portCurrent)}) at ${wCagr.toFixed(1)}% weighted CAGR<br>
-                            • Past returns already included in current value
-                        </small>
-                    </div>
-                `;
-            }).join('');
+
+                return {
+                    name: p.name,
+                    portCurrent,
+                    portWCagr,
+                    pY5, pY10, pY15,
+                    assetProj,
+                    assetSumY5, assetSumY10, assetSumY15,
+                    totalInvested: p.totalInvested
+                };
+            });
+
+            // Re-weight family CAGR correctly now that we have total current
+            if (grand.current > 0) {
+                grand.wCagr = 0;
+                portfolioProjections.forEach(proj => {
+                    const weight = proj.portCurrent / grand.current;
+                    grand.wCagr += proj.portWCagr * weight;
+                });
+            }
+
             const grandHtml = `
                 <div class="card-glass-static p-4 mb-4">
                     <h5 class="fw-semibold mb-3">Total Family Wealth Projection (Compounded from Today)</h5>
@@ -950,25 +964,114 @@
                             </tbody>
                         </table>
                     </div>
-                    <small class="text-muted-custom d-block mt-3">
+
+                    <div class="mt-4 pt-3 border-top border-secondary">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-semibold">Family Weighted Expected CAGR</span>
+                            <span class="fs-5 fw-bold text-accent">
+                                ${grand.current > 0 ? grand.wCagr.toFixed(1) : '—'}%
+                            </span>
+                        </div>
+                        <small class="text-muted-custom d-block mt-1">
+                            Weighted average of each portfolio's expected CAGR (by current value allocation)
+                        </small>
+                    </div>
+
+                    <small class="text-muted-custom d-block mt-4">
                         • Starting from current net worth: ${formatCurrency(getCurrentValue())}<br>
                         • Each portfolio compounds at its own weighted expected CAGR
                     </small>
                 </div>
             `;
+
+            const html = portfolioProjections.map(proj => `
+                <div class="card-glass-static p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="fw-semibold mb-0">${escapeHtml(proj.name)}</h5>
+                        <span class="text-muted-custom small">
+                            Weighted CAGR: <span class="text-accent fw-medium">${proj.portWCagr.toFixed(1)}%</span>
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-dark-custom mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Asset</th>
+                                    <th class="text-end">Category</th>
+                                    <th class="text-end">CAGR</th>
+                                    <th class="text-end">Invested</th>
+                                    <th class="text-end">5 Yr</th>
+                                    <th class="text-end">10 Yr</th>
+                                    <th class="text-end">15 Yr</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${proj.assetProj.map(a => `
+                                    <tr>
+                                        <td>${escapeHtml(a.name)}</td>
+                                        <td class="text-end text-muted-custom">${a.category}</td>
+                                        <td class="text-end text-accent">${a.rate}%</td>
+                                        <td class="text-end text-muted-custom">${formatCurrency(a.amount)}</td>
+                                        <td class="text-end">${formatCurrency(a.y5)}</td>
+                                        <td class="text-end">${formatCurrency(a.y10)}</td>
+                                        <td class="text-end">${formatCurrency(a.y15)}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr class="bg-dark">
+                                    <td colspan="3" class="fw-semibold">Asset-level totals (from invested)</td>
+                                    <td class="text-end fw-semibold">${formatCurrency(proj.totalInvested)}</td>
+                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.assetSumY5)}</td>
+                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.assetSumY10)}</td>
+                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.assetSumY15)}</td>
+                                </tr>
+                                <tr class="bg-accent-subtle">
+                                    <td colspan="3" class="fw-semibold">Portfolio projection (from current value)</td>
+                                    <td class="text-end fw-semibold">${formatCurrency(proj.portCurrent)}</td>
+                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.pY5)}</td>
+                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.pY10)}</td>
+                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.pY15)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <small class="text-muted-custom d-block mt-3">
+                        • Future values compound today's current value (${formatCurrency(proj.portCurrent)}) at ${proj.portWCagr.toFixed(1)}% weighted CAGR<br>
+                        • Past returns already included in current value
+                    </small>
+                </div>
+            `).join('');
+
             container.innerHTML = grandHtml + html;
         }
 
-        // INIT
+        // ────────────────────────────────────────────────
+        // Initialization
+        // ────────────────────────────────────────────────
+
         document.addEventListener('DOMContentLoaded', async () => {
             await loadState();
+
+            document.getElementById('cagrEquity').value = appState.cagrAssumptions.equity;
+            document.getElementById('cagrDebt').value   = appState.cagrAssumptions.debt;
+            document.getElementById('cagrGold').value   = appState.cagrAssumptions.gold;
+            document.getElementById('cagrOthers').value = appState.cagrAssumptions.others;
+
+            const cagrInputs = ['cagrEquity', 'cagrDebt', 'cagrGold', 'cagrOthers'];
+            cagrInputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener('input', updateAndSaveCagr);
+                }
+            });
+
             updateNetWorthDisplay();
             renderPortfolios();
             updateProjections();
+
             document.getElementById('projections-tab').addEventListener('shown.bs.tab', updateProjections);
         });
 
-        // Expose functions to window
+        // Expose to window
         window.openAddPortfolio = openAddPortfolio;
         window.editPortfolio = editPortfolio;
         window.deletePortfolio = deletePortfolio;
