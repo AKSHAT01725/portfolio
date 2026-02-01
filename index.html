@@ -393,7 +393,6 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
-
         enableIndexedDbPersistence(db).catch((err) => {
             console.warn("IndexedDB persistence issue:", err);
         });
@@ -401,10 +400,28 @@
         const DOC_REF = doc(db, "shared", "family-portfolio-data");
         const PASSWORD_REF = ref(rtdb, "appPassword");
 
-        const CHART_COLORS = [
-            '#2dd4bf', '#22c55e', '#f59e0b', '#d97706',
-            '#a855f7', '#ef4444', '#3b82f6', '#ec4899'
+        // ──── COLOR DEFINITIONS ───────────────────────────────────────────────
+        const CATEGORY_COLORS = {
+            equity:  '#ef4444',   // red-500
+            debt:    '#22c55e',   // green-500
+            gold:    '#eab308',   // amber-500 / gold tone
+            // others will use rotating palette below
+        };
+
+        const OTHERS_COLORS = [
+            '#6b7280',    // gray-500
+            '#9ca3af',    // gray-400
+            '#64748b',    // slate-600
+            '#475569',    // slate-700
+            '#334155'     // slate-800
         ];
+
+        function getAssetColor(category, indexForOthers = 0) {
+            if (category in CATEGORY_COLORS) {
+                return CATEGORY_COLORS[category];
+            }
+            return OTHERS_COLORS[indexForOthers % OTHERS_COLORS.length];
+        }
 
         let appState = {
             portfolios: [],
@@ -429,14 +446,12 @@
         let touchEndY = 0;
         const swipeThreshold = 70;
         const swipeArea = document.getElementById('swipeArea');
-
         swipeArea.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
             const scrollable = e.target.closest('.table-responsive');
             swipeArea.dataset.touchStartedInScrollable = scrollable ? 'true' : 'false';
         }, { passive: true });
-
         swipeArea.addEventListener('touchend', e => {
             touchEndX = e.changedTouches[0].screenX;
             touchEndY = e.changedTouches[0].screenY;
@@ -449,7 +464,6 @@
             if (diffY > 50) return;
             if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) return;
             if (Math.abs(diffX) < swipeThreshold) return;
-
             if (diffX > 0) {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
             } else {
@@ -473,6 +487,10 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function sortAssetsByPercentage(assets) {
+            return [...assets].sort((a, b) => b.percentage - a.percentage);
         }
 
         function getTotalInvested() {
@@ -512,7 +530,10 @@
                 const snap = await getDoc(DOC_REF);
                 if (snap.exists()) {
                     const data = snap.data();
-                    appState.portfolios = data.portfolios || [];
+                    appState.portfolios = (data.portfolios || []).map(p => ({
+                        ...p,
+                        assets: sortAssetsByPercentage(p.assets) // Ensure loaded assets are sorted
+                    }));
                     appState.totalReturns = data.totalReturns || 0;
                     appState.cagrAssumptions = data.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
                 }
@@ -571,7 +592,7 @@
                 <p class="text-muted-custom mb-4" id="pwdMessage">
                     Secure access required
                 </p>
-                <input type="password" class="form-control form-control-dark mb-4 text-center" 
+                <input type="password" class="form-control form-control-dark mb-4 text-center"
                        id="pwdInput" placeholder="••••••••" autocomplete="off" autofocus>
                 <button class="btn btn-accent w-100 py-3 fw-semibold" id="pwdSubmit">Unlock</button>
                 <div id="pwdError" class="alert alert-danger mt-3 d-none small"></div>
@@ -579,7 +600,6 @@
         </div>
     </div>
 </div>`;
-
             document.body.insertAdjacentHTML('beforeend', modalHtml);
 
             const pwdModalEl = document.getElementById('passwordModal');
@@ -587,13 +607,11 @@
             const pwdSubmit = document.getElementById('pwdSubmit');
             const pwdError = document.getElementById('pwdError');
             const pwdMessage = document.getElementById('pwdMessage');
-
             const modal = new bootstrap.Modal(pwdModalEl, { backdrop: 'static', keyboard: false });
             modal.show();
 
             let hasPassword = false;
             let storedHash = null;
-
             try {
                 const snap = await get(PASSWORD_REF);
                 hasPassword = snap.exists() && typeof snap.val() === 'string' && snap.val().length >= 64;
@@ -615,7 +633,6 @@
                 pwdError.classList.add('d-none');
                 pwdSubmit.disabled = true;
                 pwdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Checking...';
-
                 const val = pwdInput.value.trim();
                 if (val.length < 6) {
                     pwdError.textContent = "Password must be at least 6 characters";
@@ -624,7 +641,6 @@
                     pwdSubmit.textContent = 'Unlock';
                     return;
                 }
-
                 let hash;
                 try {
                     hash = await sha256(val);
@@ -635,7 +651,6 @@
                     pwdSubmit.textContent = 'Unlock';
                     return;
                 }
-
                 if (!hasPassword) {
                     try {
                         await set(PASSWORD_REF, hash);
@@ -692,7 +707,6 @@
             updateNetWorthDisplay();
             renderPortfolios();
             updateProjections();
-
             document.getElementById('projections-tab')?.addEventListener('shown.bs.tab', updateProjections);
 
             if ('serviceWorker' in navigator) {
@@ -706,12 +720,10 @@
         function updateNetWorthDisplay() {
             document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
             document.getElementById('currentValue').textContent = formatCurrency(getCurrentValue());
-
             const returnPct = getReturnPercentage();
             const isPositive = returnPct >= 0;
             const pill = document.getElementById('returnPill');
             const pctEl = document.getElementById('returnPercentage');
-
             pill.className = isPositive ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${isPositive ? '+' : ''}${returnPct.toFixed(2)}%`;
         }
@@ -734,7 +746,13 @@
                 return;
             }
 
-            container.innerHTML = appState.portfolios.map(p => `
+            // Sort assets for each portfolio before rendering
+            const sortedPortfolios = appState.portfolios.map(p => ({
+                ...p,
+                assets: sortAssetsByPercentage(p.assets)
+            }));
+
+            container.innerHTML = sortedPortfolios.map(p => `
                 <div class="col-lg-6">
                     <div class="card-glass p-4">
                         <div class="d-flex justify-content-between align-items-start mb-3">
@@ -758,11 +776,11 @@
                                 </div>
                             </div>
                             <div class="col-7">
-                                <p class="text-muted-custom small mb-2">Asset Breakdown</p>
+                                <p class="text-muted-custom small mb-2">Asset Breakdown (Sorted by Allocation)</p>
                                 ${p.assets.map((a, i) => `
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="asset-dot" style="background:${CHART_COLORS[i % CHART_COLORS.length]}"></span>
+                                            <span class="asset-dot" style="background:${getAssetColor(getAssetCategory(a.name), i)}"></span>
                                             <span class="small">${escapeHtml(a.name)}</span>
                                         </div>
                                         <div class="text-end">
@@ -785,13 +803,19 @@
             if (!canvas) return;
             if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
 
+            // Use sorted assets for chart data
+            const sortedAssets = sortAssetsByPercentage(portfolio.assets);
+            const colors = sortedAssets.map((a, idx) => 
+                getAssetColor(getAssetCategory(a.name), idx)
+            );
+
             chartInstances[portfolio.id] = new Chart(canvas, {
                 type: 'pie',
                 data: {
-                    labels: portfolio.assets.map(a => a.name),
+                    labels: sortedAssets.map(a => a.name),
                     datasets: [{
-                        data: portfolio.assets.map(a => a.percentage),
-                        backgroundColor: portfolio.assets.map((_,i) => CHART_COLORS[i % CHART_COLORS.length]),
+                        data: sortedAssets.map(a => a.percentage),
+                        backgroundColor: colors,
                         borderColor: '#161b22',
                         borderWidth: 2
                     }]
@@ -817,13 +841,13 @@
         function editPortfolio(id) {
             const p = appState.portfolios.find(x => x.id === id);
             if (!p) return;
-
             document.getElementById('portfolioModalTitle').textContent = 'Edit Portfolio';
             document.getElementById('editingPortfolioId').value = id;
             document.getElementById('portfolioName').value = p.name;
             document.getElementById('portfolioAmount').value = p.totalInvested;
             document.getElementById('portfolioError').classList.add('d-none');
             document.getElementById('assetsContainer').innerHTML = '';
+            // Load in original order for editing, but will sort on save
             p.assets.forEach(a => addAssetRow(a.name, a.percentage));
             recalculateAssetAmounts();
             new bootstrap.Modal(document.getElementById('portfolioModal')).show();
@@ -896,7 +920,7 @@
             if (!name) { err.textContent = 'Portfolio name is required'; err.classList.remove('d-none'); return; }
             if (!totalInvested || totalInvested <= 0) { err.textContent = 'Total invested must be > 0'; err.classList.remove('d-none'); return; }
 
-            const assets = [];
+            let assets = [];
             document.querySelectorAll('.asset-row').forEach(row => {
                 const n = row.querySelector('.asset-name').value.trim();
                 const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
@@ -911,6 +935,9 @@
             if (Math.abs(sumPct - 100) > 0.01) {
                 err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`; err.classList.remove('d-none'); return;
             }
+
+            // Sort assets by percentage descending before saving
+            assets = sortAssetsByPercentage(assets);
 
             const portfolio = { id: id || generateId(), name, totalInvested, assets };
 
@@ -1004,7 +1031,9 @@
                 const portReturns = appState.totalReturns * share;
                 const portCurrent = p.totalInvested + portReturns;
 
-                const assetProj = p.assets.map(a => {
+                // Sort assets for projections table
+                const sortedAssets = sortAssetsByPercentage(p.assets);
+                const assetProj = sortedAssets.map(a => {
                     const cat = getAssetCategory(a.name);
                     const r = rates[cat];
                     return {
@@ -1018,19 +1047,20 @@
                 });
 
                 const portWCagr = assetProj.reduce((s,a) => s + (a.rate * (a.amount / p.totalInvested)), 0) || 0;
-                const pY5 = calculateFutureValue(portCurrent, portWCagr, 5);
+
+                const pY5  = calculateFutureValue(portCurrent, portWCagr, 5);
                 const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
                 const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
 
                 grand.current += portCurrent;
-                grand.y5 += pY5;
-                grand.y10 += pY10;
-                grand.y15 += pY15;
-                grand.wCagr += portWCagr * (portCurrent / (grand.current || 1));
+                grand.y5     += pY5;
+                grand.y10    += pY10;
+                grand.y15    += pY15;
+                grand.wCagr  += portWCagr * (portCurrent / (grand.current || 1));
 
-                const assetSumY5 = assetProj.reduce((s,a)=>s+a.y5, 0);
-                const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10,0);
-                const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15,0);
+                const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5,  0);
+                const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10, 0);
+                const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15, 0);
 
                 return { name: p.name, portCurrent, portWCagr, pY5, pY10, pY15, assetProj, assetSumY5, assetSumY10, assetSumY15, totalInvested: p.totalInvested };
             });
@@ -1083,7 +1113,7 @@
                         <table class="table table-dark-custom mb-0">
                             <thead><tr><th>Asset</th><th class="text-end">Category</th><th class="text-end">CAGR</th><th class="text-end">Invested</th><th class="text-end">5 Yr</th><th class="text-end">10 Yr</th><th class="text-end">15 Yr</th></tr></thead>
                             <tbody>
-                                ${proj.assetProj.map(a => `
+                                ${proj.assetProj.map((a, i) => `
                                     <tr>
                                         <td>${escapeHtml(a.name)}</td>
                                         <td class="text-end text-muted-custom">${a.category}</td>
@@ -1128,14 +1158,14 @@
             checkOrSetPassword();
         });
 
-        window.openAddPortfolio = openAddPortfolio;
-        window.editPortfolio = editPortfolio;
-        window.deletePortfolio = deletePortfolio;
-        window.addAssetRow = addAssetRow;
-        window.removeAssetRow = removeAssetRow;
+        window.openAddPortfolio  = openAddPortfolio;
+        window.editPortfolio     = editPortfolio;
+        window.deletePortfolio   = deletePortfolio;
+        window.addAssetRow       = addAssetRow;
+        window.removeAssetRow    = removeAssetRow;
         window.updateAllocationTotal = updateAllocationTotal;
-        window.savePortfolio = savePortfolio;
-        window.saveReturns = saveReturns;
+        window.savePortfolio     = savePortfolio;
+        window.saveReturns       = saveReturns;
     </script>
 </body>
 </html>
