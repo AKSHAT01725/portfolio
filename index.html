@@ -6,17 +6,14 @@
     <meta name="theme-color" content="#2dd4bf">
     <meta name="description" content="Family Wealth Dashboard - Portfolio Pro">
     <title>Portfolio Pro – Family Wealth Dashboard</title>
-
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <!-- Apple touch icon support -->
     <link rel="apple-touch-icon" href="icon-192.png">
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0d1117 0%, #090c10 50%, #0a0e14 100%);
@@ -203,7 +200,8 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-custom sticky-top">
+
+    <nav class="navbar navbar-custom sticky-top d-none">
         <div class="container">
             <div class="d-flex align-items-center gap-3">
                 <div class="brand-icon">
@@ -225,7 +223,7 @@
         </div>
     </nav>
 
-    <main class="container py-4 no-select" id="swipeArea">
+    <main class="container py-4 no-select d-none" id="swipeArea">
         <div class="tab-content" id="mainTabContent">
             <div class="tab-pane fade show active" id="overview" role="tabpanel">
                 <div class="card-glass-static p-4 p-md-5 mb-4">
@@ -294,7 +292,7 @@
         </div>
     </main>
 
-    <!-- Modals -->
+    <!-- Portfolio Modal -->
     <div class="modal fade" id="portfolioModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content modal-content-dark">
@@ -334,6 +332,7 @@
         </div>
     </div>
 
+    <!-- Returns Modal -->
     <div class="modal fade" id="returnsModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content modal-content-dark">
@@ -381,6 +380,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
@@ -389,21 +389,20 @@
             storageBucket: "portfolio-f938c.firebasestorage.app",
             messagingSenderId: "963544931671",
             appId: "1:963544931671:web:ff0210cc532428ea227212",
-            measurementId: "G-C41JE44L43"
+            measurementId: "G-C41JE44L43",
+            databaseURL: "https://portfolio-f938c-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const rtdb = getDatabase(app);
 
         enableIndexedDbPersistence(db).catch((err) => {
-            if (err.code === 'failed-precondition') {
-                console.warn("Persistence failed: multiple tabs open");
-            } else if (err.code === 'unimplemented') {
-                console.warn("Browser does not support persistence");
-            }
+            console.warn("IndexedDB persistence issue:", err);
         });
 
         const DOC_REF = doc(db, "shared", "family-portfolio-data");
+        const PASSWORD_REF = ref(rtdb, "appPassword");
 
         const CHART_COLORS = [
             '#2dd4bf', '#22c55e', '#f59e0b', '#d97706',
@@ -427,13 +426,11 @@
         // ────────────────────────────────────────────────
         // Improved swipe handling
         // ────────────────────────────────────────────────
-
         let touchStartX = 0;
         let touchStartY = 0;
         let touchEndX = 0;
         let touchEndY = 0;
         const swipeThreshold = 70;
-
         const swipeArea = document.getElementById('swipeArea');
 
         swipeArea.addEventListener('touchstart', e => {
@@ -452,24 +449,20 @@
         function handleSwipe() {
             const diffX = touchStartX - touchEndX;
             const diffY = Math.abs(touchStartY - touchEndY);
-
             if (diffY > 50) return;
             if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) return;
             if (Math.abs(diffX) < swipeThreshold) return;
-
             if (diffX > 0) {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
             } else {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('overview-tab')).show();
             }
-
             swipeArea.dataset.touchStartedInScrollable = 'false';
         }
 
         // ────────────────────────────────────────────────
-        // Remaining code (formatCurrency, generateId, helpers, firestore, render functions, etc.)
+        // Helper functions
         // ────────────────────────────────────────────────
-
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(amount));
         }
@@ -513,6 +506,9 @@
             return appState.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
         }
 
+        // ────────────────────────────────────────────────
+        // Firestore
+        // ────────────────────────────────────────────────
         async function loadState() {
             try {
                 const snap = await getDoc(DOC_REF);
@@ -551,6 +547,165 @@
             }
         }
 
+        // ────────────────────────────────────────────────
+        // Password logic (SHA-256)
+        // ────────────────────────────────────────────────
+        async function sha256(str) {
+            const msgBuffer = new TextEncoder().encode(str);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
+        }
+
+        async function checkOrSetPassword() {
+            const nav = document.querySelector('nav');
+            const main = document.querySelector('main');
+            nav.classList.add('d-none');
+            main.classList.add('d-none');
+
+            const modalHtml = `
+            <div class="modal fade" id="passwordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content modal-content-dark">
+                        <div class="modal-header modal-header-dark">
+                            <h5 class="modal-title fw-bold">Portfolio Pro – Protected</h5>
+                        </div>
+                        <div class="modal-body">
+                            <p class="text-muted-custom mb-4" id="pwdMessage">Enter password to continue</p>
+                            <input type="password" class="form-control form-control-dark mb-3" id="pwdInput" placeholder="Password" autocomplete="off" autofocus>
+                            <div class="d-grid">
+                                <button class="btn btn-accent" id="pwdSubmit">Unlock</button>
+                            </div>
+                            <div id="pwdError" class="alert alert-danger mt-3 d-none small"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+            const pwdModalEl  = document.getElementById('passwordModal');
+            const pwdInput    = document.getElementById('pwdInput');
+            const pwdSubmit   = document.getElementById('pwdSubmit');
+            const pwdError    = document.getElementById('pwdError');
+            const pwdMessage  = document.getElementById('pwdMessage');
+
+            const modal = new bootstrap.Modal(pwdModalEl, { backdrop: 'static', keyboard: false });
+            modal.show();
+
+            let hasPassword = false;
+            let storedHash = null;
+
+            try {
+                const snap = await get(PASSWORD_REF);
+                hasPassword = snap.exists() && typeof snap.val() === 'string' && snap.val().length >= 64;
+                if (hasPassword) storedHash = snap.val();
+            } catch (err) {
+                console.error("Firebase read failed:", err);
+                pwdError.textContent = "Cannot connect to database. Check internet / Firebase rules.";
+                pwdError.classList.remove('d-none');
+                pwdSubmit.disabled = true;
+                return;
+            }
+
+            if (!hasPassword) {
+                pwdMessage.textContent = "First time setup – create your password (min 6 chars)";
+                pwdInput.placeholder = "Create password";
+            }
+
+            pwdSubmit.onclick = async () => {
+                pwdError.classList.add('d-none');
+                pwdSubmit.disabled = true;
+                pwdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Checking...';
+
+                const val = pwdInput.value.trim();
+                if (val.length < 6) {
+                    pwdError.textContent = "Password must be at least 6 characters";
+                    pwdError.classList.remove('d-none');
+                    pwdSubmit.disabled = false;
+                    pwdSubmit.textContent = 'Unlock';
+                    return;
+                }
+
+                let hash;
+                try {
+                    hash = await sha256(val);
+                } catch (err) {
+                    pwdError.textContent = "Security error – try another browser";
+                    pwdError.classList.remove('d-none');
+                    pwdSubmit.disabled = false;
+                    pwdSubmit.textContent = 'Unlock';
+                    return;
+                }
+
+                if (!hasPassword) {
+                    try {
+                        await set(PASSWORD_REF, hash);
+                        unlock();
+                    } catch (err) {
+                        console.error("Firebase write failed:", err);
+                        pwdError.textContent = "Failed to save password. Check Firebase rules & internet.";
+                        pwdError.classList.remove('d-none');
+                        pwdSubmit.disabled = false;
+                        pwdSubmit.textContent = 'Unlock';
+                    }
+                } else {
+                    if (hash === storedHash) {
+                        unlock();
+                    } else {
+                        pwdError.textContent = "Incorrect password";
+                        pwdError.classList.remove('d-none');
+                        pwdInput.value = '';
+                        pwdInput.focus();
+                        pwdSubmit.disabled = false;
+                        pwdSubmit.textContent = 'Unlock';
+                    }
+                }
+            };
+
+            pwdInput.addEventListener('keypress', e => {
+                if (e.key === 'Enter' && !pwdSubmit.disabled) pwdSubmit.click();
+            });
+        }
+
+        function unlock() {
+            const modalEl = document.getElementById('passwordModal');
+            bootstrap.Modal.getInstance(modalEl)?.hide();
+            document.querySelector('nav').classList.remove('d-none');
+            document.querySelector('main').classList.remove('d-none');
+            document.getElementById('passwordModal')?.remove();
+            initApp();
+        }
+
+        // ────────────────────────────────────────────────
+        // App init after password
+        // ────────────────────────────────────────────────
+        async function initApp() {
+            await loadState();
+
+            document.getElementById('cagrEquity').value = appState.cagrAssumptions.equity;
+            document.getElementById('cagrDebt').value = appState.cagrAssumptions.debt;
+            document.getElementById('cagrGold').value = appState.cagrAssumptions.gold;
+            document.getElementById('cagrOthers').value = appState.cagrAssumptions.others;
+
+            ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', updateAndSaveCagr);
+            });
+
+            updateNetWorthDisplay();
+            renderPortfolios();
+            updateProjections();
+
+            document.getElementById('projections-tab')?.addEventListener('shown.bs.tab', updateProjections);
+
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW failed', err));
+            }
+        }
+
+        // ────────────────────────────────────────────────
+        // Render & update functions
+        // ────────────────────────────────────────────────
         function updateNetWorthDisplay() {
             document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
             document.getElementById('currentValue').textContent = formatCurrency(getCurrentValue());
@@ -630,7 +785,6 @@
             const canvas = document.getElementById(`chart-${portfolio.id}`);
             if (!canvas) return;
             if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
-
             chartInstances[portfolio.id] = new Chart(canvas, {
                 type: 'pie',
                 data: {
@@ -649,8 +803,6 @@
                 }
             });
         }
-
-        // ... (rest of the functions: openAddPortfolio, editPortfolio, addAssetRow, removeAssetRow, updateAllocationTotal, recalculateAssetAmounts, savePortfolio, deletePortfolio, previewReturns, saveReturns, updateAndSaveCagr, updateProjections)
 
         function openAddPortfolio() {
             document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
@@ -686,7 +838,7 @@
             row.id = `asset-${id}`;
             row.innerHTML = `
                 <div class="col">
-                    <input type="text" class="form-control form-control-dark form-control-sm asset-name" placeholder="Asset name (e.g., Equity, Debt)" value="${escapeHtml(name)}">
+                    <input type="text" class="form-control form-control-dark form-control-sm asset-name" placeholder="Asset name (e.g., Equity MF, PPF, Gold)" value="${escapeHtml(name)}">
                 </div>
                 <div class="col-3">
                     <input type="number" class="form-control form-control-dark form-control-sm asset-percentage text-center" placeholder="0%" min="0" max="100" value="${percentage}" oninput="updateAllocationTotal()">
@@ -734,6 +886,7 @@
         async function savePortfolio() {
             const err = document.getElementById('portfolioError');
             err.classList.add('d-none');
+
             const id = document.getElementById('editingPortfolioId').value;
             const name = document.getElementById('portfolioName').value.trim();
             const totalInvested = parseFloat(document.getElementById('portfolioAmount').value);
@@ -745,16 +898,20 @@
             document.querySelectorAll('.asset-row').forEach(row => {
                 const n = row.querySelector('.asset-name').value.trim();
                 const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
-                if (n && pct > 0) assets.push({ id: generateId(), name: n, percentage: pct, amount: pct / 100 * totalInvested });
+                if (n && pct > 0) {
+                    assets.push({ id: generateId(), name: n, percentage: pct, amount: pct / 100 * totalInvested });
+                }
             });
 
             if (assets.length === 0) { err.textContent = 'At least one asset required'; err.classList.remove('d-none'); return; }
+
             const sumPct = assets.reduce((s,a)=>s+a.percentage,0);
             if (Math.abs(sumPct - 100) > 0.01) {
                 err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`; err.classList.remove('d-none'); return;
             }
 
             const portfolio = { id: id || generateId(), name, totalInvested, assets };
+
             if (id) {
                 const idx = appState.portfolios.findIndex(p => p.id === id);
                 if (idx !== -1) appState.portfolios[idx] = portfolio;
@@ -772,7 +929,10 @@
         async function deletePortfolio(id) {
             if (!confirm('Delete this portfolio?')) return;
             appState.portfolios = appState.portfolios.filter(p => p.id !== id);
-            if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+            if (chartInstances[id]) {
+                chartInstances[id].destroy();
+                delete chartInstances[id];
+            }
             await saveState();
             renderPortfolios();
             updateNetWorthDisplay();
@@ -785,10 +945,12 @@
             const val = inv + ret;
             const pct = inv > 0 ? (ret / inv) * 100 : 0;
             const pos = ret >= 0;
+
             document.getElementById('previewInvested').textContent = formatCurrency(inv);
             document.getElementById('previewReturns').textContent = `${pos ? '+' : ''}${formatCurrency(ret)}`;
             document.getElementById('previewReturns').className = pos ? 'text-success-custom' : 'text-danger';
             document.getElementById('previewValue').textContent = formatCurrency(val);
+
             const pctEl = document.getElementById('previewReturnPct');
             pctEl.className = pos ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${pos ? '+' : ''}${pct.toFixed(2)}%`;
@@ -810,8 +972,8 @@
         async function updateAndSaveCagr() {
             appState.cagrAssumptions = {
                 equity: parseFloat(document.getElementById('cagrEquity').value) || 13,
-                debt:   parseFloat(document.getElementById('cagrDebt').value)   || 7.5,
-                gold:   parseFloat(document.getElementById('cagrGold').value)   || 9,
+                debt: parseFloat(document.getElementById('cagrDebt').value) || 7.5,
+                gold: parseFloat(document.getElementById('cagrGold').value) || 9,
                 others: parseFloat(document.getElementById('cagrOthers').value) || 2
             };
             updateProjections();
@@ -854,6 +1016,7 @@
                 });
 
                 const portWCagr = assetProj.reduce((s,a) => s + (a.rate * (a.amount / p.totalInvested)), 0) || 0;
+
                 const pY5  = calculateFutureValue(portCurrent, portWCagr, 5);
                 const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
                 const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
@@ -957,33 +1120,11 @@
             container.innerHTML = grandHtml + html;
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            await loadState();
-
-            document.getElementById('cagrEquity').value = appState.cagrAssumptions.equity;
-            document.getElementById('cagrDebt').value   = appState.cagrAssumptions.debt;
-            document.getElementById('cagrGold').value   = appState.cagrAssumptions.gold;
-            document.getElementById('cagrOthers').value = appState.cagrAssumptions.others;
-
-            ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', updateAndSaveCagr);
-            });
-
-            updateNetWorthDisplay();
-            renderPortfolios();
-            updateProjections();
-
-            document.getElementById('projections-tab').addEventListener('shown.bs.tab', updateProjections);
-
-            // Register service worker if available
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('./service-worker.js')
-                        .then(reg => console.log('Service Worker registered'))
-                        .catch(err => console.log('Service Worker failed:', err));
-                });
-            }
+        // ────────────────────────────────────────────────
+        // Start: password first
+        // ────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            checkOrSetPassword();
         });
 
         window.openAddPortfolio = openAddPortfolio;
