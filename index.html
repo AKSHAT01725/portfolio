@@ -2,12 +2,21 @@
 <html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#2dd4bf">
+    <meta name="description" content="Family Wealth Dashboard - Portfolio Pro">
     <title>Portfolio Pro – Family Wealth Dashboard</title>
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Apple touch icon support -->
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
     <style>
         :root {
             --bg-gradient: linear-gradient(135deg, #0d1117 0%, #090c10 50%, #0a0e14 100%);
@@ -285,7 +294,7 @@
         </div>
     </main>
 
-    <!-- Add/Edit Portfolio Modal -->
+    <!-- Modals -->
     <div class="modal fade" id="portfolioModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content modal-content-dark">
@@ -325,7 +334,6 @@
         </div>
     </div>
 
-    <!-- Total Returns Modal -->
     <div class="modal fade" id="returnsModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content modal-content-dark">
@@ -417,22 +425,20 @@
         let isSaving = false;
 
         // ────────────────────────────────────────────────
-        // Improved Swipe support – better distinguish from table horizontal scroll
+        // Improved swipe handling
         // ────────────────────────────────────────────────
 
         let touchStartX = 0;
         let touchStartY = 0;
         let touchEndX = 0;
         let touchEndY = 0;
-        const swipeThreshold = 70; // increased slightly for safety
+        const swipeThreshold = 70;
 
         const swipeArea = document.getElementById('swipeArea');
 
         swipeArea.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
-
-            // Check if touch started inside a horizontally scrollable area
             const scrollable = e.target.closest('.table-responsive');
             swipeArea.dataset.touchStartedInScrollable = scrollable ? 'true' : 'false';
         }, { passive: true });
@@ -440,7 +446,6 @@
         swipeArea.addEventListener('touchend', e => {
             touchEndX = e.changedTouches[0].screenX;
             touchEndY = e.changedTouches[0].screenY;
-
             handleSwipe();
         }, { passive: true });
 
@@ -448,39 +453,25 @@
             const diffX = touchStartX - touchEndX;
             const diffY = Math.abs(touchStartY - touchEndY);
 
-            // If more vertical movement → probably scrolling page up/down → ignore
             if (diffY > 50) return;
-
-            // If started inside table-responsive and has meaningful horizontal movement → likely scrolling table
-            if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) {
-                return;
-            }
-
-            // Not strong enough horizontal swipe
+            if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) return;
             if (Math.abs(diffX) < swipeThreshold) return;
 
-            // Direction: left swipe (positive diffX) → next tab (Projections)
-            // right swipe (negative diffX) → previous tab (Overview)
             if (diffX > 0) {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
             } else {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('overview-tab')).show();
             }
 
-            // Reset flag
             swipeArea.dataset.touchStartedInScrollable = 'false';
         }
 
         // ────────────────────────────────────────────────
-        // Rest of your code remains unchanged
+        // Remaining code (formatCurrency, generateId, helpers, firestore, render functions, etc.)
         // ────────────────────────────────────────────────
 
         function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR',
-                maximumFractionDigits: 0
-            }).format(Math.round(amount));
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(amount));
         }
 
         function generateId() {
@@ -512,21 +503,14 @@
 
         function getAssetCategory(assetName) {
             const name = assetName.toLowerCase();
-            if (name.includes('equity') || name.includes('stock') || name.includes('share') ||
-                name.includes('mf') || name.includes('mutual fund') || name.includes('nifty') ||
-                name.includes('sensex') || name.includes('midcap') || name.includes('smallcap')) return 'equity';
-            if (name.includes('debt') || name.includes('bond') || name.includes('fd') ||
-                name.includes('fixed deposit') || name.includes('ppf') || name.includes('rd') ||
-                name.includes('corporate bond') || name.includes('gilt')) return 'debt';
-            if (name.includes('gold') || name.includes('sgb') || name.includes('gold etf') ||
-                name.includes('gold fund') || name.includes('digital gold')) return 'gold';
+            if (/equity|stock|share|mf|mutual fund|nifty|sensex|midcap|smallcap/.test(name)) return 'equity';
+            if (/debt|bond|fd|fixed deposit|ppf|rd|corporate bond|gilt/.test(name)) return 'debt';
+            if (/gold|sgb|gold etf|gold fund|digital gold/.test(name)) return 'gold';
             return 'others';
         }
 
         function getCagrAssumptions() {
-            return appState.cagrAssumptions || {
-                equity: 13, debt: 7.5, gold: 9, others: 2
-            };
+            return appState.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
         }
 
         async function loadState() {
@@ -536,9 +520,7 @@
                     const data = snap.data();
                     appState.portfolios = data.portfolios || [];
                     appState.totalReturns = data.totalReturns || 0;
-                    appState.cagrAssumptions = data.cagrAssumptions || {
-                        equity: 13, debt: 7.5, gold: 9, others: 2
-                    };
+                    appState.cagrAssumptions = data.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
                 }
             } catch (e) {
                 console.error("Error loading from Firestore:", e);
@@ -561,9 +543,7 @@
             if (isSaving) return;
             isSaving = true;
             try {
-                await setDoc(DOC_REF, {
-                    cagrAssumptions: appState.cagrAssumptions
-                }, { merge: true });
+                await setDoc(DOC_REF, { cagrAssumptions: appState.cagrAssumptions }, { merge: true });
             } catch (e) {
                 console.error("Error saving CAGR:", e);
             } finally {
@@ -610,12 +590,8 @@
                                     <i class="bi bi-three-dots-vertical"></i>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-dark-custom dropdown-menu-end">
-                                    <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="editPortfolio('${p.id}')">
-                                        <i class="bi bi-pencil me-2"></i>Edit
-                                    </a></li>
-                                    <li><a class="dropdown-item dropdown-item-custom text-danger" href="#" onclick="deletePortfolio('${p.id}')">
-                                        <i class="bi bi-trash me-2"></i>Delete
-                                    </a></li>
+                                    <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="editPortfolio('${p.id}')"><i class="bi bi-pencil me-2"></i>Edit</a></li>
+                                    <li><a class="dropdown-item dropdown-item-custom text-danger" href="#" onclick="deletePortfolio('${p.id}')"><i class="bi bi-trash me-2"></i>Delete</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -647,9 +623,7 @@
                 </div>
             `).join('');
 
-            setTimeout(() => {
-                appState.portfolios.forEach(p => renderChart(p));
-            }, 50);
+            setTimeout(() => appState.portfolios.forEach(p => renderChart(p)), 50);
         }
 
         function renderChart(portfolio) {
@@ -671,21 +645,12 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: '#21262d',
-                            titleColor: '#f0f6fc',
-                            bodyColor: '#8b949e',
-                            borderColor: '#30363d',
-                            borderWidth: 1,
-                            padding: 12,
-                            cornerRadius: 8
-                        }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
         }
+
+        // ... (rest of the functions: openAddPortfolio, editPortfolio, addAssetRow, removeAssetRow, updateAllocationTotal, recalculateAssetAmounts, savePortfolio, deletePortfolio, previewReturns, saveReturns, updateAndSaveCagr, updateProjections)
 
         function openAddPortfolio() {
             document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
@@ -705,8 +670,7 @@
             document.getElementById('portfolioName').value = p.name;
             document.getElementById('portfolioAmount').value = p.totalInvested;
             document.getElementById('portfolioError').classList.add('d-none');
-            const container = document.getElementById('assetsContainer');
-            container.innerHTML = '';
+            document.getElementById('assetsContainer').innerHTML = '';
             p.assets.forEach(a => addAssetRow(a.name, a.percentage));
             recalculateAssetAmounts();
             new bootstrap.Modal(document.getElementById('portfolioModal')).show();
@@ -717,7 +681,6 @@
             const id = generateId();
             const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
             const amount = (parseFloat(percentage) || 0) / 100 * total;
-
             const row = document.createElement('div');
             row.className = 'row g-2 mb-2 asset-row';
             row.id = `asset-${id}`;
@@ -751,9 +714,7 @@
 
         function updateAllocationTotal() {
             let total = 0;
-            document.querySelectorAll('.asset-percentage').forEach(el => {
-                total += parseFloat(el.value) || 0;
-            });
+            document.querySelectorAll('.asset-percentage').forEach(el => total += parseFloat(el.value) || 0);
             const el = document.getElementById('allocationTotal');
             const valid = Math.abs(total - 100) <= 0.01;
             el.textContent = `Total: ${total.toFixed(1)}%`;
@@ -773,7 +734,6 @@
         async function savePortfolio() {
             const err = document.getElementById('portfolioError');
             err.classList.add('d-none');
-
             const id = document.getElementById('editingPortfolioId').value;
             const name = document.getElementById('portfolioName').value.trim();
             const totalInvested = parseFloat(document.getElementById('portfolioAmount').value);
@@ -785,26 +745,16 @@
             document.querySelectorAll('.asset-row').forEach(row => {
                 const n = row.querySelector('.asset-name').value.trim();
                 const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
-                if (n && pct > 0) {
-                    assets.push({
-                        id: generateId(),
-                        name: n,
-                        percentage: pct,
-                        amount: pct / 100 * totalInvested
-                    });
-                }
+                if (n && pct > 0) assets.push({ id: generateId(), name: n, percentage: pct, amount: pct / 100 * totalInvested });
             });
 
             if (assets.length === 0) { err.textContent = 'At least one asset required'; err.classList.remove('d-none'); return; }
             const sumPct = assets.reduce((s,a)=>s+a.percentage,0);
             if (Math.abs(sumPct - 100) > 0.01) {
-                err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`;
-                err.classList.remove('d-none');
-                return;
+                err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`; err.classList.remove('d-none'); return;
             }
 
             const portfolio = { id: id || generateId(), name, totalInvested, assets };
-
             if (id) {
                 const idx = appState.portfolios.findIndex(p => p.id === id);
                 if (idx !== -1) appState.portfolios[idx] = portfolio;
@@ -822,10 +772,7 @@
         async function deletePortfolio(id) {
             if (!confirm('Delete this portfolio?')) return;
             appState.portfolios = appState.portfolios.filter(p => p.id !== id);
-            if (chartInstances[id]) {
-                chartInstances[id].destroy();
-                delete chartInstances[id];
-            }
+            if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
             await saveState();
             renderPortfolios();
             updateNetWorthDisplay();
@@ -838,12 +785,10 @@
             const val = inv + ret;
             const pct = inv > 0 ? (ret / inv) * 100 : 0;
             const pos = ret >= 0;
-
             document.getElementById('previewInvested').textContent = formatCurrency(inv);
             document.getElementById('previewReturns').textContent = `${pos ? '+' : ''}${formatCurrency(ret)}`;
             document.getElementById('previewReturns').className = pos ? 'text-success-custom' : 'text-danger';
             document.getElementById('previewValue').textContent = formatCurrency(val);
-
             const pctEl = document.getElementById('previewReturnPct');
             pctEl.className = pos ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${pos ? '+' : ''}${pct.toFixed(2)}%`;
@@ -887,7 +832,6 @@
             }
 
             const rates = getCagrAssumptions();
-
             let grand = { current: 0, y5: 0, y10: 0, y15: 0, wCagr: 0 };
 
             const portfolioProjections = appState.portfolios.map(p => {
@@ -909,10 +853,7 @@
                     };
                 });
 
-                const portWCagr = assetProj.reduce((s,a) => {
-                    return s + (a.rate * (a.amount / p.totalInvested));
-                }, 0) || 0;
-
+                const portWCagr = assetProj.reduce((s,a) => s + (a.rate * (a.amount / p.totalInvested)), 0) || 0;
                 const pY5  = calculateFutureValue(portCurrent, portWCagr, 5);
                 const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
                 const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
@@ -921,31 +862,19 @@
                 grand.y5  += pY5;
                 grand.y10 += pY10;
                 grand.y15 += pY15;
-
-                // Accumulate weighted contribution
                 grand.wCagr += portWCagr * (portCurrent / (grand.current || 1));
 
                 const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5, 0);
                 const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10,0);
                 const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15,0);
 
-                return {
-                    name: p.name,
-                    portCurrent,
-                    portWCagr,
-                    pY5, pY10, pY15,
-                    assetProj,
-                    assetSumY5, assetSumY10, assetSumY15,
-                    totalInvested: p.totalInvested
-                };
+                return { name: p.name, portCurrent, portWCagr, pY5, pY10, pY15, assetProj, assetSumY5, assetSumY10, assetSumY15, totalInvested: p.totalInvested };
             });
 
-            // Final correct weighting after total is known
             if (grand.current > 0) {
                 grand.wCagr = 0;
                 portfolioProjections.forEach(proj => {
-                    const weight = proj.portCurrent / grand.current;
-                    grand.wCagr += proj.portWCagr * weight;
+                    grand.wCagr += proj.portWCagr * (proj.portCurrent / grand.current);
                 });
             }
 
@@ -954,15 +883,7 @@
                     <h5 class="fw-semibold mb-3">Total Family Wealth Projection (Compounded from Today)</h5>
                     <div class="table-responsive">
                         <table class="table table-dark-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Metric</th>
-                                    <th class="text-end">Current Value</th>
-                                    <th class="text-end">5 Years</th>
-                                    <th class="text-end">10 Years</th>
-                                    <th class="text-end">15 Years</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Metric</th><th class="text-end">Current Value</th><th class="text-end">5 Years</th><th class="text-end">10 Years</th><th class="text-end">15 Years</th></tr></thead>
                             <tbody>
                                 <tr class="bg-accent-subtle">
                                     <td class="fw-semibold">All Portfolios</td>
@@ -974,19 +895,13 @@
                             </tbody>
                         </table>
                     </div>
-
                     <div class="mt-4 pt-3 border-top border-secondary">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="fw-semibold">Family Weighted Expected CAGR</span>
-                            <span class="fs-5 fw-bold text-accent">
-                                ${grand.current > 0 ? grand.wCagr.toFixed(1) : '—'}%
-                            </span>
+                            <span class="fs-5 fw-bold text-accent">${grand.current > 0 ? grand.wCagr.toFixed(1) : '—'}%</span>
                         </div>
-                        <small class="text-muted-custom d-block mt-1">
-                            Weighted average of each portfolio's expected CAGR (by current value allocation)
-                        </small>
+                        <small class="text-muted-custom d-block mt-1">Weighted average of each portfolio's expected CAGR (by current value allocation)</small>
                     </div>
-
                     <small class="text-muted-custom d-block mt-4">
                         • Starting from current net worth: ${formatCurrency(getCurrentValue())}<br>
                         • Each portfolio compounds at its own weighted expected CAGR
@@ -998,23 +913,11 @@
                 <div class="card-glass-static p-4 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="fw-semibold mb-0">${escapeHtml(proj.name)}</h5>
-                        <span class="text-muted-custom small">
-                            Weighted CAGR: <span class="text-accent fw-medium">${proj.portWCagr.toFixed(1)}%</span>
-                        </span>
+                        <span class="text-muted-custom small">Weighted CAGR: <span class="text-accent fw-medium">${proj.portWCagr.toFixed(1)}%</span></span>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-dark-custom mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Asset</th>
-                                    <th class="text-end">Category</th>
-                                    <th class="text-end">CAGR</th>
-                                    <th class="text-end">Invested</th>
-                                    <th class="text-end">5 Yr</th>
-                                    <th class="text-end">10 Yr</th>
-                                    <th class="text-end">15 Yr</th>
-                                </tr>
-                            </thead>
+                            <thead><tr><th>Asset</th><th class="text-end">Category</th><th class="text-end">CAGR</th><th class="text-end">Invested</th><th class="text-end">5 Yr</th><th class="text-end">10 Yr</th><th class="text-end">15 Yr</th></tr></thead>
                             <tbody>
                                 ${proj.assetProj.map(a => `
                                     <tr>
@@ -1062,12 +965,9 @@
             document.getElementById('cagrGold').value   = appState.cagrAssumptions.gold;
             document.getElementById('cagrOthers').value = appState.cagrAssumptions.others;
 
-            const cagrInputs = ['cagrEquity', 'cagrDebt', 'cagrGold', 'cagrOthers'];
-            cagrInputs.forEach(id => {
+            ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
                 const el = document.getElementById(id);
-                if (el) {
-                    el.addEventListener('input', updateAndSaveCagr);
-                }
+                if (el) el.addEventListener('input', updateAndSaveCagr);
             });
 
             updateNetWorthDisplay();
@@ -1075,9 +975,17 @@
             updateProjections();
 
             document.getElementById('projections-tab').addEventListener('shown.bs.tab', updateProjections);
+
+            // Register service worker if available
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('./service-worker.js')
+                        .then(reg => console.log('Service Worker registered'))
+                        .catch(err => console.log('Service Worker failed:', err));
+                });
+            }
         });
 
-        // Expose functions
         window.openAddPortfolio = openAddPortfolio;
         window.editPortfolio = editPortfolio;
         window.deletePortfolio = deletePortfolio;
