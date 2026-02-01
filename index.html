@@ -202,12 +202,12 @@
                 </div>
                 <div>
                     <h1 class="h5 mb-0 fw-bold">Portfolio Pro</h1>
-                    <small class="text-muted-custom">Family Wealth Dashboard</small>
+                    <small class="text-muted-custom">Family Wealth Overview</small>
                 </div>
             </div>
             <ul class="nav nav-tabs-custom" id="mainTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Dashboard</button>
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="projections-tab" data-bs-toggle="tab" data-bs-target="#projections" type="button">Projections</button>
@@ -416,33 +416,63 @@
         let chartInstances = {};
         let isSaving = false;
 
-        // Swipe support
+        // ────────────────────────────────────────────────
+        // Improved Swipe support – better distinguish from table horizontal scroll
+        // ────────────────────────────────────────────────
+
         let touchStartX = 0;
+        let touchStartY = 0;
         let touchEndX = 0;
-        const swipeThreshold = 60;
+        let touchEndY = 0;
+        const swipeThreshold = 70; // increased slightly for safety
+
         const swipeArea = document.getElementById('swipeArea');
 
         swipeArea.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+
+            // Check if touch started inside a horizontally scrollable area
+            const scrollable = e.target.closest('.table-responsive');
+            swipeArea.dataset.touchStartedInScrollable = scrollable ? 'true' : 'false';
         }, { passive: true });
 
         swipeArea.addEventListener('touchend', e => {
             touchEndX = e.changedTouches[0].screenX;
+            touchEndY = e.changedTouches[0].screenY;
+
             handleSwipe();
         }, { passive: true });
 
         function handleSwipe() {
-            const diff = touchStartX - touchEndX;
-            if (Math.abs(diff) < swipeThreshold) return;
-            if (diff > 0) {
+            const diffX = touchStartX - touchEndX;
+            const diffY = Math.abs(touchStartY - touchEndY);
+
+            // If more vertical movement → probably scrolling page up/down → ignore
+            if (diffY > 50) return;
+
+            // If started inside table-responsive and has meaningful horizontal movement → likely scrolling table
+            if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) {
+                return;
+            }
+
+            // Not strong enough horizontal swipe
+            if (Math.abs(diffX) < swipeThreshold) return;
+
+            // Direction: left swipe (positive diffX) → next tab (Projections)
+            // right swipe (negative diffX) → previous tab (Overview)
+            if (diffX > 0) {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
             } else {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('overview-tab')).show();
             }
+
+            // Reset flag
+            swipeArea.dataset.touchStartedInScrollable = 'false';
         }
 
         // ────────────────────────────────────────────────
-        // Helpers
+        // Rest of your code remains unchanged
         // ────────────────────────────────────────────────
 
         function formatCurrency(amount) {
@@ -499,10 +529,6 @@
             };
         }
 
-        // ────────────────────────────────────────────────
-        // Firestore
-        // ────────────────────────────────────────────────
-
         async function loadState() {
             try {
                 const snap = await getDoc(DOC_REF);
@@ -544,10 +570,6 @@
                 isSaving = false;
             }
         }
-
-        // ────────────────────────────────────────────────
-        // UI Updates
-        // ────────────────────────────────────────────────
 
         function updateNetWorthDisplay() {
             document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
@@ -664,10 +686,6 @@
                 }
             });
         }
-
-        // ────────────────────────────────────────────────
-        // Portfolio CRUD
-        // ────────────────────────────────────────────────
 
         function openAddPortfolio() {
             document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
@@ -814,10 +832,6 @@
             updateProjections();
         }
 
-        // ────────────────────────────────────────────────
-        // Returns Modal
-        // ────────────────────────────────────────────────
-
         function previewReturns() {
             const ret = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
             const inv = getTotalInvested();
@@ -847,10 +861,6 @@
             document.getElementById('totalReturnsInput').value = appState.totalReturns;
             previewReturns();
         });
-
-        // ────────────────────────────────────────────────
-        // Projections + CAGR saving + Family Weighted CAGR
-        // ────────────────────────────────────────────────
 
         async function updateAndSaveCagr() {
             appState.cagrAssumptions = {
@@ -912,8 +922,8 @@
                 grand.y10 += pY10;
                 grand.y15 += pY15;
 
-                // Accumulate for family weighted CAGR
-                grand.wCagr += portWCagr * (portCurrent / (grand.current || 1)); // avoid div by zero
+                // Accumulate weighted contribution
+                grand.wCagr += portWCagr * (portCurrent / (grand.current || 1));
 
                 const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5, 0);
                 const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10,0);
@@ -930,7 +940,7 @@
                 };
             });
 
-            // Re-weight family CAGR correctly now that we have total current
+            // Final correct weighting after total is known
             if (grand.current > 0) {
                 grand.wCagr = 0;
                 portfolioProjections.forEach(proj => {
@@ -1044,10 +1054,6 @@
             container.innerHTML = grandHtml + html;
         }
 
-        // ────────────────────────────────────────────────
-        // Initialization
-        // ────────────────────────────────────────────────
-
         document.addEventListener('DOMContentLoaded', async () => {
             await loadState();
 
@@ -1071,7 +1077,7 @@
             document.getElementById('projections-tab').addEventListener('shown.bs.tab', updateProjections);
         });
 
-        // Expose to window
+        // Expose functions
         window.openAddPortfolio = openAddPortfolio;
         window.editPortfolio = editPortfolio;
         window.deletePortfolio = deletePortfolio;
