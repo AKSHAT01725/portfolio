@@ -200,7 +200,6 @@
     </style>
 </head>
 <body>
-
     <nav class="navbar navbar-custom sticky-top d-none">
         <div class="container">
             <div class="d-flex align-items-center gap-3">
@@ -209,12 +208,12 @@
                 </div>
                 <div>
                     <h1 class="h5 mb-0 fw-bold">Portfolio Pro</h1>
-                    <small class="text-muted-custom">Family Wealth Overview</small>
+                    <small class="text-muted-custom">Family Wealth Dashboard</small>
                 </div>
             </div>
             <ul class="nav nav-tabs-custom" id="mainTabs" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Overview</button>
+                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Dashboard</button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="projections-tab" data-bs-toggle="tab" data-bs-target="#projections" type="button">Projections</button>
@@ -222,7 +221,6 @@
             </ul>
         </div>
     </nav>
-
     <main class="container py-4 no-select d-none" id="swipeArea">
         <div class="tab-content" id="mainTabContent">
             <div class="tab-pane fade show active" id="overview" role="tabpanel">
@@ -258,7 +256,6 @@
                 </div>
                 <div id="portfoliosContainer" class="row g-4"></div>
             </div>
-
             <div class="tab-pane fade" id="projections" role="tabpanel">
                 <div class="card-glass-static p-4 mb-4">
                     <div class="d-flex align-items-center gap-2 mb-3">
@@ -452,6 +449,7 @@
             if (diffY > 50) return;
             if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) return;
             if (Math.abs(diffX) < swipeThreshold) return;
+
             if (diffX > 0) {
                 bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
             } else {
@@ -567,16 +565,20 @@
             <div class="modal fade" id="passwordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content modal-content-dark">
-                        <center><div class="modal-header justify-content-center modal-header-dark">
-                            <h1 class="modal-title fw-bold">Portfolio Pro</h1>
-                        </div></center>
-                        <div class="modal-body">
-                            <p class="text-muted-custom mb-4" id="pwdMessage">Enter your Portfolio pro password</p>
-                            <input type="password" class="form-control form-control-dark mb-3" id="pwdInput" placeholder="••••••••" autocomplete="off" autofocus>
+                        <div class="modal-header justify-content-center modal-header-dark border-0 pb-2">
+                            <div class="d-flex flex-column align-items-center gap-2 py-3">
+                                <i class="bi bi-lock text-accent" style="font-size: 3.8rem;"></i>
+                                <h1 class="modal-title fw-bold mb-1">Portfolio Pro</h1>
+                                <small class="text-muted-custom">Family Wealth Dashboard</small>
+                            </div>
+                        </div>
+                        <div class="modal-body px-5 pb-4">
+                            <p class="text-muted-custom mb-4 text-center" id="pwdMessage">Enter your password to unlock</p>
+                            <input type="password" class="form-control form-control-dark mb-3 text-center" id="pwdInput" placeholder="••••••••" autocomplete="off" autofocus>
                             <div class="d-grid">
                                 <button class="btn btn-accent" id="pwdSubmit">Unlock</button>
                             </div>
-                            <div id="pwdError" class="alert alert-danger mt-3 d-none small"></div>
+                            <div id="pwdError" class="alert alert-danger mt-3 d-none small text-center"></div>
                         </div>
                     </div>
                 </div>
@@ -584,11 +586,11 @@
 
             document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-            const pwdModalEl  = document.getElementById('passwordModal');
-            const pwdInput    = document.getElementById('pwdInput');
-            const pwdSubmit   = document.getElementById('pwdSubmit');
-            const pwdError    = document.getElementById('pwdError');
-            const pwdMessage  = document.getElementById('pwdMessage');
+            const pwdModalEl = document.getElementById('passwordModal');
+            const pwdInput = document.getElementById('pwdInput');
+            const pwdSubmit = document.getElementById('pwdSubmit');
+            const pwdError = document.getElementById('pwdError');
+            const pwdMessage = document.getElementById('pwdMessage');
 
             const modal = new bootstrap.Modal(pwdModalEl, { backdrop: 'static', keyboard: false });
             modal.show();
@@ -682,7 +684,6 @@
         // ────────────────────────────────────────────────
         async function initApp() {
             await loadState();
-
             document.getElementById('cagrEquity').value = appState.cagrAssumptions.equity;
             document.getElementById('cagrDebt').value = appState.cagrAssumptions.debt;
             document.getElementById('cagrGold').value = appState.cagrAssumptions.gold;
@@ -709,10 +710,12 @@
         function updateNetWorthDisplay() {
             document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
             document.getElementById('currentValue').textContent = formatCurrency(getCurrentValue());
+
             const returnPct = getReturnPercentage();
             const isPositive = returnPct >= 0;
             const pill = document.getElementById('returnPill');
             const pctEl = document.getElementById('returnPercentage');
+
             pill.className = isPositive ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${isPositive ? '+' : ''}${returnPct.toFixed(2)}%`;
         }
@@ -785,6 +788,7 @@
             const canvas = document.getElementById(`chart-${portfolio.id}`);
             if (!canvas) return;
             if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
+
             chartInstances[portfolio.id] = new Chart(canvas, {
                 type: 'pie',
                 data: {
@@ -817,6 +821,7 @@
         function editPortfolio(id) {
             const p = appState.portfolios.find(x => x.id === id);
             if (!p) return;
+
             document.getElementById('portfolioModalTitle').textContent = 'Edit Portfolio';
             document.getElementById('editingPortfolioId').value = id;
             document.getElementById('portfolioName').value = p.name;
@@ -833,6 +838,7 @@
             const id = generateId();
             const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
             const amount = (parseFloat(percentage) || 0) / 100 * total;
+
             const row = document.createElement('div');
             row.className = 'row g-2 mb-2 asset-row';
             row.id = `asset-${id}`;
@@ -1016,18 +1022,17 @@
                 });
 
                 const portWCagr = assetProj.reduce((s,a) => s + (a.rate * (a.amount / p.totalInvested)), 0) || 0;
-
-                const pY5  = calculateFutureValue(portCurrent, portWCagr, 5);
+                const pY5 = calculateFutureValue(portCurrent, portWCagr, 5);
                 const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
                 const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
 
                 grand.current += portCurrent;
-                grand.y5  += pY5;
+                grand.y5 += pY5;
                 grand.y10 += pY10;
                 grand.y15 += pY15;
                 grand.wCagr += portWCagr * (portCurrent / (grand.current || 1));
 
-                const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5, 0);
+                const assetSumY5 = assetProj.reduce((s,a)=>s+a.y5, 0);
                 const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10,0);
                 const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15,0);
 
