@@ -562,27 +562,23 @@
             main.classList.add('d-none');
 
             const modalHtml = `
-            <div class="modal fade" id="passwordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content modal-content-dark">
-                        <div class="modal-header justify-content-center modal-header-dark border-0 pb-2">
-                            <div class="d-flex flex-column align-items-center gap-2 py-3">
-                                <i class="bi bi-lock text-accent" style="font-size: 3.8rem;"></i>
-                                <h1 class="modal-title fw-bold mb-1">Portfolio Pro</h1>
-                                <small class="text-muted-custom">Family Wealth Dashboard</small>
-                            </div>
-                        </div>
-                        <div class="modal-body px-5 pb-4">
-                            <p class="text-muted-custom mb-4 text-center" id="pwdMessage">Enter your password to unlock</p>
-                            <input type="password" class="form-control form-control-dark mb-3 text-center" id="pwdInput" placeholder="••••••••" autocomplete="off" autofocus>
-                            <div class="d-grid">
-                                <button class="btn btn-accent" id="pwdSubmit">Unlock</button>
-                            </div>
-                            <div id="pwdError" class="alert alert-danger mt-3 d-none small text-center"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
+<div class="modal fade" id="passwordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-dark border-0 shadow-lg">
+            <div class="modal-body text-center py-5 px-5">
+                <i class="bi bi-shield-lock text-accent mb-4" style="font-size: 3.5rem; opacity: 0.92;"></i>
+                <h4 class="fw-bold mb-4">Portfolio Pro</h4>
+                <p class="text-muted-custom mb-4" id="pwdMessage">
+                    Secure access required
+                </p>
+                <input type="password" class="form-control form-control-dark mb-4 text-center" 
+                       id="pwdInput" placeholder="••••••••" autocomplete="off" autofocus>
+                <button class="btn btn-accent w-100 py-3 fw-semibold" id="pwdSubmit">Unlock</button>
+                <div id="pwdError" class="alert alert-danger mt-3 d-none small"></div>
+            </div>
+        </div>
+    </div>
+</div>`;
 
             document.body.insertAdjacentHTML('beforeend', modalHtml);
 
