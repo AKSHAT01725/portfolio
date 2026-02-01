@@ -532,7 +532,7 @@
                     const data = snap.data();
                     appState.portfolios = (data.portfolios || []).map(p => ({
                         ...p,
-                        assets: sortAssetsByPercentage(p.assets) // Ensure loaded assets are sorted
+                        assets: sortAssetsByPercentage(p.assets)
                     }));
                     appState.totalReturns = data.totalReturns || 0;
                     appState.cagrAssumptions = data.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
@@ -746,7 +746,6 @@
                 return;
             }
 
-            // Sort assets for each portfolio before rendering
             const sortedPortfolios = appState.portfolios.map(p => ({
                 ...p,
                 assets: sortAssetsByPercentage(p.assets)
@@ -803,7 +802,6 @@
             if (!canvas) return;
             if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
 
-            // Use sorted assets for chart data
             const sortedAssets = sortAssetsByPercentage(portfolio.assets);
             const colors = sortedAssets.map((a, idx) => 
                 getAssetColor(getAssetCategory(a.name), idx)
@@ -823,7 +821,11 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    plugins: { legend: { display: false } }
+                    direction: 'counter-clockwise',     // ← This makes it draw anti-clockwise
+                    rotation: -180,                      // Optional: starts from top (12 o'clock)
+                    plugins: {
+                        legend: { display: false }
+                    }
                 }
             });
         }
@@ -847,7 +849,6 @@
             document.getElementById('portfolioAmount').value = p.totalInvested;
             document.getElementById('portfolioError').classList.add('d-none');
             document.getElementById('assetsContainer').innerHTML = '';
-            // Load in original order for editing, but will sort on save
             p.assets.forEach(a => addAssetRow(a.name, a.percentage));
             recalculateAssetAmounts();
             new bootstrap.Modal(document.getElementById('portfolioModal')).show();
@@ -936,7 +937,6 @@
                 err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`; err.classList.remove('d-none'); return;
             }
 
-            // Sort assets by percentage descending before saving
             assets = sortAssetsByPercentage(assets);
 
             const portfolio = { id: id || generateId(), name, totalInvested, assets };
@@ -1031,7 +1031,6 @@
                 const portReturns = appState.totalReturns * share;
                 const portCurrent = p.totalInvested + portReturns;
 
-                // Sort assets for projections table
                 const sortedAssets = sortAssetsByPercentage(p.assets);
                 const assetProj = sortedAssets.map(a => {
                     const cat = getAssetCategory(a.name);
