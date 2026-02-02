@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#2dd4bf">
     <meta name="description" content="Family Wealth Dashboard - Portfolio Pro">
-    <title>Portfolio Pro – Family Wealth Dashboard</title>
+    <title>Portfolio Pro - Family Wealth Dashboard</title>
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <!-- Apple touch icon support -->
@@ -63,8 +63,9 @@
             color: var(--text-secondary);
             border:none;
             border-radius:8px;
-            padding:10px 24px;
+            padding:10px 12px;
             font-weight:500;
+            font-size: 0.875rem;
             transition:all 0.2s;
         }
         .nav-tabs-custom .nav-link:hover { color:var(--text-primary); background:rgba(45,212,191,0.1); }
@@ -218,6 +219,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="projections-tab" data-bs-toggle="tab" data-bs-target="#projections" type="button">Projections</button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="sip-tab" data-bs-toggle="tab" data-bs-target="#sip" type="button">SIP Calculator</button>
+                </li>
             </ul>
         </div>
     </nav>
@@ -286,9 +290,106 @@
                 </div>
                 <div id="projectionsContainer"></div>
             </div>
+            <div class="tab-pane fade" id="sip" role="tabpanel">
+                <div class="row g-4">
+                    <div class="col-lg-6">
+                        <div class="card-glass-static p-4">
+                            <h5 class="fw-semibold mb-4">SIP / Lumpsum Calculator</h5>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Investment Type</label>
+                                <select class="form-select form-control-dark" id="investType">
+                                    <option value="sip">SIP (Monthly)</option>
+                                    <option value="lumpsum">Lumpsum</option>
+                                </select>
+                            </div>
+                            <div id="sipInputs">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted-custom small">Monthly Investment (₹)</label>
+                                    <input type="number" class="form-control form-control-dark" id="monthlyAmt" min="100" value="5000">
+                                </div>
+                            </div>
+                            <div id="lumpsumInputs" style="display:none;">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted-custom small">Lumpsum Amount (₹)</label>
+                                    <input type="number" class="form-control form-control-dark" id="lumpsumAmt" min="100" value="100000">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Expected Return Rate (% p.a.)</label>
+                                <input type="number" class="form-control form-control-dark" id="returnRate" step="0.1" min="0" value="12">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Investment Period (Years)</label>
+                                <input type="number" class="form-control form-control-dark" id="periodYears" min="1" value="10">
+                            </div>
+                            <div id="sipResults" class="d-none">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted-custom">Invested Amount</span>
+                                    <span id="investedAmt">₹0</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted-custom">Est. Returns</span>
+                                    <span id="estReturns" class="text-success-custom">₹0</span>
+                                </div>
+                                <hr class="border-secondary">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-semibold">Total Value</span>
+                                    <span id="totalValue" class="fw-bold text-accent">₹0</span>
+                                </div>
+                                <small class="text-muted-custom d-block mt-2">
+                                    • Assumes investment at the <strong>beginning of each month</strong> (standard Groww / most Indian calculator convention)<br>
+                                    • Uses true monthly rate derived from annual CAGR → more realistic<br>
+                                    • Compounded monthly • No exit load / taxes considered
+                                </small>
+                                <div class="chart-container mt-4" style="height:200px;">
+                                    <canvas id="sipChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="card-glass-static p-4">
+                            <h5 class="fw-semibold mb-4">Step-up SIP Calculator</h5>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Monthly Investment (₹)</label>
+                                <input type="number" class="form-control form-control-dark" id="stepMonthlyAmt" min="100" value="5000">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Annual Step-up (%)</label>
+                                <input type="number" class="form-control form-control-dark" id="stepUpPct" step="0.1" min="0" value="10">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Expected Return Rate (% p.a.)</label>
+                                <input type="number" class="form-control form-control-dark" id="stepReturnRate" step="0.1" min="0" value="12">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label text-muted-custom small">Investment Period (Years)</label>
+                                <input type="number" class="form-control form-control-dark" id="stepPeriodYears" min="1" value="10">
+                            </div>
+                            <div id="stepSipResults" class="d-none">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted-custom">Invested Amount</span>
+                                    <span id="stepInvestedAmt">₹0</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="text-muted-custom">Est. Returns</span>
+                                    <span id="stepEstReturns" class="text-success-custom">₹0</span>
+                                </div>
+                                <hr class="border-secondary">
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-semibold">Total Value</span>
+                                    <span id="stepTotalValue" class="fw-bold text-accent">₹0</span>
+                                </div>
+                                <div class="chart-container mt-4" style="height:200px;">
+                                    <canvas id="stepSipChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
-
     <!-- Portfolio Modal -->
     <div class="modal fade" id="portfolioModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -328,7 +429,6 @@
             </div>
         </div>
     </div>
-
     <!-- Returns Modal -->
     <div class="modal fade" id="returnsModal" tabindex="-1">
         <div class="modal-dialog">
@@ -372,13 +472,11 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
         import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
         import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-
         const firebaseConfig = {
             apiKey: "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
             authDomain: "portfolio-f938c.firebaseapp.com",
@@ -389,40 +487,29 @@
             measurementId: "G-C41JE44L43",
             databaseURL: "https://portfolio-f938c-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const rtdb = getDatabase(app);
         enableIndexedDbPersistence(db).catch((err) => {
             console.warn("IndexedDB persistence issue:", err);
         });
-
         const DOC_REF = doc(db, "shared", "family-portfolio-data");
         const PASSWORD_REF = ref(rtdb, "appPassword");
-
         // ──── COLOR DEFINITIONS ───────────────────────────────────────────────
         const CATEGORY_COLORS = {
-            equity:  '#ef4444',   // red-500
-            debt:    '#22c55e',   // green-500
-            gold:    '#eab308',   // amber-500 / gold tone
-            // others will use rotating palette below
+            equity: '#ef4444', // red-500
+            debt: '#22c55e', // green-500
+            gold: '#eab308', // amber-500 / gold tone
         };
-
         const OTHERS_COLORS = [
-            '#6b7280',    // gray-500
-            '#9ca3af',    // gray-400
-            '#64748b',    // slate-600
-            '#475569',    // slate-700
-            '#334155'     // slate-800
+            '#6b7280', '#9ca3af', '#64748b', '#475569', '#334155'
         ];
-
         function getAssetColor(category, indexForOthers = 0) {
             if (category in CATEGORY_COLORS) {
                 return CATEGORY_COLORS[category];
             }
             return OTHERS_COLORS[indexForOthers % OTHERS_COLORS.length];
         }
-
         let appState = {
             portfolios: [],
             totalReturns: 0,
@@ -433,10 +520,8 @@
                 others: 2
             }
         };
-
         let chartInstances = {};
         let isSaving = false;
-
         // ────────────────────────────────────────────────
         // Improved swipe handling
         // ────────────────────────────────────────────────
@@ -457,59 +542,53 @@
             touchEndY = e.changedTouches[0].screenY;
             handleSwipe();
         }, { passive: true });
-
         function handleSwipe() {
             const diffX = touchStartX - touchEndX;
             const diffY = Math.abs(touchStartY - touchEndY);
             if (diffY > 50) return;
             if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) return;
             if (Math.abs(diffX) < swipeThreshold) return;
-            if (diffX > 0) {
-                bootstrap.Tab.getOrCreateInstance(document.getElementById('projections-tab')).show();
-            } else {
-                bootstrap.Tab.getOrCreateInstance(document.getElementById('overview-tab')).show();
+            const tabButtons = Array.from(document.querySelectorAll('#mainTabs .nav-link'));
+            const currentIdx = tabButtons.findIndex(b => b.classList.contains('active'));
+            let newIdx;
+            if (diffX > 0) { // swipe left → next
+                newIdx = (currentIdx + 1) % tabButtons.length;
+            } else { // swipe right → previous
+                newIdx = (currentIdx - 1 + tabButtons.length) % tabButtons.length;
             }
+            bootstrap.Tab.getOrCreateInstance(tabButtons[newIdx]).show();
             swipeArea.dataset.touchStartedInScrollable = 'false';
         }
-
         // ────────────────────────────────────────────────
         // Helper functions
         // ────────────────────────────────────────────────
         function formatCurrency(amount) {
             return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(amount));
         }
-
         function generateId() {
             return Math.random().toString(36).substring(2, 9);
         }
-
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
-
         function sortAssetsByPercentage(assets) {
             return [...assets].sort((a, b) => b.percentage - a.percentage);
         }
-
         function getTotalInvested() {
             return appState.portfolios.reduce((sum, p) => sum + (p.totalInvested || 0), 0);
         }
-
         function getCurrentValue() {
             return getTotalInvested() + appState.totalReturns;
         }
-
         function getReturnPercentage() {
             const invested = getTotalInvested();
             return invested > 0 ? (appState.totalReturns / invested) * 100 : 0;
         }
-
         function calculateFutureValue(principal, rate, years) {
             return principal * Math.pow(1 + rate / 100, years);
         }
-
         function getAssetCategory(assetName) {
             const name = assetName.toLowerCase();
             if (/equity|stock|share|mf|mutual fund|nifty|sensex|midcap|smallcap/.test(name)) return 'equity';
@@ -517,11 +596,9 @@
             if (/gold|sgb|gold etf|gold fund|digital gold/.test(name)) return 'gold';
             return 'others';
         }
-
         function getCagrAssumptions() {
             return appState.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
         }
-
         // ────────────────────────────────────────────────
         // Firestore
         // ────────────────────────────────────────────────
@@ -541,7 +618,6 @@
                 console.error("Error loading from Firestore:", e);
             }
         }
-
         async function saveState() {
             if (isSaving) return;
             isSaving = true;
@@ -553,7 +629,6 @@
                 isSaving = false;
             }
         }
-
         async function saveCagrAssumptions() {
             if (isSaving) return;
             isSaving = true;
@@ -565,7 +640,6 @@
                 isSaving = false;
             }
         }
-
         // ────────────────────────────────────────────────
         // Password logic (SHA-256)
         // ────────────────────────────────────────────────
@@ -575,13 +649,11 @@
             const hashArray = Array.from(new Uint8Array(hashBuffer));
             return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
         }
-
         async function checkOrSetPassword() {
             const nav = document.querySelector('nav');
             const main = document.querySelector('main');
             nav.classList.add('d-none');
             main.classList.add('d-none');
-
             const modalHtml = `
 <div class="modal fade" id="passwordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
@@ -601,7 +673,6 @@
     </div>
 </div>`;
             document.body.insertAdjacentHTML('beforeend', modalHtml);
-
             const pwdModalEl = document.getElementById('passwordModal');
             const pwdInput = document.getElementById('pwdInput');
             const pwdSubmit = document.getElementById('pwdSubmit');
@@ -609,7 +680,6 @@
             const pwdMessage = document.getElementById('pwdMessage');
             const modal = new bootstrap.Modal(pwdModalEl, { backdrop: 'static', keyboard: false });
             modal.show();
-
             let hasPassword = false;
             let storedHash = null;
             try {
@@ -623,12 +693,10 @@
                 pwdSubmit.disabled = true;
                 return;
             }
-
             if (!hasPassword) {
                 pwdMessage.textContent = "First time setup – create your password (min 6 chars)";
                 pwdInput.placeholder = "Create password";
             }
-
             pwdSubmit.onclick = async () => {
                 pwdError.classList.add('d-none');
                 pwdSubmit.disabled = true;
@@ -675,12 +743,10 @@
                     }
                 }
             };
-
             pwdInput.addEventListener('keypress', e => {
                 if (e.key === 'Enter' && !pwdSubmit.disabled) pwdSubmit.click();
             });
         }
-
         function unlock() {
             const modalEl = document.getElementById('passwordModal');
             bootstrap.Modal.getInstance(modalEl)?.hide();
@@ -689,7 +755,6 @@
             document.getElementById('passwordModal')?.remove();
             initApp();
         }
-
         // ────────────────────────────────────────────────
         // App init after password
         // ────────────────────────────────────────────────
@@ -699,21 +764,32 @@
             document.getElementById('cagrDebt').value = appState.cagrAssumptions.debt;
             document.getElementById('cagrGold').value = appState.cagrAssumptions.gold;
             document.getElementById('cagrOthers').value = appState.cagrAssumptions.others;
-
             ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
                 document.getElementById(id)?.addEventListener('input', updateAndSaveCagr);
             });
-
+            document.getElementById('investType')?.addEventListener('change', function() {
+                document.getElementById('sipInputs').style.display = this.value === 'sip' ? 'block' : 'none';
+                document.getElementById('lumpsumInputs').style.display = this.value === 'lumpsum' ? 'block' : 'none';
+                calculateSipLumpsum();
+            });
+            ['monthlyAmt', 'lumpsumAmt', 'returnRate', 'periodYears'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', calculateSipLumpsum);
+            });
+            ['stepMonthlyAmt', 'stepUpPct', 'stepReturnRate', 'stepPeriodYears'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.addEventListener('input', calculateStepUpSip);
+            });
             updateNetWorthDisplay();
             renderPortfolios();
             updateProjections();
             document.getElementById('projections-tab')?.addEventListener('shown.bs.tab', updateProjections);
-
+            calculateSipLumpsum();
+            calculateStepUpSip();
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW failed', err));
             }
         }
-
         // ────────────────────────────────────────────────
         // Render & update functions
         // ────────────────────────────────────────────────
@@ -727,7 +803,6 @@
             pill.className = isPositive ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${isPositive ? '+' : ''}${returnPct.toFixed(2)}%`;
         }
-
         function renderPortfolios() {
             const container = document.getElementById('portfoliosContainer');
             if (appState.portfolios.length === 0) {
@@ -745,12 +820,10 @@
                 `;
                 return;
             }
-
             const sortedPortfolios = appState.portfolios.map(p => ({
                 ...p,
                 assets: sortAssetsByPercentage(p.assets)
             }));
-
             container.innerHTML = sortedPortfolios.map(p => `
                 <div class="col-lg-6">
                     <div class="card-glass p-4">
@@ -793,20 +866,16 @@
                     </div>
                 </div>
             `).join('');
-
             setTimeout(() => appState.portfolios.forEach(p => renderChart(p)), 50);
         }
-
         function renderChart(portfolio) {
             const canvas = document.getElementById(`chart-${portfolio.id}`);
             if (!canvas) return;
             if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
-
             const sortedAssets = sortAssetsByPercentage(portfolio.assets);
-            const colors = sortedAssets.map((a, idx) => 
+            const colors = sortedAssets.map((a, idx) =>
                 getAssetColor(getAssetCategory(a.name), idx)
             );
-
             chartInstances[portfolio.id] = new Chart(canvas, {
                 type: 'pie',
                 data: {
@@ -821,15 +890,13 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    direction: 'counter-clockwise',     // ← This makes it draw anti-clockwise
-                    rotation: -180,                      // Optional: starts from top (12 o'clock)
+                    rotation: -180,
                     plugins: {
                         legend: { display: false }
                     }
                 }
             });
         }
-
         function openAddPortfolio() {
             document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
             document.getElementById('editingPortfolioId').value = '';
@@ -839,7 +906,6 @@
             document.getElementById('assetsContainer').innerHTML = '';
             addAssetRow();
         }
-
         function editPortfolio(id) {
             const p = appState.portfolios.find(x => x.id === id);
             if (!p) return;
@@ -853,13 +919,11 @@
             recalculateAssetAmounts();
             new bootstrap.Modal(document.getElementById('portfolioModal')).show();
         }
-
         function addAssetRow(name = '', percentage = '') {
             const container = document.getElementById('assetsContainer');
             const id = generateId();
             const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
             const amount = (parseFloat(percentage) || 0) / 100 * total;
-
             const row = document.createElement('div');
             row.className = 'row g-2 mb-2 asset-row';
             row.id = `asset-${id}`;
@@ -882,7 +946,6 @@
             container.appendChild(row);
             updateAllocationTotal();
         }
-
         function removeAssetRow(id) {
             const rows = document.querySelectorAll('.asset-row');
             if (rows.length > 1) {
@@ -890,7 +953,6 @@
                 updateAllocationTotal();
             }
         }
-
         function updateAllocationTotal() {
             let total = 0;
             document.querySelectorAll('.asset-percentage').forEach(el => total += parseFloat(el.value) || 0);
@@ -900,7 +962,6 @@
             el.className = `small fw-medium ${valid ? 'text-success-custom' : 'text-warning'}`;
             recalculateAssetAmounts();
         }
-
         function recalculateAssetAmounts() {
             const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
             document.querySelectorAll('.asset-row').forEach(row => {
@@ -909,18 +970,14 @@
                 row.querySelector('.asset-amount').value = amt > 0 ? formatCurrency(amt) : '';
             });
         }
-
         async function savePortfolio() {
             const err = document.getElementById('portfolioError');
             err.classList.add('d-none');
-
             const id = document.getElementById('editingPortfolioId').value;
             const name = document.getElementById('portfolioName').value.trim();
             const totalInvested = parseFloat(document.getElementById('portfolioAmount').value);
-
             if (!name) { err.textContent = 'Portfolio name is required'; err.classList.remove('d-none'); return; }
             if (!totalInvested || totalInvested <= 0) { err.textContent = 'Total invested must be > 0'; err.classList.remove('d-none'); return; }
-
             let assets = [];
             document.querySelectorAll('.asset-row').forEach(row => {
                 const n = row.querySelector('.asset-name').value.trim();
@@ -929,32 +986,25 @@
                     assets.push({ id: generateId(), name: n, percentage: pct, amount: pct / 100 * totalInvested });
                 }
             });
-
             if (assets.length === 0) { err.textContent = 'At least one asset required'; err.classList.remove('d-none'); return; }
-
             const sumPct = assets.reduce((s,a)=>s+a.percentage,0);
             if (Math.abs(sumPct - 100) > 0.01) {
                 err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`; err.classList.remove('d-none'); return;
             }
-
             assets = sortAssetsByPercentage(assets);
-
             const portfolio = { id: id || generateId(), name, totalInvested, assets };
-
             if (id) {
                 const idx = appState.portfolios.findIndex(p => p.id === id);
                 if (idx !== -1) appState.portfolios[idx] = portfolio;
             } else {
                 appState.portfolios.push(portfolio);
             }
-
             await saveState();
             renderPortfolios();
             updateNetWorthDisplay();
             updateProjections();
             bootstrap.Modal.getInstance(document.getElementById('portfolioModal')).hide();
         }
-
         async function deletePortfolio(id) {
             if (!confirm('Delete this portfolio?')) return;
             appState.portfolios = appState.portfolios.filter(p => p.id !== id);
@@ -967,24 +1017,20 @@
             updateNetWorthDisplay();
             updateProjections();
         }
-
         function previewReturns() {
             const ret = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
             const inv = getTotalInvested();
             const val = inv + ret;
             const pct = inv > 0 ? (ret / inv) * 100 : 0;
             const pos = ret >= 0;
-
             document.getElementById('previewInvested').textContent = formatCurrency(inv);
             document.getElementById('previewReturns').textContent = `${pos ? '+' : ''}${formatCurrency(ret)}`;
             document.getElementById('previewReturns').className = pos ? 'text-success-custom' : 'text-danger';
             document.getElementById('previewValue').textContent = formatCurrency(val);
-
             const pctEl = document.getElementById('previewReturnPct');
             pctEl.className = pos ? 'pill-success' : 'pill-danger';
             pctEl.textContent = `${pos ? '+' : ''}${pct.toFixed(2)}%`;
         }
-
         async function saveReturns() {
             appState.totalReturns = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
             await saveState();
@@ -992,12 +1038,10 @@
             updateProjections();
             bootstrap.Modal.getInstance(document.getElementById('returnsModal')).hide();
         }
-
         document.getElementById('returnsModal').addEventListener('show.bs.modal', () => {
             document.getElementById('totalReturnsInput').value = appState.totalReturns;
             previewReturns();
         });
-
         async function updateAndSaveCagr() {
             appState.cagrAssumptions = {
                 equity: parseFloat(document.getElementById('cagrEquity').value) || 13,
@@ -1008,7 +1052,6 @@
             updateProjections();
             await saveCagrAssumptions();
         }
-
         function updateProjections() {
             const container = document.getElementById('projectionsContainer');
             if (appState.portfolios.length === 0) {
@@ -1021,16 +1064,13 @@
                 `;
                 return;
             }
-
             const rates = getCagrAssumptions();
             let grand = { current: 0, y5: 0, y10: 0, y15: 0, wCagr: 0 };
-
             const portfolioProjections = appState.portfolios.map(p => {
                 const totalInvAll = getTotalInvested();
                 const share = totalInvAll > 0 ? p.totalInvested / totalInvAll : 0;
                 const portReturns = appState.totalReturns * share;
                 const portCurrent = p.totalInvested + portReturns;
-
                 const sortedAssets = sortAssetsByPercentage(p.assets);
                 const assetProj = sortedAssets.map(a => {
                     const cat = getAssetCategory(a.name);
@@ -1044,33 +1084,26 @@
                         y15: calculateFutureValue(a.amount, r, 15)
                     };
                 });
-
                 const portWCagr = assetProj.reduce((s,a) => s + (a.rate * (a.amount / p.totalInvested)), 0) || 0;
-
-                const pY5  = calculateFutureValue(portCurrent, portWCagr, 5);
+                const pY5 = calculateFutureValue(portCurrent, portWCagr, 5);
                 const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
                 const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
-
                 grand.current += portCurrent;
-                grand.y5     += pY5;
-                grand.y10    += pY10;
-                grand.y15    += pY15;
-                grand.wCagr  += portWCagr * (portCurrent / (grand.current || 1));
-
-                const assetSumY5  = assetProj.reduce((s,a)=>s+a.y5,  0);
+                grand.y5 += pY5;
+                grand.y10 += pY10;
+                grand.y15 += pY15;
+                grand.wCagr += portWCagr * (portCurrent / (grand.current || 1));
+                const assetSumY5 = assetProj.reduce((s,a)=>s+a.y5, 0);
                 const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10, 0);
                 const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15, 0);
-
                 return { name: p.name, portCurrent, portWCagr, pY5, pY10, pY15, assetProj, assetSumY5, assetSumY10, assetSumY15, totalInvested: p.totalInvested };
             });
-
             if (grand.current > 0) {
                 grand.wCagr = 0;
                 portfolioProjections.forEach(proj => {
                     grand.wCagr += proj.portWCagr * (proj.portCurrent / grand.current);
                 });
             }
-
             const grandHtml = `
                 <div class="card-glass-static p-4 mb-4">
                     <h5 class="fw-semibold mb-3">Total Family Wealth Projection (Compounded from Today)</h5>
@@ -1101,7 +1134,6 @@
                     </small>
                 </div>
             `;
-
             const html = portfolioProjections.map(proj => `
                 <div class="card-glass-static p-4 mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -1146,25 +1178,107 @@
                     </small>
                 </div>
             `).join('');
-
             container.innerHTML = grandHtml + html;
         }
 
+        // ───────────────────── UPDATED SIP / LUMPSUM CALCULATOR (GROWW STYLE) ─────────────────────
+        function calculateSipLumpsum() {
+            const type = document.getElementById('investType').value;
+            const rate = parseFloat(document.getElementById('returnRate').value) / 100 || 0;
+            const years = parseInt(document.getElementById('periodYears').value) || 0;
+            const months = years * 12;
+
+            let invested = 0;
+            let fv = 0;
+
+            if (type === 'lumpsum') {
+                const principal = parseFloat(document.getElementById('lumpsumAmt').value) || 0;
+                invested = principal;
+                fv = principal * Math.pow(1 + rate, years);               // true annual compounding
+            } else {
+                // ─── SIP (Groww / realistic effective monthly rate) ───
+                const monthly = parseFloat(document.getElementById('monthlyAmt').value) || 0;
+                invested = monthly * months;
+                fv = invested;
+
+                if (rate > 0) {
+                    const r = Math.pow(1 + rate, 1/12) - 1;                // effective monthly rate from annual CAGR
+                    fv = monthly * ((Math.pow(1 + r, months) - 1) / r) * (1 + r);  // beginning-of-month convention (standard in India)
+                }
+            }
+
+            const returns = fv - invested;
+            document.getElementById('investedAmt').textContent = formatCurrency(invested);
+            document.getElementById('estReturns').textContent = formatCurrency(returns);
+            document.getElementById('totalValue').textContent = formatCurrency(fv);
+            document.getElementById('sipResults').classList.remove('d-none');
+            renderCalculatorChart('sipChart', invested, returns);
+        }
+
+        function calculateStepUpSip() {
+            const monthly = parseFloat(document.getElementById('stepMonthlyAmt').value) || 0;
+            const step = parseFloat(document.getElementById('stepUpPct').value) / 100 || 0;
+            const rate = parseFloat(document.getElementById('stepReturnRate').value) / 100 || 0;
+            const years = parseInt(document.getElementById('stepPeriodYears').value) || 0;
+
+            let invested = 0;
+            let fv = 0;
+            const totalMonths = years * 12;
+            const r = rate > 0 ? Math.pow(1 + rate, 1/12) - 1 : 0;   // effective monthly rate
+
+            for (let month = 0; month < totalMonths; month++) {
+                const year = Math.floor(month / 12);
+                const sipAmount = monthly * Math.pow(1 + step, year);
+                invested += sipAmount;
+                const growthPeriods = totalMonths - month;          // now matches regular SIP (beginning-of-month convention)
+                fv += sipAmount * Math.pow(1 + r, growthPeriods);
+            }
+
+            const returns = fv - invested;
+            document.getElementById('stepInvestedAmt').textContent = formatCurrency(invested);
+            document.getElementById('stepEstReturns').textContent = formatCurrency(returns);
+            document.getElementById('stepTotalValue').textContent = formatCurrency(fv);
+            document.getElementById('stepSipResults').classList.remove('d-none');
+            renderCalculatorChart('stepSipChart', invested, returns);
+        }
+        // ─────────────────────────────────────────────────────────────────────────────────────
+
+        function renderCalculatorChart(chartId, invested, returns) {
+            const canvas = document.getElementById(chartId);
+            if (chartInstances[chartId]) chartInstances[chartId].destroy();
+            chartInstances[chartId] = new Chart(canvas, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Invested Amount', 'Est. Returns'],
+                    datasets: [{
+                        data: [invested, returns],
+                        backgroundColor: ['#6b7280', '#22c55e'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
         // ────────────────────────────────────────────────
         // Start: password first
         // ────────────────────────────────────────────────
         document.addEventListener('DOMContentLoaded', () => {
             checkOrSetPassword();
         });
-
-        window.openAddPortfolio  = openAddPortfolio;
-        window.editPortfolio     = editPortfolio;
-        window.deletePortfolio   = deletePortfolio;
-        window.addAssetRow       = addAssetRow;
-        window.removeAssetRow    = removeAssetRow;
+        window.openAddPortfolio = openAddPortfolio;
+        window.editPortfolio = editPortfolio;
+        window.deletePortfolio = deletePortfolio;
+        window.addAssetRow = addAssetRow;
+        window.removeAssetRow = removeAssetRow;
         window.updateAllocationTotal = updateAllocationTotal;
-        window.savePortfolio     = savePortfolio;
-        window.saveReturns       = saveReturns;
+        window.savePortfolio = savePortfolio;
+        window.saveReturns = saveReturns;
     </script>
 </body>
 </html>
