@@ -1,6 +1,6 @@
 {
   "name": "Portfolio Pro",
-  "short_name": "PortPro",
+  "short_name": "PortfolioPro",
   "description": "Family Wealth Dashboard",
   "start_url": "./",
   "display": "standalone",
