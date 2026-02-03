@@ -198,6 +198,21 @@
             -webkit-user-select: none;
             touch-action: pan-y;
         }
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: #161b22;;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+      }
+
+        .brand-icon svg {
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body>
@@ -205,7 +220,14 @@
         <div class="container">
             <div class="d-flex align-items-center gap-3">
                 <div class="brand-icon">
-                    <img src="port_image.png" alt="Portfolio Pro" />
+                    <svg width="40" height="40" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M100 20L169.282 60V140L100 180L30.718 140V60L100 20Z" stroke="#4FB3FF" stroke-width="8" stroke-linejoin="round"/>
+        <rect x="65" y="110" width="12" height="30" rx="2" fill="#4FB3FF" />
+        <rect x="85" y="90" width="12" height="50" rx="2" fill="#3A9DFF" />
+        <rect x="105" y="75" width="12" height="65" rx="2" fill="#2687FF" />
+        <rect x="125" y="60" width="12" height="80" rx="2" fill="#1271FF" />
+        <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
                 </div>
                 <div>
                     <h1 class="h5 mb-0 fw-bold">Portfolio Pro</h1>
