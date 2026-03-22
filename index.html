@@ -1,1306 +1,1459 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#2dd4bf">
-    <meta name="description" content="Family Wealth Dashboard - Portfolio Pro">
-    <title>Portfolio Pro - Family Wealth Dashboard</title>
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <!-- Apple touch icon support -->
-    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#C9A84C">
+    <meta name="description" content="Portfolio Pro – Family Wealth Dashboard">
+    <title>Portfolio Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
-        :root {
-            --bg-gradient: linear-gradient(135deg, #0d1117 0%, #090c10 50%, #0a0e14 100%);
-            --card-gradient: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
-            --accent: #2dd4bf;
-            --accent-dark: #14b8a6;
-            --success: #22c55e;
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --text-primary: #f0f6fc;
-            --text-secondary: #8b949e;
-            --border-color: #30363d;
-            --card-bg: #161b22;
-            --input-bg: #21262d;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; }
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg-gradient);
-            min-height: 100vh;
-            color: var(--text-primary);
-            touch-action: pan-y;
-        }
-        .navbar-custom {
-            background: rgba(22,27,34,0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .brand-icon {
-            width:40px; height:40px;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            border-radius:12px;
-            display:flex; align-items:center; justify-content:center;
-        }
-        .brand-icon img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            border-radius: 1px;
-        }
-        .nav-tabs-custom {
-            background: rgba(33,38,45,0.5);
-            border-radius:12px;
-            padding:4px;
-        }
-        .nav-tabs-custom .nav-link {
-            color: var(--text-secondary);
-            border:none;
-            border-radius:8px;
-            padding:10px 12px;
-            font-weight:500;
-            font-size: 0.875rem;
-            transition:all 0.2s;
-        }
-        .nav-tabs-custom .nav-link:hover { color:var(--text-primary); background:rgba(45,212,191,0.1); }
-        .nav-tabs-custom .nav-link.active {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            color:#0d1117;
-        }
-        .card-glass, .card-glass-static {
-            background: var(--card-gradient);
-            border:1px solid var(--border-color);
-            border-radius:16px;
-            box-shadow:0 4px 16px rgba(0,0,0,0.4);
-        }
-        .card-glass:hover {
-            transform:translateY(-4px);
-            border-color:rgba(45,212,191,0.3);
-            box-shadow:0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(45,212,191,0.15);
-        }
-        .stat-value {
-            font-size:2.5rem;
-            font-weight:700;
-            background: linear-gradient(135deg, var(--accent) 0%, #5eead4 100%);
-            -webkit-background-clip:text;
-            -webkit-text-fill-color:transparent;
-            background-clip:text;
-        }
-        .pill-success {
-            background: linear-gradient(135deg, var(--success) 0%, #16a34a 100%);
-            color:white;
-            padding:6px 14px;
-            border-radius:50px;
-            font-size:0.875rem;
-            font-weight:500;
-            display:inline-flex; align-items:center; gap:4px;
-        }
-        .pill-danger {
-            background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
-            color:white;
-            padding:6px 14px;
-            border-radius:50px;
-            font-size:0.875rem;
-            font-weight:500;
-            display:inline-flex; align-items:center; gap:4px;
-        }
-        .btn-accent {
-            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-            color:#0d1117;
-            border:none;
-            padding:12px 24px;
-            border-radius:10px;
-            font-weight:600;
-            transition:all 0.2s;
-            box-shadow:0 2px 8px rgba(0,0,0,0.3);
-        }
-        .btn-accent:hover {
-            transform:translateY(-2px);
-            box-shadow:0 4px 16px rgba(0,0,0,0.4), 0 0 20px rgba(45,212,191,0.3);
-            color:#0d1117;
-        }
-        .btn-secondary-custom {
-            background:var(--input-bg);
-            color:var(--text-primary);
-            border:1px solid var(--border-color);
-            padding:12px 24px;
-            border-radius:10px;
-            font-weight:600;
-            transition:all 0.2s;
-        }
-        .btn-secondary-custom:hover {
-            background:var(--card-bg);
-            border-color:rgba(45,212,191,0.3);
-            color:var(--text-primary);
-        }
-        .form-control-dark {
-            background:var(--input-bg);
-            border:1px solid var(--border-color);
-            color:var(--text-primary);
-            border-radius:10px;
-            padding:12px 16px;
-            transition:all 0.2s;
-        }
-        .form-control-dark:focus {
-            background:var(--input-bg);
-            border-color:var(--accent);
-            color:var(--text-primary);
-            box-shadow:0 0 0 2px rgba(45,212,191,0.2);
-        }
-        .form-control-dark::placeholder { color:var(--text-secondary); }
-        .modal-content-dark {
-            background:var(--card-gradient);
-            border:1px solid var(--border-color);
-            border-radius:20px;
-        }
-        .modal-header-dark { border-bottom:1px solid var(--border-color); }
-        .dropdown-menu-dark-custom {
-            background:var(--card-bg);
-            border:1px solid var(--border-color);
-            border-radius:10px;
-            box-shadow:0 8px 32px rgba(0,0,0,0.5);
-        }
-        .dropdown-item-custom:hover { background:var(--input-bg); }
-        .text-muted-custom { color:var(--text-secondary) !important; }
-        .empty-state { text-align:center; padding:60px 20px; }
-        .empty-state i { font-size:4rem; color:var(--text-secondary); margin-bottom:20px; }
-        .chart-container { width:140px; height:140px; }
-        .asset-dot {
-            width:12px; height:12px;
-            border-radius:50%;
-            display:inline-block;
-        }
-        .table-dark-custom {
-            --bs-table-bg:transparent;
-            --bs-table-color:var(--text-primary);
-        }
-        .table-dark-custom th {
-            color:var(--text-secondary);
-            font-weight:500;
-            border-bottom:1px solid var(--border-color);
-        }
-        .table-dark-custom td { border-bottom:1px solid rgba(48,54,61,0.5); }
-        .bg-accent-subtle { background:rgba(45,212,191,0.1); }
-        .text-success-custom { color:var(--success) !important; }
-        .text-accent { color:var(--accent) !important; }
-        @media (max-width:768px) {
-            .stat-value { font-size:1.75rem; }
-            .chart-container { width:120px; height:120px; margin:0 auto; }
-        }
-        .no-select {
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: pan-y;
-        }
-        .brand-icon {
-            width: 44px;
-            height: 44px;
-            background: #161b22;;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px;
-      }
+    :root {
+        --gold:       #C9A84C;
+        --gold-light: #E5C97E;
+        --gold-dim:   rgba(201,168,76,0.18);
+        --gold-glow:  rgba(201,168,76,0.08);
+        --bg:         #0B0C0E;
+        --surface:    #111318;
+        --surface2:   #181C22;
+        --border:     rgba(255,255,255,0.07);
+        --border-gold:rgba(201,168,76,0.25);
+        --text:       #F2EDE6;
+        --muted:      #6B6D75;
+        --green:      #3ECF8E;
+        --red:        #F26B6B;
+        --radius:     14px;
+        --radius-sm:  8px;
+        --shadow:     0 8px 32px rgba(0,0,0,0.55);
+    }
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { scroll-behavior:smooth; }
+    body {
+        font-family:'DM Sans', system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height:100vh;
+        overflow-x:hidden;
+        -webkit-font-smoothing: antialiased;
+    }
 
-        .brand-icon svg {
-            width: 100%;
-            height: 100%;
+    /* ── noise texture overlay ── */
+    body::before {
+        content:'';
+        position:fixed; inset:0;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+        pointer-events:none; z-index:0; opacity:.55;
+    }
+    .layer { position:relative; z-index:1; }
+
+    /* ──────────── AUTH SCREEN ──────────── */
+    #authScreen {
+        min-height:100vh;
+        display:flex; align-items:center; justify-content:center;
+        background: radial-gradient(ellipse 80% 80% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%), var(--bg);
+    }
+    .auth-card {
+        width:100%; max-width:400px;
+        background: var(--surface);
+        border:1px solid var(--border-gold);
+        border-radius:24px;
+        padding:48px 40px;
+        box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.1);
+        text-align:center;
+    }
+    .auth-logo {
+        width:64px; height:64px;
+        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
+        border-radius:18px;
+        display:flex; align-items:center; justify-content:center;
+        margin:0 auto 24px;
+        box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+    }
+    .auth-logo svg { width:36px; height:36px; }
+    .auth-title {
+        font-family:'Playfair Display', serif;
+        font-size:1.75rem;
+        font-weight:700;
+        color:var(--text);
+        margin-bottom:8px;
+    }
+    .auth-sub { color:var(--muted); font-size:.9rem; margin-bottom:32px; }
+    .btn-google {
+        width:100%;
+        background: #fff;
+        color: #1F1F1F;
+        border:none;
+        border-radius:12px;
+        padding:14px 24px;
+        font-family:'DM Sans', sans-serif;
+        font-weight:600;
+        font-size:.95rem;
+        display:flex; align-items:center; justify-content:center; gap:12px;
+        cursor:pointer;
+        transition: box-shadow .2s, transform .2s;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+    }
+    .btn-google:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.35); }
+    .btn-google:active { transform:translateY(0); }
+    .google-icon { width:20px; height:20px; flex-shrink:0; }
+    .auth-note { color:var(--muted); font-size:.78rem; margin-top:20px; line-height:1.5; }
+    .auth-divider { border-color:var(--border); margin:20px 0; }
+    #authError { color:var(--red); font-size:.82rem; margin-top:12px; display:none; }
+
+    /* ──────────── NAV ──────────── */
+    #appShell { display:none; }
+    .topbar {
+        position:sticky; top:0; z-index:100;
+        background: rgba(11,12,14,0.85);
+        backdrop-filter: blur(20px) saturate(180%);
+        border-bottom:1px solid var(--border);
+        padding:0 24px;
+        height:64px;
+        display:flex; align-items:center; justify-content:space-between;
+    }
+    .brand {
+        display:flex; align-items:center; gap:12px;
+        text-decoration:none;
+    }
+    .brand-mark {
+        width:38px; height:38px;
+        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
+        border-radius:10px;
+        display:flex; align-items:center; justify-content:center;
+        box-shadow:0 4px 12px rgba(201,168,76,0.25);
+    }
+    .brand-mark svg { width:22px; height:22px; }
+    .brand-name {
+        font-family:'Playfair Display', serif;
+        font-size:1.1rem;
+        font-weight:700;
+        color:var(--text);
+    }
+    .brand-tagline { font-size:.7rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+    .nav-pills-custom {
+        display:flex; gap:4px;
+        background:var(--surface2);
+        border-radius:10px;
+        padding:4px;
+        border:1px solid var(--border);
+    }
+    .nav-pill {
+        padding:7px 18px;
+        border-radius:7px;
+        border:none;
+        background:transparent;
+        color:var(--muted);
+        font-family:'DM Sans', sans-serif;
+        font-size:.85rem;
+        font-weight:500;
+        cursor:pointer;
+        transition:all .2s;
+        white-space:nowrap;
+    }
+    .nav-pill:hover { color:var(--text); }
+    .nav-pill.active {
+        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
+        color:#0B0C0E;
+        font-weight:600;
+        box-shadow:0 2px 8px rgba(201,168,76,0.3);
+    }
+    .user-pill {
+        display:flex; align-items:center; gap:10px;
+        background:var(--surface2);
+        border:1px solid var(--border);
+        border-radius:999px;
+        padding:6px 14px 6px 6px;
+        cursor:pointer;
+        transition:border-color .2s;
+    }
+    .user-pill:hover { border-color:var(--border-gold); }
+    .user-avatar {
+        width:30px; height:30px;
+        border-radius:50%;
+        overflow:hidden;
+        border:1.5px solid var(--border-gold);
+        display:flex; align-items:center; justify-content:center;
+        background:var(--surface);
+        color:var(--gold);
+        font-size:.8rem; font-weight:600;
+    }
+    .user-avatar img { width:100%; height:100%; object-fit:cover; }
+    .user-name { font-size:.82rem; font-weight:500; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .signout-btn {
+        background:transparent; border:none;
+        color:var(--muted); font-size:.78rem;
+        cursor:pointer; padding:4px 8px; border-radius:6px;
+        transition:color .15s;
+    }
+    .signout-btn:hover { color:var(--red); }
+
+    /* ──────────── MAIN ──────────── */
+    .main-container {
+        max-width:1200px;
+        margin:0 auto;
+        padding:32px 24px 80px;
+    }
+
+    /* ──────────── TAB PANES ──────────── */
+    .tab-pane-pp { display:none; }
+    .tab-pane-pp.active { display:block; }
+
+    /* ──────────── HERO CARD ──────────── */
+    .hero-card {
+        background: linear-gradient(135deg, var(--surface) 0%, #0E1015 100%);
+        border:1px solid var(--border-gold);
+        border-radius:20px;
+        padding:40px 44px;
+        margin-bottom:28px;
+        position:relative;
+        overflow:hidden;
+        box-shadow: var(--shadow);
+    }
+    .hero-card::before {
+        content:'';
+        position:absolute; top:-60px; right:-60px;
+        width:300px; height:300px;
+        background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+        pointer-events:none;
+    }
+    .hero-label {
+        font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
+        color:var(--gold); font-weight:600; margin-bottom:10px;
+    }
+    .hero-value {
+        font-family:'Playfair Display', serif;
+        font-size:3.2rem;
+        font-weight:700;
+        color:var(--text);
+        line-height:1;
+        margin-bottom:20px;
+    }
+    .hero-sub { display:flex; gap:32px; flex-wrap:wrap; }
+    .hero-sub-item label { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:4px; }
+    .hero-sub-item .val { font-size:1.05rem; font-weight:600; font-variant-numeric:tabular-nums; }
+    .badge-return {
+        display:inline-flex; align-items:center; gap:5px;
+        padding:5px 13px;
+        border-radius:999px;
+        font-size:.8rem; font-weight:600;
+        font-variant-numeric:tabular-nums;
+    }
+    .badge-green { background:rgba(62,207,142,0.15); color:var(--green); border:1px solid rgba(62,207,142,0.25); }
+    .badge-red   { background:rgba(242,107,107,0.15); color:var(--red);   border:1px solid rgba(242,107,107,0.25); }
+    .hero-actions { display:flex; gap:12px; flex-wrap:wrap; }
+
+    /* ──────────── BUTTONS ──────────── */
+    .btn-primary-pp {
+        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
+        color:#0B0C0E;
+        border:none;
+        padding:10px 22px;
+        border-radius:10px;
+        font-family:'DM Sans', sans-serif;
+        font-weight:600;
+        font-size:.9rem;
+        cursor:pointer;
+        display:inline-flex; align-items:center; gap:8px;
+        transition:all .2s;
+        box-shadow:0 2px 12px rgba(201,168,76,0.25);
+    }
+    .btn-primary-pp:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,0.4); }
+    .btn-ghost-pp {
+        background:transparent;
+        color:var(--text);
+        border:1px solid var(--border);
+        padding:10px 22px;
+        border-radius:10px;
+        font-family:'DM Sans', sans-serif;
+        font-weight:500;
+        font-size:.9rem;
+        cursor:pointer;
+        display:inline-flex; align-items:center; gap:8px;
+        transition:all .2s;
+    }
+    .btn-ghost-pp:hover { border-color:var(--border-gold); color:var(--gold); }
+
+    /* ──────────── PORTFOLIO CARDS ──────────── */
+    .portfolio-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(400px, 1fr)); gap:20px; }
+    @media(max-width:600px) { .portfolio-grid { grid-template-columns:1fr; } }
+    .port-card {
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        padding:24px;
+        transition:all .25s;
+        position:relative;
+        overflow:hidden;
+    }
+    .port-card::after {
+        content:'';
+        position:absolute; bottom:0; left:0; right:0;
+        height:2px;
+        background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        opacity:0;
+        transition:opacity .25s;
+    }
+    .port-card:hover { border-color:var(--border-gold); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+    .port-card:hover::after { opacity:1; }
+    .port-name {
+        font-family:'Playfair Display', serif;
+        font-size:1.15rem;
+        font-weight:600;
+        color:var(--text);
+    }
+    .port-amount { font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums; }
+    .port-menu-btn {
+        background:transparent; border:none;
+        color:var(--muted); cursor:pointer;
+        padding:4px 6px; border-radius:6px;
+        transition:color .15s, background .15s;
+    }
+    .port-menu-btn:hover { color:var(--text); background:var(--surface2); }
+    .asset-row-display {
+        display:flex; justify-content:space-between; align-items:center;
+        padding:6px 0;
+        border-bottom:1px solid rgba(255,255,255,0.04);
+    }
+    .asset-row-display:last-child { border-bottom:none; }
+    .asset-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .asset-name-text { font-size:.83rem; color:var(--text); }
+    .asset-pct { font-size:.8rem; font-weight:600; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
+    .asset-amt-text { font-size:.75rem; color:var(--muted); font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
+    .chart-wrap { width:110px; height:110px; flex-shrink:0; }
+
+    /* ──────────── EMPTY STATE ──────────── */
+    .empty-state {
+        text-align:center; padding:80px 20px;
+        border:1px dashed var(--border);
+        border-radius:var(--radius);
+        background:var(--surface);
+    }
+    .empty-icon { font-size:3rem; color:var(--muted); margin-bottom:16px; }
+    .empty-title { font-family:'Playfair Display',serif; font-size:1.4rem; margin-bottom:8px; }
+
+    /* ──────────── MODALS ──────────── */
+    .modal-overlay {
+        display:none; position:fixed; inset:0; z-index:1000;
+        background:rgba(0,0,0,0.7);
+        backdrop-filter:blur(6px);
+        align-items:center; justify-content:center;
+        padding:20px;
+    }
+    .modal-overlay.open { display:flex; }
+    .modal-box {
+        background: var(--surface);
+        border:1px solid var(--border-gold);
+        border-radius:20px;
+        width:100%; max-width:560px;
+        max-height:90vh; overflow-y:auto;
+        box-shadow:0 32px 80px rgba(0,0,0,0.7);
+        animation: modalIn .22s ease;
+    }
+    @keyframes modalIn {
+        from { opacity:0; transform:scale(.96) translateY(8px); }
+        to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+    .modal-header-pp {
+        padding:24px 28px 0;
+        display:flex; justify-content:space-between; align-items:center;
+    }
+    .modal-title-pp {
+        font-family:'Playfair Display',serif;
+        font-size:1.25rem; font-weight:700;
+    }
+    .modal-close {
+        background:transparent; border:none;
+        color:var(--muted); cursor:pointer; font-size:1.1rem;
+        padding:6px; border-radius:6px; transition:color .15s;
+    }
+    .modal-close:hover { color:var(--text); }
+    .modal-body-pp { padding:20px 28px; }
+    .modal-footer-pp { padding:0 28px 24px; display:flex; justify-content:flex-end; gap:10px; }
+
+    /* ──────────── FORM ──────────── */
+    .field-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:6px; display:block; }
+    .field-input {
+        width:100%;
+        background:var(--surface2);
+        border:1px solid var(--border);
+        border-radius:var(--radius-sm);
+        color:var(--text);
+        font-family:'DM Sans',sans-serif;
+        font-size:.9rem;
+        padding:10px 14px;
+        outline:none;
+        transition:border-color .2s, box-shadow .2s;
+    }
+    .field-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+    .field-input::placeholder { color:var(--muted); }
+    .field-group { margin-bottom:18px; }
+    .select-input { appearance:none; }
+
+    /* ──────────── ASSET ROWS IN MODAL ──────────── */
+    .asset-edit-row {
+        display:grid; grid-template-columns:1fr 80px 90px 32px;
+        gap:8px; align-items:center;
+        margin-bottom:8px;
+    }
+    .asset-edit-row input { font-size:.85rem; padding:8px 10px; }
+    .asset-del-btn {
+        background:transparent; border:none; color:var(--muted);
+        cursor:pointer; font-size:.9rem; padding:4px;
+        border-radius:6px; transition:color .15s;
+        display:flex; align-items:center; justify-content:center;
+    }
+    .asset-del-btn:hover { color:var(--red); }
+    .allocation-badge {
+        display:inline-flex; align-items:center;
+        font-size:.78rem; font-weight:600;
+        padding:3px 10px; border-radius:999px;
+    }
+    .alloc-ok  { background:rgba(62,207,142,0.15); color:var(--green); }
+    .alloc-bad { background:rgba(242,107,107,0.12); color:var(--red); }
+    .add-asset-btn {
+        background:transparent; border:1px dashed var(--border);
+        color:var(--muted); border-radius:var(--radius-sm);
+        padding:8px 14px; font-size:.82rem; cursor:pointer;
+        transition:all .2s; width:100%;
+        font-family:'DM Sans',sans-serif;
+    }
+    .add-asset-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .err-msg { color:var(--red); font-size:.82rem; margin-top:8px; display:none; }
+
+    /* ──────────── PROJECTIONS ──────────── */
+    .section-title {
+        font-family:'Playfair Display',serif;
+        font-size:1.3rem; font-weight:700;
+        margin-bottom:20px;
+    }
+    .proj-table-wrap {
+        overflow-x:auto;
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        margin-bottom:24px;
+    }
+    table.pp-table { width:100%; border-collapse:collapse; }
+    table.pp-table th {
+        font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
+        color:var(--muted); font-weight:600;
+        padding:14px 18px;
+        border-bottom:1px solid var(--border);
+        text-align:right; white-space:nowrap;
+    }
+    table.pp-table th:first-child { text-align:left; }
+    table.pp-table td {
+        padding:12px 18px;
+        font-size:.85rem;
+        border-bottom:1px solid rgba(255,255,255,0.04);
+        text-align:right;
+        font-variant-numeric:tabular-nums;
+        font-family:'JetBrains Mono',monospace;
+    }
+    table.pp-table td:first-child { text-align:left; font-family:'DM Sans',sans-serif; }
+    table.pp-table tr:last-child td { border-bottom:none; }
+    table.pp-table tr.highlight td { background:var(--gold-glow); }
+    table.pp-table tr.grand td { background:var(--gold-dim); font-weight:700; }
+    .cagr-grid {
+        display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr));
+        gap:14px; margin-bottom:28px;
+    }
+    .cagr-card {
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:var(--radius-sm);
+        padding:14px 16px;
+    }
+    .cagr-card label { display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:8px; }
+    .cagr-hint { font-size:.73rem; color:var(--muted); margin-top:16px; }
+
+    /* ──────────── SIP ──────────── */
+    .sip-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:20px; }
+    .sip-card {
+        background:var(--surface);
+        border:1px solid var(--border);
+        border-radius:var(--radius);
+        padding:28px;
+    }
+    .sip-card-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:22px; }
+    .result-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .result-row:last-of-type { border-bottom:none; }
+    .result-label { font-size:.84rem; color:var(--muted); }
+    .result-val { font-size:.9rem; font-weight:600; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
+    .result-total { font-size:1.15rem; color:var(--gold); font-family:'Playfair Display',serif; }
+    .sip-note { font-size:.73rem; color:var(--muted); line-height:1.6; margin-top:14px; border-top:1px solid var(--border); padding-top:14px; }
+
+    /* ──────────── DROPDOWN ──────────── */
+    .dropdown-pp {
+        position:absolute; right:0; top:100%;
+        background:var(--surface2);
+        border:1px solid var(--border);
+        border-radius:10px;
+        min-width:150px;
+        box-shadow:0 12px 32px rgba(0,0,0,0.5);
+        z-index:50;
+        overflow:hidden;
+        display:none;
+    }
+    .dropdown-pp.open { display:block; }
+    .dropdown-pp button {
+        display:flex; align-items:center; gap:8px;
+        width:100%; padding:10px 16px;
+        background:transparent; border:none;
+        color:var(--text); font-family:'DM Sans',sans-serif; font-size:.85rem;
+        cursor:pointer; transition:background .15s;
+        text-align:left;
+    }
+    .dropdown-pp button:hover { background:var(--surface); }
+    .dropdown-pp button.danger { color:var(--red); }
+
+    /* ──────────── GRAND TOTAL CARD ──────────── */
+    .grand-card {
+        background: linear-gradient(135deg, var(--surface) 0%, rgba(201,168,76,0.04) 100%);
+        border:1px solid var(--border-gold);
+        border-radius:var(--radius);
+        padding:24px 28px;
+        margin-bottom:24px;
+    }
+    .grand-card-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .grand-card-row:last-child { border-bottom:none; }
+    .grand-card-row .lbl { font-size:.82rem; color:var(--muted); }
+    .grand-card-row .vl { font-size:.9rem; font-weight:600; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
+
+    /* ──────────── SPINNER ──────────── */
+    .spinner { width:20px; height:20px; border:2px solid rgba(11,12,14,0.3); border-top-color:#0B0C0E; border-radius:50%; animation:spin .6s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* ──────────── LOADING ──────────── */
+    #loadingOverlay {
+        position:fixed; inset:0; z-index:200;
+        background:var(--bg);
+        display:flex; align-items:center; justify-content:center;
+        flex-direction:column; gap:16px;
+    }
+    .loading-logo { width:56px; height:56px; background:linear-gradient(135deg,var(--gold),#a0772a); border-radius:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(201,168,76,0.3); }
+    .loading-bar { width:160px; height:2px; background:var(--surface2); border-radius:999px; overflow:hidden; }
+    .loading-bar-fill { height:100%; background:var(--gold); border-radius:999px; animation:loadbar 1.4s ease-in-out infinite; }
+    @keyframes loadbar { 0%{width:0%;margin-left:0} 50%{width:70%;margin-left:0} 100%{width:0%;margin-left:160px} }
+
+    /* ──────────── RESPONSIVE ──────────── */
+    @media(max-width:768px) {
+        .hero-value { font-size:2.2rem; }
+        .topbar { padding:0 16px; }
+        .main-container { padding:20px 16px 60px; }
+        .nav-pills-custom { display:none; }
+        .mobile-tab-bar {
+            display:flex; position:fixed; bottom:0; left:0; right:0; z-index:90;
+            background:rgba(11,12,14,0.95); backdrop-filter:blur(20px);
+            border-top:1px solid var(--border);
+            padding:10px 0 max(10px,env(safe-area-inset-bottom));
         }
+        .mob-tab {
+            flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
+            background:transparent; border:none; color:var(--muted);
+            font-family:'DM Sans',sans-serif; font-size:.68rem; font-weight:500;
+            cursor:pointer; padding:4px 8px; transition:color .2s;
+        }
+        .mob-tab i { font-size:1.2rem; }
+        .mob-tab.active { color:var(--gold); }
+        .auth-card { padding:36px 28px; }
+    }
+    @media(min-width:769px) {
+        .mobile-tab-bar { display:none; }
+    }
+
+    /* ──────────── TRANSITIONS ──────────── */
+    .tab-pane-pp { animation:fadeUp .25s ease both; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-custom sticky-top d-none">
-        <div class="container">
-            <div class="d-flex align-items-center gap-3">
-                <div class="brand-icon">
-                    <svg width="40" height="40" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100 20L169.282 60V140L100 180L30.718 140V60L100 20Z" stroke="#4FB3FF" stroke-width="8" stroke-linejoin="round"/>
-        <rect x="65" y="110" width="12" height="30" rx="2" fill="#4FB3FF" />
-        <rect x="85" y="90" width="12" height="50" rx="2" fill="#3A9DFF" />
-        <rect x="105" y="75" width="12" height="65" rx="2" fill="#2687FF" />
-        <rect x="125" y="60" width="12" height="80" rx="2" fill="#1271FF" />
-        <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-                </div>
-                <div>
-                    <h1 class="h5 mb-0 fw-bold">Portfolio Pro</h1>
-                    <small class="text-muted-custom">Family Wealth Dashboard</small>
-                </div>
+
+<!-- LOADING -->
+<div id="loadingOverlay">
+    <div class="loading-logo">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+            <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0B0C0E" stroke-width="10" stroke-linejoin="round"/>
+            <rect x="65" y="110" width="12" height="30" rx="2" fill="#0B0C0E"/>
+            <rect x="85" y="90" width="12" height="50" rx="2" fill="#0B0C0E"/>
+            <rect x="105" y="75" width="12" height="65" rx="2" fill="#0B0C0E"/>
+            <rect x="125" y="60" width="12" height="80" rx="2" fill="#0B0C0E"/>
+            <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="#0B0C0E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+</div>
+
+<!-- AUTH SCREEN -->
+<div id="authScreen" class="layer" style="display:none;">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0B0C0E" stroke-width="10" stroke-linejoin="round"/>
+                <rect x="65" y="110" width="12" height="30" rx="2" fill="#0B0C0E"/>
+                <rect x="85" y="90" width="12" height="50" rx="2" fill="#0B0C0E"/>
+                <rect x="105" y="75" width="12" height="65" rx="2" fill="#0B0C0E"/>
+                <rect x="125" y="60" width="12" height="80" rx="2" fill="#0B0C0E"/>
+            </svg>
+        </div>
+        <div class="auth-title">Portfolio Pro</div>
+        <div class="auth-sub">Your family's private wealth dashboard</div>
+        <button class="btn-google" id="googleSignInBtn">
+            <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Sign in with Google
+        </button>
+        <div id="authError"></div>
+        <p class="auth-note">Access is restricted to authorised family members only.<br>Your data is encrypted and stored securely.</p>
+    </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell" class="layer">
+    <!-- Topbar -->
+    <nav class="topbar">
+        <a class="brand" href="#">
+            <div class="brand-mark">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0B0C0E" stroke-width="10" stroke-linejoin="round"/>
+                    <rect x="65" y="110" width="12" height="30" rx="2" fill="#0B0C0E"/>
+                    <rect x="85" y="90" width="12" height="50" rx="2" fill="#0B0C0E"/>
+                    <rect x="105" y="75" width="12" height="65" rx="2" fill="#0B0C0E"/>
+                    <rect x="125" y="60" width="12" height="80" rx="2" fill="#0B0C0E"/>
+                    <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="#0B0C0E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
             </div>
-            <ul class="nav nav-tabs-custom" id="mainTabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button">Dashboard</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="projections-tab" data-bs-toggle="tab" data-bs-target="#projections" type="button">Projections</button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="sip-tab" data-bs-toggle="tab" data-bs-target="#sip" type="button">SIP Calculator</button>
-                </li>
-            </ul>
+            <div>
+                <div class="brand-name">Portfolio Pro</div>
+                <div class="brand-tagline">Family Wealth</div>
+            </div>
+        </a>
+        <div class="nav-pills-custom">
+            <button class="nav-pill active" onclick="showTab('dashboard',this)">Dashboard</button>
+            <button class="nav-pill" onclick="showTab('projections',this)">Projections</button>
+            <button class="nav-pill" onclick="showTab('sip',this)">SIP Calculator</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div class="user-pill" id="userPill">
+                <div class="user-avatar" id="userAvatar">?</div>
+                <span class="user-name" id="userName">Loading…</span>
+            </div>
+            <button class="signout-btn" onclick="signOut()" title="Sign out"><i class="bi bi-box-arrow-right"></i></button>
         </div>
     </nav>
-    <main class="container py-4 no-select d-none" id="swipeArea">
-        <div class="tab-content" id="mainTabContent">
-            <div class="tab-pane fade show active" id="overview" role="tabpanel">
-                <div class="card-glass-static p-4 p-md-5 mb-4">
-                    <div class="row align-items-center">
-                        <div class="col-lg-7">
-                            <p class="text-muted-custom text-uppercase small mb-2 letter-spacing-1">Family Net Worth</p>
-                            <h2 class="stat-value mb-4" id="currentValue">₹0</h2>
-                            <div class="d-flex flex-wrap gap-4">
-                                <div>
-                                    <p class="text-muted-custom small mb-1">Total Invested</p>
-                                    <p class="fs-5 fw-semibold mb-0" id="totalInvested">₹0</p>
-                                </div>
-                                <div>
-                                    <p class="text-muted-custom small mb-1">Overall Returns</p>
-                                    <span id="returnPill" class="pill-success">
-                                        <span id="returnPercentage">0.00%</span>
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-5 mt-4 mt-lg-0">
-                            <div class="d-flex flex-wrap gap-3 justify-content-lg-end">
-                                <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#portfolioModal" onclick="openAddPortfolio()">
-                                    <i class="bi bi-plus-lg me-2"></i>Add Portfolio
-                                </button>
-                                <button class="btn btn-secondary-custom" data-bs-toggle="modal" data-bs-target="#returnsModal">
-                                    <i class="bi bi-cash-coin me-2"></i>Total Returns
-                                </button>
-                            </div>
-                        </div>
+
+    <!-- Mobile Tab Bar -->
+    <div class="mobile-tab-bar">
+        <button class="mob-tab active" onclick="showTab('dashboard',this,'mob')">
+            <i class="bi bi-grid-3x3-gap-fill"></i><span>Dashboard</span>
+        </button>
+        <button class="mob-tab" onclick="showTab('projections',this,'mob')">
+            <i class="bi bi-graph-up-arrow"></i><span>Projections</span>
+        </button>
+        <button class="mob-tab" onclick="showTab('sip',this,'mob')">
+            <i class="bi bi-calculator"></i><span>SIP</span>
+        </button>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-container">
+
+        <!-- ── DASHBOARD TAB ── -->
+        <div id="tab-dashboard" class="tab-pane-pp active">
+            <div class="hero-card">
+                <div class="hero-label">Family Net Worth</div>
+                <div class="hero-value" id="heroValue">₹0</div>
+                <div class="hero-sub mb-4">
+                    <div class="hero-sub-item">
+                        <label>Total Invested</label>
+                        <span class="val" id="heroInvested">₹0</span>
+                    </div>
+                    <div class="hero-sub-item">
+                        <label>Overall Returns</label>
+                        <span id="heroBadge" class="badge-return badge-green">+0.00%</span>
                     </div>
                 </div>
-                <div id="portfoliosContainer" class="row g-4"></div>
-            </div>
-            <div class="tab-pane fade" id="projections" role="tabpanel">
-                <div class="card-glass-static p-4 mb-4">
-                    <div class="d-flex align-items-center gap-2 mb-3">
-                        <i class="bi bi-gear text-accent"></i>
-                        <h5 class="mb-0 fw-semibold">CAGR Assumptions (Expected Future Returns)</h5>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <label class="form-label text-muted-custom small">Equity (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrEquity" step="0.5" min="0" max="30">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-muted-custom small">Debt (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrDebt" step="0.5" min="0" max="15">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-muted-custom small">Gold (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrGold" step="0.5" min="0" max="20">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label text-muted-custom small">Others (%)</label>
-                            <input type="number" class="form-control form-control-dark" id="cagrOthers" step="0.5" min="-5" max="15">
-                        </div>
-                    </div>
-                    <p class="text-muted-custom small mt-3 mb-0">
-                        * Categories detected from asset names. Use keywords like: Equity, Debt, Gold, etc.
-                    </p>
-                </div>
-                <div id="projectionsContainer"></div>
-            </div>
-            <div class="tab-pane fade" id="sip" role="tabpanel">
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="card-glass-static p-4">
-                            <h5 class="fw-semibold mb-4">SIP / Lumpsum Calculator</h5>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Investment Type</label>
-                                <select class="form-select form-control-dark" id="investType">
-                                    <option value="sip">SIP (Monthly)</option>
-                                    <option value="lumpsum">Lumpsum</option>
-                                </select>
-                            </div>
-                            <div id="sipInputs">
-                                <div class="mb-3">
-                                    <label class="form-label text-muted-custom small">Monthly Investment (₹)</label>
-                                    <input type="number" class="form-control form-control-dark" id="monthlyAmt" min="100" value="5000">
-                                </div>
-                            </div>
-                            <div id="lumpsumInputs" style="display:none;">
-                                <div class="mb-3">
-                                    <label class="form-label text-muted-custom small">Lumpsum Amount (₹)</label>
-                                    <input type="number" class="form-control form-control-dark" id="lumpsumAmt" min="100" value="100000">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Expected Return Rate (% p.a.)</label>
-                                <input type="number" class="form-control form-control-dark" id="returnRate" step="0.1" min="0" value="12">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Investment Period (Years)</label>
-                                <input type="number" class="form-control form-control-dark" id="periodYears" min="1" value="10">
-                            </div>
-                            <div id="sipResults" class="d-none">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted-custom">Invested Amount</span>
-                                    <span id="investedAmt">₹0</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted-custom">Est. Returns</span>
-                                    <span id="estReturns" class="text-success-custom">₹0</span>
-                                </div>
-                                <hr class="border-secondary">
-                                <div class="d-flex justify-content-between">
-                                    <span class="fw-semibold">Total Value</span>
-                                    <span id="totalValue" class="fw-bold text-accent">₹0</span>
-                                </div>
-                                <small class="text-muted-custom d-block mt-2">
-                                    • Assumes investment at the <strong>beginning of each month</strong> (standard Groww / most Indian calculator convention)<br>
-                                    • Uses true monthly rate derived from annual CAGR → more realistic<br>
-                                    • Compounded monthly • No exit load / taxes considered
-                                </small>
-                                <div class="chart-container mt-4" style="height:200px;">
-                                    <canvas id="sipChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="card-glass-static p-4">
-                            <h5 class="fw-semibold mb-4">Step-up SIP Calculator</h5>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Monthly Investment (₹)</label>
-                                <input type="number" class="form-control form-control-dark" id="stepMonthlyAmt" min="100" value="5000">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Annual Step-up (%)</label>
-                                <input type="number" class="form-control form-control-dark" id="stepUpPct" step="0.1" min="0" value="10">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Expected Return Rate (% p.a.)</label>
-                                <input type="number" class="form-control form-control-dark" id="stepReturnRate" step="0.1" min="0" value="12">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label text-muted-custom small">Investment Period (Years)</label>
-                                <input type="number" class="form-control form-control-dark" id="stepPeriodYears" min="1" value="10">
-                            </div>
-                            <div id="stepSipResults" class="d-none">
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted-custom">Invested Amount</span>
-                                    <span id="stepInvestedAmt">₹0</span>
-                                </div>
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="text-muted-custom">Est. Returns</span>
-                                    <span id="stepEstReturns" class="text-success-custom">₹0</span>
-                                </div>
-                                <hr class="border-secondary">
-                                <div class="d-flex justify-content-between">
-                                    <span class="fw-semibold">Total Value</span>
-                                    <span id="stepTotalValue" class="fw-bold text-accent">₹0</span>
-                                </div>
-                                <div class="chart-container mt-4" style="height:200px;">
-                                    <canvas id="stepSipChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-actions">
+                    <button class="btn-primary-pp" onclick="openAddPortfolio()"><i class="bi bi-plus-lg"></i>Add Portfolio</button>
+                    <button class="btn-ghost-pp" onclick="openReturnsModal()"><i class="bi bi-cash-coin"></i>Total Returns</button>
                 </div>
             </div>
+            <div id="portfoliosGrid" class="portfolio-grid"></div>
         </div>
-    </main>
-    <!-- Portfolio Modal -->
-    <div class="modal fade" id="portfolioModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content modal-content-dark">
-                <div class="modal-header modal-header-dark border-0 pb-0">
-                    <h5 class="modal-title fw-semibold" id="portfolioModalTitle">Add Portfolio</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+        <!-- ── PROJECTIONS TAB ── -->
+        <div id="tab-projections" class="tab-pane-pp" style="display:none;">
+            <div class="section-title">CAGR Assumptions</div>
+            <div class="cagr-grid">
+                <div class="cagr-card">
+                    <label>Equity (%)</label>
+                    <input type="number" class="field-input" id="cagrEquity" step="0.5" min="0" max="30" value="13">
                 </div>
-                <div class="modal-body">
-                    <form id="portfolioForm">
-                        <input type="hidden" id="editingPortfolioId">
-                        <div class="mb-4">
-                            <label class="form-label text-muted-custom small">Portfolio Name</label>
-                            <input type="text" class="form-control form-control-dark" id="portfolioName" placeholder="e.g., My Retirement Fund" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label text-muted-custom small">Total Invested Amount (₹)</label>
-                            <input type="number" class="form-control form-control-dark" id="portfolioAmount" placeholder="Enter amount" min="1" required oninput="recalculateAssetAmounts()">
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <label class="form-label text-muted-custom small mb-0">Asset Allocation</label>
-                                <span id="allocationTotal" class="small fw-medium text-warning">Total: 0%</span>
-                            </div>
-                            <div id="assetsContainer"></div>
-                            <button type="button" class="btn btn-link text-accent text-decoration-none p-0 mt-2" onclick="addAssetRow()">
-                                <i class="bi bi-plus-lg me-1"></i>Add Asset
-                            </button>
-                        </div>
-                        <div id="portfolioError" class="alert alert-danger d-none"></div>
-                    </form>
+                <div class="cagr-card">
+                    <label>Debt (%)</label>
+                    <input type="number" class="field-input" id="cagrDebt" step="0.5" min="0" max="15" value="7.5">
                 </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" onclick="savePortfolio()">Save Portfolio</button>
+                <div class="cagr-card">
+                    <label>Gold (%)</label>
+                    <input type="number" class="field-input" id="cagrGold" step="0.5" min="0" max="20" value="9">
+                </div>
+                <div class="cagr-card">
+                    <label>Others (%)</label>
+                    <input type="number" class="field-input" id="cagrOthers" step="0.5" min="-5" max="15" value="2">
+                </div>
+            </div>
+            <p class="cagr-hint">Keywords detected: equity/stock/mf → Equity · debt/fd/ppf → Debt · gold/sgb → Gold · else → Others</p>
+            <div id="projectionsContainer" style="margin-top:28px;"></div>
+        </div>
+
+        <!-- ── SIP TAB ── -->
+        <div id="tab-sip" class="tab-pane-pp" style="display:none;">
+            <div class="sip-grid">
+                <!-- Regular SIP -->
+                <div class="sip-card">
+                    <div class="sip-card-title">SIP / Lumpsum Calculator</div>
+                    <div class="field-group">
+                        <label class="field-label">Investment Type</label>
+                        <select class="field-input select-input" id="investType" onchange="handleInvestTypeChange()">
+                            <option value="sip">SIP (Monthly)</option>
+                            <option value="lumpsum">Lumpsum</option>
+                        </select>
+                    </div>
+                    <div id="sipInputGroup" class="field-group">
+                        <label class="field-label">Monthly Investment (₹)</label>
+                        <input type="number" class="field-input" id="monthlyAmt" min="100" value="5000" oninput="calcSip()">
+                    </div>
+                    <div id="lumpsumInputGroup" class="field-group" style="display:none;">
+                        <label class="field-label">Lumpsum Amount (₹)</label>
+                        <input type="number" class="field-input" id="lumpsumAmt" min="100" value="100000" oninput="calcSip()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Expected Return (% p.a.)</label>
+                        <input type="number" class="field-input" id="returnRate" step="0.1" min="0" value="12" oninput="calcSip()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Investment Period (Years)</label>
+                        <input type="number" class="field-input" id="periodYears" min="1" value="10" oninput="calcSip()">
+                    </div>
+                    <div id="sipResultsBox" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+                        <div class="result-row"><span class="result-label">Invested Amount</span><span class="result-val" id="sipInvested">₹0</span></div>
+                        <div class="result-row"><span class="result-label">Est. Returns</span><span class="result-val" style="color:var(--green);" id="sipReturns">₹0</span></div>
+                        <div class="result-row"><span class="result-label" style="font-weight:600;color:var(--text);">Total Value</span><span class="result-val result-total" id="sipTotal">₹0</span></div>
+                        <div style="height:180px; margin-top:16px;"><canvas id="sipChart"></canvas></div>
+                    </div>
+                    <p class="sip-note">Beginning-of-month convention · Effective monthly rate from annual CAGR · No taxes/exit load</p>
+                </div>
+                <!-- Step-up SIP -->
+                <div class="sip-card">
+                    <div class="sip-card-title">Step-up SIP Calculator</div>
+                    <div class="field-group">
+                        <label class="field-label">Monthly Investment (₹)</label>
+                        <input type="number" class="field-input" id="stepMonthly" min="100" value="5000" oninput="calcStepSip()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Annual Step-up (%)</label>
+                        <input type="number" class="field-input" id="stepPct" step="0.1" min="0" value="10" oninput="calcStepSip()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Expected Return (% p.a.)</label>
+                        <input type="number" class="field-input" id="stepRate" step="0.1" min="0" value="12" oninput="calcStepSip()">
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label">Investment Period (Years)</label>
+                        <input type="number" class="field-input" id="stepYears" min="1" value="10" oninput="calcStepSip()">
+                    </div>
+                    <div id="stepResultsBox" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+                        <div class="result-row"><span class="result-label">Invested Amount</span><span class="result-val" id="stepInvested">₹0</span></div>
+                        <div class="result-row"><span class="result-label">Est. Returns</span><span class="result-val" style="color:var(--green);" id="stepReturns">₹0</span></div>
+                        <div class="result-row"><span class="result-label" style="font-weight:600;color:var(--text);">Total Value</span><span class="result-val result-total" id="stepTotal">₹0</span></div>
+                        <div style="height:180px; margin-top:16px;"><canvas id="stepSipChart"></canvas></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- Returns Modal -->
-    <div class="modal fade" id="returnsModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content modal-content-dark">
-                <div class="modal-header modal-header-dark border-0 pb-0">
-                    <h5 class="modal-title fw-semibold">
-                        <i class="bi bi-graph-up-arrow text-accent me-2"></i>Total Returns / Unrealized Gain/Loss
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-4">
-                        <label class="form-label text-muted-custom small">Total Profit/Loss Across All Portfolios (₹)</label>
-                        <input type="number" class="form-control form-control-dark" id="totalReturnsInput" placeholder="Enter total returns (can be negative)" oninput="previewReturns()">
-                        <small class="text-muted-custom">Positive = profit/gain • Negative = loss</small>
-                    </div>
-                    <div class="bg-dark rounded-3 p-3">
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted-custom">Total Invested</span>
-                            <span id="previewInvested">₹0</span>
-                        </div>
-                        <div class="d-flex justify-content-between small mb-2">
-                            <span class="text-muted-custom">Returns</span>
-                            <span id="previewReturns" class="text-success-custom">+₹0</span>
-                        </div>
-                        <hr class="border-secondary my-2">
-                        <div class="d-flex justify-content-between">
-                            <span class="text-muted-custom">Current Value</span>
-                            <span id="previewValue" class="fw-bold">₹0</span>
-                        </div>
-                        <div class="d-flex justify-content-between small mt-2">
-                            <span class="text-muted-custom">Return %</span>
-                            <span id="previewReturnPct" class="pill-success">+0.00%</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer border-0">
-                    <button type="button" class="btn btn-secondary-custom" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-accent" onclick="saveReturns()">Save Returns</button>
-                </div>
+</div>
+
+<!-- ── PORTFOLIO MODAL ── -->
+<div class="modal-overlay" id="portfolioModal">
+    <div class="modal-box">
+        <div class="modal-header-pp">
+            <div class="modal-title-pp" id="portModalTitle">Add Portfolio</div>
+            <button class="modal-close" onclick="closeModal('portfolioModal')"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body-pp">
+            <div class="field-group">
+                <label class="field-label">Portfolio Name</label>
+                <input type="text" class="field-input" id="portName" placeholder="e.g. Retirement Fund">
             </div>
+            <div class="field-group">
+                <label class="field-label">Total Invested (₹)</label>
+                <input type="number" class="field-input" id="portAmount" placeholder="0" min="1" oninput="recalcAmounts()">
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <label class="field-label" style="margin:0;">Asset Allocation</label>
+                    <span id="allocBadge" class="allocation-badge alloc-bad">0%</span>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 80px 90px 32px; gap:8px; margin-bottom:6px; padding:0 2px;">
+                    <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Asset Name</span>
+                    <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center;">%</span>
+                    <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:right;">Amount</span>
+                    <span></span>
+                </div>
+                <div id="assetsContainer"></div>
+                <button class="add-asset-btn" onclick="addAssetRow()" style="margin-top:8px;"><i class="bi bi-plus"></i> Add Asset</button>
+            </div>
+            <div class="err-msg" id="portError"></div>
+            <input type="hidden" id="editingId">
+        </div>
+        <div class="modal-footer-pp">
+            <button class="btn-ghost-pp" onclick="closeModal('portfolioModal')">Cancel</button>
+            <button class="btn-primary-pp" onclick="savePortfolio()">Save Portfolio</button>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
-        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
-            authDomain: "portfolio-f938c.firebaseapp.com",
-            projectId: "portfolio-f938c",
-            storageBucket: "portfolio-f938c.firebasestorage.app",
-            messagingSenderId: "963544931671",
-            appId: "1:963544931671:web:ff0210cc532428ea227212",
-            measurementId: "G-C41JE44L43",
-            databaseURL: "https://portfolio-f938c-default-rtdb.asia-southeast1.firebasedatabase.app"
-        };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const rtdb = getDatabase(app);
-        enableIndexedDbPersistence(db).catch((err) => {
-            console.warn("IndexedDB persistence issue:", err);
-        });
-        const DOC_REF = doc(db, "shared", "family-portfolio-data");
-        const PASSWORD_REF = ref(rtdb, "appPassword");
-        // ──── COLOR DEFINITIONS ───────────────────────────────────────────────
-        const CATEGORY_COLORS = {
-            equity: '#ef4444', // red-500
-            debt: '#22c55e', // green-500
-            gold: '#eab308', // amber-500 / gold tone
-        };
-        const OTHERS_COLORS = [
-            '#6b7280', '#9ca3af', '#64748b', '#475569', '#334155'
-        ];
-        function getAssetColor(category, indexForOthers = 0) {
-            if (category in CATEGORY_COLORS) {
-                return CATEGORY_COLORS[category];
-            }
-            return OTHERS_COLORS[indexForOthers % OTHERS_COLORS.length];
-        }
-        let appState = {
-            portfolios: [],
-            totalReturns: 0,
-            cagrAssumptions: {
-                equity: 13,
-                debt: 7.5,
-                gold: 9,
-                others: 2
-            }
-        };
-        let chartInstances = {};
-        let isSaving = false;
-        // ────────────────────────────────────────────────
-        // Improved swipe handling
-        // ────────────────────────────────────────────────
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
-        const swipeThreshold = 70;
-        const swipeArea = document.getElementById('swipeArea');
-        swipeArea.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-            touchStartY = e.changedTouches[0].screenY;
-            const scrollable = e.target.closest('.table-responsive');
-            swipeArea.dataset.touchStartedInScrollable = scrollable ? 'true' : 'false';
-        }, { passive: true });
-        swipeArea.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            touchEndY = e.changedTouches[0].screenY;
-            handleSwipe();
-        }, { passive: true });
-        function handleSwipe() {
-            const diffX = touchStartX - touchEndX;
-            const diffY = Math.abs(touchStartY - touchEndY);
-            if (diffY > 50) return;
-            if (swipeArea.dataset.touchStartedInScrollable === 'true' && Math.abs(diffX) > 40) return;
-            if (Math.abs(diffX) < swipeThreshold) return;
-            const tabButtons = Array.from(document.querySelectorAll('#mainTabs .nav-link'));
-            const currentIdx = tabButtons.findIndex(b => b.classList.contains('active'));
-            let newIdx;
-            if (diffX > 0) { // swipe left → next
-                newIdx = (currentIdx + 1) % tabButtons.length;
-            } else { // swipe right → previous
-                newIdx = (currentIdx - 1 + tabButtons.length) % tabButtons.length;
-            }
-            bootstrap.Tab.getOrCreateInstance(tabButtons[newIdx]).show();
-            swipeArea.dataset.touchStartedInScrollable = 'false';
-        }
-        // ────────────────────────────────────────────────
-        // Helper functions
-        // ────────────────────────────────────────────────
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(Math.round(amount));
-        }
-        function generateId() {
-            return Math.random().toString(36).substring(2, 9);
-        }
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-        function sortAssetsByPercentage(assets) {
-            return [...assets].sort((a, b) => b.percentage - a.percentage);
-        }
-        function getTotalInvested() {
-            return appState.portfolios.reduce((sum, p) => sum + (p.totalInvested || 0), 0);
-        }
-        function getCurrentValue() {
-            return getTotalInvested() + appState.totalReturns;
-        }
-        function getReturnPercentage() {
-            const invested = getTotalInvested();
-            return invested > 0 ? (appState.totalReturns / invested) * 100 : 0;
-        }
-        function calculateFutureValue(principal, rate, years) {
-            return principal * Math.pow(1 + rate / 100, years);
-        }
-        function getAssetCategory(assetName) {
-            const name = assetName.toLowerCase();
-            if (/equity|stock|share|mf|mutual fund|nifty|sensex|midcap|smallcap/.test(name)) return 'equity';
-            if (/debt|bond|fd|fixed deposit|ppf|rd|corporate bond|gilt/.test(name)) return 'debt';
-            if (/gold|sgb|gold etf|gold fund|digital gold/.test(name)) return 'gold';
-            return 'others';
-        }
-        function getCagrAssumptions() {
-            return appState.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
-        }
-        // ────────────────────────────────────────────────
-        // Firestore
-        // ────────────────────────────────────────────────
-        async function loadState() {
-            try {
-                const snap = await getDoc(DOC_REF);
-                if (snap.exists()) {
-                    const data = snap.data();
-                    appState.portfolios = (data.portfolios || []).map(p => ({
-                        ...p,
-                        assets: sortAssetsByPercentage(p.assets)
-                    }));
-                    appState.totalReturns = data.totalReturns || 0;
-                    appState.cagrAssumptions = data.cagrAssumptions || { equity: 13, debt: 7.5, gold: 9, others: 2 };
-                }
-            } catch (e) {
-                console.error("Error loading from Firestore:", e);
-            }
-        }
-        async function saveState() {
-            if (isSaving) return;
-            isSaving = true;
-            try {
-                await setDoc(DOC_REF, appState);
-            } catch (e) {
-                console.error("Error saving to Firestore:", e);
-            } finally {
-                isSaving = false;
-            }
-        }
-        async function saveCagrAssumptions() {
-            if (isSaving) return;
-            isSaving = true;
-            try {
-                await setDoc(DOC_REF, { cagrAssumptions: appState.cagrAssumptions }, { merge: true });
-            } catch (e) {
-                console.error("Error saving CAGR:", e);
-            } finally {
-                isSaving = false;
-            }
-        }
-        // ────────────────────────────────────────────────
-        // Password logic (SHA-256)
-        // ────────────────────────────────────────────────
-        async function sha256(str) {
-            const msgBuffer = new TextEncoder().encode(str);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2,'0')).join('');
-        }
-        async function checkOrSetPassword() {
-            const nav = document.querySelector('nav');
-            const main = document.querySelector('main');
-            nav.classList.add('d-none');
-            main.classList.add('d-none');
-            const modalHtml = `
-<div class="modal fade" id="passwordModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content modal-content-dark border-0 shadow-lg">
-            <div class="modal-body text-center py-5 px-5">
-                <i class="bi bi-shield-lock text-accent mb-4" style="font-size: 3.5rem; opacity: 0.92;"></i>
-                <h4 class="fw-bold mb-4">Portfolio Pro</h4>
-                <p class="text-muted-custom mb-4" id="pwdMessage">
-                    Secure access required
-                </p>
-                <input type="password" class="form-control form-control-dark mb-4 text-center"
-                       id="pwdInput" placeholder="••••••••" autocomplete="off" autofocus>
-                <button class="btn btn-accent w-100 py-3 fw-semibold" id="pwdSubmit">Unlock</button>
-                <div id="pwdError" class="alert alert-danger mt-3 d-none small"></div>
+</div>
+
+<!-- ── RETURNS MODAL ── -->
+<div class="modal-overlay" id="returnsModal">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header-pp">
+            <div class="modal-title-pp">Total Returns</div>
+            <button class="modal-close" onclick="closeModal('returnsModal')"><i class="bi bi-x-lg"></i></button>
+        </div>
+        <div class="modal-body-pp">
+            <div class="field-group">
+                <label class="field-label">Profit / Loss Across All Portfolios (₹)</label>
+                <input type="number" class="field-input" id="returnsInput" placeholder="Positive = profit · Negative = loss" oninput="previewReturns()">
+                <p style="font-size:.75rem; color:var(--muted); margin-top:6px;">Enter the total unrealised gain or loss across your entire family portfolio.</p>
+            </div>
+            <div class="grand-card">
+                <div class="grand-card-row"><span class="lbl">Total Invested</span><span class="vl" id="retPreviewInvested">₹0</span></div>
+                <div class="grand-card-row"><span class="lbl">Returns</span><span class="vl" id="retPreviewReturns" style="color:var(--green)">+₹0</span></div>
+                <div class="grand-card-row"><span class="lbl" style="font-weight:600;color:var(--text);">Current Value</span><span class="vl" style="font-size:1.05rem;color:var(--gold);" id="retPreviewValue">₹0</span></div>
+                <div class="grand-card-row"><span class="lbl">Return %</span><span id="retPreviewPct" class="badge-return badge-green" style="font-size:.8rem;">+0.00%</span></div>
             </div>
         </div>
+        <div class="modal-footer-pp">
+            <button class="btn-ghost-pp" onclick="closeModal('returnsModal')">Cancel</button>
+            <button class="btn-primary-pp" onclick="saveReturns()">Save</button>
+        </div>
     </div>
-</div>`;
-            document.body.insertAdjacentHTML('beforeend', modalHtml);
-            const pwdModalEl = document.getElementById('passwordModal');
-            const pwdInput = document.getElementById('pwdInput');
-            const pwdSubmit = document.getElementById('pwdSubmit');
-            const pwdError = document.getElementById('pwdError');
-            const pwdMessage = document.getElementById('pwdMessage');
-            const modal = new bootstrap.Modal(pwdModalEl, { backdrop: 'static', keyboard: false });
-            modal.show();
-            let hasPassword = false;
-            let storedHash = null;
-            try {
-                const snap = await get(PASSWORD_REF);
-                hasPassword = snap.exists() && typeof snap.val() === 'string' && snap.val().length >= 64;
-                if (hasPassword) storedHash = snap.val();
-            } catch (err) {
-                console.error("Firebase read failed:", err);
-                pwdError.textContent = "Cannot connect to database. Check internet / Firebase rules.";
-                pwdError.classList.remove('d-none');
-                pwdSubmit.disabled = true;
-                return;
-            }
-            if (!hasPassword) {
-                pwdMessage.textContent = "First time setup – create your password (min 6 chars)";
-                pwdInput.placeholder = "Create password";
-            }
-            pwdSubmit.onclick = async () => {
-                pwdError.classList.add('d-none');
-                pwdSubmit.disabled = true;
-                pwdSubmit.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Checking...';
-                const val = pwdInput.value.trim();
-                if (val.length < 6) {
-                    pwdError.textContent = "Password must be at least 6 characters";
-                    pwdError.classList.remove('d-none');
-                    pwdSubmit.disabled = false;
-                    pwdSubmit.textContent = 'Unlock';
-                    return;
-                }
-                let hash;
-                try {
-                    hash = await sha256(val);
-                } catch (err) {
-                    pwdError.textContent = "Security error – try another browser";
-                    pwdError.classList.remove('d-none');
-                    pwdSubmit.disabled = false;
-                    pwdSubmit.textContent = 'Unlock';
-                    return;
-                }
-                if (!hasPassword) {
-                    try {
-                        await set(PASSWORD_REF, hash);
-                        unlock();
-                    } catch (err) {
-                        console.error("Firebase write failed:", err);
-                        pwdError.textContent = "Failed to save password. Check Firebase rules & internet.";
-                        pwdError.classList.remove('d-none');
-                        pwdSubmit.disabled = false;
-                        pwdSubmit.textContent = 'Unlock';
-                    }
-                } else {
-                    if (hash === storedHash) {
-                        unlock();
-                    } else {
-                        pwdError.textContent = "Incorrect password";
-                        pwdError.classList.remove('d-none');
-                        pwdInput.value = '';
-                        pwdInput.focus();
-                        pwdSubmit.disabled = false;
-                        pwdSubmit.textContent = 'Unlock';
-                    }
-                }
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
+    authDomain: "portfolio-f938c.firebaseapp.com",
+    projectId: "portfolio-f938c",
+    storageBucket: "portfolio-f938c.firebasestorage.app",
+    messagingSenderId: "963544931671",
+    appId: "1:963544931671:web:ff0210cc532428ea227212",
+    databaseURL: "https://portfolio-f938c-default-rtdb.asia-southeast1.firebasedatabase.app"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+enableIndexedDbPersistence(db).catch(()=>{});
+
+// ── expose to global scope ──
+window._fbSignOut = () => fbSignOut(auth);
+window._signInWithGoogle = async () => {
+    try {
+        await signInWithPopup(auth, provider);
+    } catch(e) {
+        const el = document.getElementById('authError');
+        el.textContent = e.message || 'Sign-in failed. Please try again.';
+        el.style.display = 'block';
+    }
+};
+
+// ── auth state ──
+onAuthStateChanged(auth, async user => {
+    document.getElementById('loadingOverlay').style.display = 'none';
+    if (user) {
+        // Set user info in nav
+        document.getElementById('userName').textContent = user.displayName?.split(' ')[0] || user.email;
+        const avatar = document.getElementById('userAvatar');
+        if (user.photoURL) {
+            avatar.innerHTML = `<img src="${user.photoURL}" alt="">`;
+        } else {
+            avatar.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+        }
+        document.getElementById('authScreen').style.display = 'none';
+        document.getElementById('appShell').style.display = 'block';
+        const DOC_REF = doc(db, 'shared', 'family-portfolio-data');
+        window._DOC_REF = DOC_REF;
+        window._db = db;
+        await window.initApp(DOC_REF, db);
+    } else {
+        document.getElementById('authScreen').style.display = 'flex';
+        document.getElementById('appShell').style.display = 'none';
+    }
+});
+</script>
+
+<script>
+// ──────────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────────
+const fmt = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Math.round(n));
+const genId = () => Math.random().toString(36).slice(2,9);
+const escHtml = t => { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; };
+const sortAssets = a => [...a].sort((x,y)=>y.percentage-x.percentage);
+
+const CATEGORY_COLORS = { equity:'#F26B6B', debt:'#3ECF8E', gold:'#C9A84C' };
+const OTHERS_COLORS = ['#6B6D75','#9CA3AF','#64748B','#475569','#334155'];
+function assetColor(cat, idx=0) { return CATEGORY_COLORS[cat] || OTHERS_COLORS[idx % OTHERS_COLORS.length]; }
+function assetCat(name) {
+    const n = name.toLowerCase();
+    if (/equity|stock|share|mf|mutual fund|nifty|sensex|midcap|smallcap/.test(n)) return 'equity';
+    if (/debt|bond|fd|fixed deposit|ppf|rd|corporate bond|gilt/.test(n)) return 'debt';
+    if (/gold|sgb|gold etf|gold fund|digital gold/.test(n)) return 'gold';
+    return 'others';
+}
+function fv(p, r, y) { return p * Math.pow(1 + r/100, y); }
+
+// ──────────────────────────────────────────────────────────
+// APP STATE
+// ──────────────────────────────────────────────────────────
+let state = {
+    portfolios: [],
+    totalReturns: 0,
+    cagrAssumptions: { equity:13, debt:7.5, gold:9, others:2 }
+};
+let chartInstances = {};
+let isSaving = false;
+let docRef, firestoreDb;
+
+// ──────────────────────────────────────────────────────────
+// FIRESTORE
+// ──────────────────────────────────────────────────────────
+async function loadState() {
+    try {
+        const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+        const snap = await getDoc(docRef);
+        if (snap.exists()) {
+            const d = snap.data();
+            state.portfolios = (d.portfolios||[]).map(p=>({...p,assets:sortAssets(p.assets)}));
+            state.totalReturns = d.totalReturns || 0;
+            state.cagrAssumptions = d.cagrAssumptions || state.cagrAssumptions;
+        }
+    } catch(e) { console.error('loadState', e); }
+}
+async function saveState() {
+    if (isSaving) return; isSaving=true;
+    try {
+        const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+        await setDoc(docRef, state);
+    } catch(e) { console.error('saveState', e); }
+    finally { isSaving=false; }
+}
+async function saveCagr() {
+    if (isSaving) return; isSaving=true;
+    try {
+        const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
+        await setDoc(docRef, { cagrAssumptions: state.cagrAssumptions }, { merge:true });
+    } catch(e) { console.error('saveCagr', e); }
+    finally { isSaving=false; }
+}
+
+// ──────────────────────────────────────────────────────────
+// INIT
+// ──────────────────────────────────────────────────────────
+window.initApp = async (ref, db) => {
+    docRef = ref;
+    firestoreDb = db;
+    await loadState();
+
+    // bind cagr inputs
+    document.getElementById('cagrEquity').value = state.cagrAssumptions.equity;
+    document.getElementById('cagrDebt').value = state.cagrAssumptions.debt;
+    document.getElementById('cagrGold').value = state.cagrAssumptions.gold;
+    document.getElementById('cagrOthers').value = state.cagrAssumptions.others;
+    ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
+        document.getElementById(id).addEventListener('input', async () => {
+            state.cagrAssumptions = {
+                equity: +document.getElementById('cagrEquity').value || 13,
+                debt:   +document.getElementById('cagrDebt').value  || 7.5,
+                gold:   +document.getElementById('cagrGold').value  || 9,
+                others: +document.getElementById('cagrOthers').value|| 2
             };
-            pwdInput.addEventListener('keypress', e => {
-                if (e.key === 'Enter' && !pwdSubmit.disabled) pwdSubmit.click();
-            });
-        }
-        function unlock() {
-            const modalEl = document.getElementById('passwordModal');
-            bootstrap.Modal.getInstance(modalEl)?.hide();
-            document.querySelector('nav').classList.remove('d-none');
-            document.querySelector('main').classList.remove('d-none');
-            document.getElementById('passwordModal')?.remove();
-            initApp();
-        }
-        // ────────────────────────────────────────────────
-        // App init after password
-        // ────────────────────────────────────────────────
-        async function initApp() {
-            await loadState();
-            document.getElementById('cagrEquity').value = appState.cagrAssumptions.equity;
-            document.getElementById('cagrDebt').value = appState.cagrAssumptions.debt;
-            document.getElementById('cagrGold').value = appState.cagrAssumptions.gold;
-            document.getElementById('cagrOthers').value = appState.cagrAssumptions.others;
-            ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
-                document.getElementById(id)?.addEventListener('input', updateAndSaveCagr);
-            });
-            document.getElementById('investType')?.addEventListener('change', function() {
-                document.getElementById('sipInputs').style.display = this.value === 'sip' ? 'block' : 'none';
-                document.getElementById('lumpsumInputs').style.display = this.value === 'lumpsum' ? 'block' : 'none';
-                calculateSipLumpsum();
-            });
-            ['monthlyAmt', 'lumpsumAmt', 'returnRate', 'periodYears'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', calculateSipLumpsum);
-            });
-            ['stepMonthlyAmt', 'stepUpPct', 'stepReturnRate', 'stepPeriodYears'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.addEventListener('input', calculateStepUpSip);
-            });
-            updateNetWorthDisplay();
-            renderPortfolios();
-            updateProjections();
-            document.getElementById('projections-tab')?.addEventListener('shown.bs.tab', updateProjections);
-            calculateSipLumpsum();
-            calculateStepUpSip();
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./service-worker.js').catch(err => console.log('SW failed', err));
-            }
-        }
-        // ────────────────────────────────────────────────
-        // Render & update functions
-        // ────────────────────────────────────────────────
-        function updateNetWorthDisplay() {
-            document.getElementById('totalInvested').textContent = formatCurrency(getTotalInvested());
-            document.getElementById('currentValue').textContent = formatCurrency(getCurrentValue());
-            const returnPct = getReturnPercentage();
-            const isPositive = returnPct >= 0;
-            const pill = document.getElementById('returnPill');
-            const pctEl = document.getElementById('returnPercentage');
-            pill.className = isPositive ? 'pill-success' : 'pill-danger';
-            pctEl.textContent = `${isPositive ? '+' : ''}${returnPct.toFixed(2)}%`;
-        }
-        function renderPortfolios() {
-            const container = document.getElementById('portfoliosContainer');
-            if (appState.portfolios.length === 0) {
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="card-glass-static empty-state">
-                            <i class="bi bi-briefcase"></i>
-                            <h4 class="fw-semibold mb-2">No Portfolios Yet</h4>
-                            <p class="text-muted-custom mb-4">Start building your family wealth dashboard by adding your first portfolio.</p>
-                            <button class="btn btn-accent" data-bs-toggle="modal" data-bs-target="#portfolioModal" onclick="openAddPortfolio()">
-                                Add Your First Portfolio
-                            </button>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-            const sortedPortfolios = appState.portfolios.map(p => ({
-                ...p,
-                assets: sortAssetsByPercentage(p.assets)
-            }));
-            container.innerHTML = sortedPortfolios.map(p => `
-                <div class="col-lg-6">
-                    <div class="card-glass p-4">
-                        <div class="d-flex justify-content-between align-items-start mb-3">
-                            <h5 class="fw-semibold mb-0">${escapeHtml(p.name)}</h5>
-                            <div class="dropdown">
-                                <button class="btn btn-link text-muted-custom p-1" data-bs-toggle="dropdown">
-                                    <i class="bi bi-three-dots-vertical"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-dark-custom dropdown-menu-end">
-                                    <li><a class="dropdown-item dropdown-item-custom" href="#" onclick="editPortfolio('${p.id}')"><i class="bi bi-pencil me-2"></i>Edit</a></li>
-                                    <li><a class="dropdown-item dropdown-item-custom text-danger" href="#" onclick="deletePortfolio('${p.id}')"><i class="bi bi-trash me-2"></i>Delete</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <p class="text-muted-custom small mb-1">Total Invested</p>
-                        <p class="fs-4 fw-bold mb-4">${formatCurrency(p.totalInvested)}</p>
-                        <div class="row align-items-center">
-                            <div class="col-5">
-                                <div class="chart-container">
-                                    <canvas id="chart-${p.id}"></canvas>
-                                </div>
-                            </div>
-                            <div class="col-7">
-                                <p class="text-muted-custom small mb-2">Asset Breakdown (Sorted by Allocation)</p>
-                                ${p.assets.map((a, i) => `
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="asset-dot" style="background:${getAssetColor(getAssetCategory(a.name), i)}"></span>
-                                            <span class="small">${escapeHtml(a.name)}</span>
-                                        </div>
-                                        <div class="text-end">
-                                            <span class="small fw-medium">${a.percentage}%</span>
-                                            <span class="small text-muted-custom ms-1">(${formatCurrency(a.amount)})</span>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-            setTimeout(() => appState.portfolios.forEach(p => renderChart(p)), 50);
-        }
-        function renderChart(portfolio) {
-            const canvas = document.getElementById(`chart-${portfolio.id}`);
-            if (!canvas) return;
-            if (chartInstances[portfolio.id]) chartInstances[portfolio.id].destroy();
-            const sortedAssets = sortAssetsByPercentage(portfolio.assets);
-            const colors = sortedAssets.map((a, idx) =>
-                getAssetColor(getAssetCategory(a.name), idx)
-            );
-            chartInstances[portfolio.id] = new Chart(canvas, {
-                type: 'pie',
-                data: {
-                    labels: sortedAssets.map(a => a.name),
-                    datasets: [{
-                        data: sortedAssets.map(a => a.percentage),
-                        backgroundColor: colors,
-                        borderColor: '#161b22',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    rotation: -180,
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-        function openAddPortfolio() {
-            document.getElementById('portfolioModalTitle').textContent = 'Add Portfolio';
-            document.getElementById('editingPortfolioId').value = '';
-            document.getElementById('portfolioName').value = '';
-            document.getElementById('portfolioAmount').value = '';
-            document.getElementById('portfolioError').classList.add('d-none');
-            document.getElementById('assetsContainer').innerHTML = '';
-            addAssetRow();
-        }
-        function editPortfolio(id) {
-            const p = appState.portfolios.find(x => x.id === id);
-            if (!p) return;
-            document.getElementById('portfolioModalTitle').textContent = 'Edit Portfolio';
-            document.getElementById('editingPortfolioId').value = id;
-            document.getElementById('portfolioName').value = p.name;
-            document.getElementById('portfolioAmount').value = p.totalInvested;
-            document.getElementById('portfolioError').classList.add('d-none');
-            document.getElementById('assetsContainer').innerHTML = '';
-            p.assets.forEach(a => addAssetRow(a.name, a.percentage));
-            recalculateAssetAmounts();
-            new bootstrap.Modal(document.getElementById('portfolioModal')).show();
-        }
-        function addAssetRow(name = '', percentage = '') {
-            const container = document.getElementById('assetsContainer');
-            const id = generateId();
-            const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
-            const amount = (parseFloat(percentage) || 0) / 100 * total;
-            const row = document.createElement('div');
-            row.className = 'row g-2 mb-2 asset-row';
-            row.id = `asset-${id}`;
-            row.innerHTML = `
-                <div class="col">
-                    <input type="text" class="form-control form-control-dark form-control-sm asset-name" placeholder="Asset name (e.g., Equity MF, PPF, Gold)" value="${escapeHtml(name)}">
-                </div>
-                <div class="col-3">
-                    <input type="number" class="form-control form-control-dark form-control-sm asset-percentage text-center" placeholder="0%" min="0" max="100" value="${percentage}" oninput="updateAllocationTotal()">
-                </div>
-                <div class="col-3">
-                    <input type="text" class="form-control form-control-dark form-control-sm asset-amount text-end" value="${amount > 0 ? formatCurrency(amount) : ''}" disabled>
-                </div>
-                <div class="col-auto">
-                    <button type="button" class="btn btn-link text-muted-custom p-2" onclick="removeAssetRow('${id}')">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(row);
-            updateAllocationTotal();
-        }
-        function removeAssetRow(id) {
-            const rows = document.querySelectorAll('.asset-row');
-            if (rows.length > 1) {
-                document.getElementById(`asset-${id}`).remove();
-                updateAllocationTotal();
-            }
-        }
-        function updateAllocationTotal() {
-            let total = 0;
-            document.querySelectorAll('.asset-percentage').forEach(el => total += parseFloat(el.value) || 0);
-            const el = document.getElementById('allocationTotal');
-            const valid = Math.abs(total - 100) <= 0.01;
-            el.textContent = `Total: ${total.toFixed(1)}%`;
-            el.className = `small fw-medium ${valid ? 'text-success-custom' : 'text-warning'}`;
-            recalculateAssetAmounts();
-        }
-        function recalculateAssetAmounts() {
-            const total = parseFloat(document.getElementById('portfolioAmount').value) || 0;
-            document.querySelectorAll('.asset-row').forEach(row => {
-                const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
-                const amt = pct / 100 * total;
-                row.querySelector('.asset-amount').value = amt > 0 ? formatCurrency(amt) : '';
-            });
-        }
-        async function savePortfolio() {
-            const err = document.getElementById('portfolioError');
-            err.classList.add('d-none');
-            const id = document.getElementById('editingPortfolioId').value;
-            const name = document.getElementById('portfolioName').value.trim();
-            const totalInvested = parseFloat(document.getElementById('portfolioAmount').value);
-            if (!name) { err.textContent = 'Portfolio name is required'; err.classList.remove('d-none'); return; }
-            if (!totalInvested || totalInvested <= 0) { err.textContent = 'Total invested must be > 0'; err.classList.remove('d-none'); return; }
-            let assets = [];
-            document.querySelectorAll('.asset-row').forEach(row => {
-                const n = row.querySelector('.asset-name').value.trim();
-                const pct = parseFloat(row.querySelector('.asset-percentage').value) || 0;
-                if (n && pct > 0) {
-                    assets.push({ id: generateId(), name: n, percentage: pct, amount: pct / 100 * totalInvested });
-                }
-            });
-            if (assets.length === 0) { err.textContent = 'At least one asset required'; err.classList.remove('d-none'); return; }
-            const sumPct = assets.reduce((s,a)=>s+a.percentage,0);
-            if (Math.abs(sumPct - 100) > 0.01) {
-                err.textContent = `Allocation must total 100% (currently ${sumPct.toFixed(1)}%)`; err.classList.remove('d-none'); return;
-            }
-            assets = sortAssetsByPercentage(assets);
-            const portfolio = { id: id || generateId(), name, totalInvested, assets };
-            if (id) {
-                const idx = appState.portfolios.findIndex(p => p.id === id);
-                if (idx !== -1) appState.portfolios[idx] = portfolio;
-            } else {
-                appState.portfolios.push(portfolio);
-            }
-            await saveState();
-            renderPortfolios();
-            updateNetWorthDisplay();
-            updateProjections();
-            bootstrap.Modal.getInstance(document.getElementById('portfolioModal')).hide();
-        }
-        async function deletePortfolio(id) {
-            if (!confirm('Delete this portfolio?')) return;
-            appState.portfolios = appState.portfolios.filter(p => p.id !== id);
-            if (chartInstances[id]) {
-                chartInstances[id].destroy();
-                delete chartInstances[id];
-            }
-            await saveState();
-            renderPortfolios();
-            updateNetWorthDisplay();
-            updateProjections();
-        }
-        function previewReturns() {
-            const ret = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
-            const inv = getTotalInvested();
-            const val = inv + ret;
-            const pct = inv > 0 ? (ret / inv) * 100 : 0;
-            const pos = ret >= 0;
-            document.getElementById('previewInvested').textContent = formatCurrency(inv);
-            document.getElementById('previewReturns').textContent = `${pos ? '+' : ''}${formatCurrency(ret)}`;
-            document.getElementById('previewReturns').className = pos ? 'text-success-custom' : 'text-danger';
-            document.getElementById('previewValue').textContent = formatCurrency(val);
-            const pctEl = document.getElementById('previewReturnPct');
-            pctEl.className = pos ? 'pill-success' : 'pill-danger';
-            pctEl.textContent = `${pos ? '+' : ''}${pct.toFixed(2)}%`;
-        }
-        async function saveReturns() {
-            appState.totalReturns = parseFloat(document.getElementById('totalReturnsInput').value) || 0;
-            await saveState();
-            updateNetWorthDisplay();
-            updateProjections();
-            bootstrap.Modal.getInstance(document.getElementById('returnsModal')).hide();
-        }
-        document.getElementById('returnsModal').addEventListener('show.bs.modal', () => {
-            document.getElementById('totalReturnsInput').value = appState.totalReturns;
-            previewReturns();
+            renderProjections();
+            await saveCagr();
         });
-        async function updateAndSaveCagr() {
-            appState.cagrAssumptions = {
-                equity: parseFloat(document.getElementById('cagrEquity').value) || 13,
-                debt: parseFloat(document.getElementById('cagrDebt').value) || 7.5,
-                gold: parseFloat(document.getElementById('cagrGold').value) || 9,
-                others: parseFloat(document.getElementById('cagrOthers').value) || 2
-            };
-            updateProjections();
-            await saveCagrAssumptions();
-        }
-        function updateProjections() {
-            const container = document.getElementById('projectionsContainer');
-            if (appState.portfolios.length === 0) {
-                container.innerHTML = `
-                    <div class="card-glass-static empty-state">
-                        <i class="bi bi-graph-up-arrow"></i>
-                        <h4 class="fw-semibold mb-2">No Portfolios Yet</h4>
-                        <p class="text-muted-custom">Add portfolios in Overview to see projections.</p>
-                    </div>
-                `;
-                return;
-            }
-            const rates = getCagrAssumptions();
-            let grand = { current: 0, y5: 0, y10: 0, y15: 0, wCagr: 0 };
-            const portfolioProjections = appState.portfolios.map(p => {
-                const totalInvAll = getTotalInvested();
-                const share = totalInvAll > 0 ? p.totalInvested / totalInvAll : 0;
-                const portReturns = appState.totalReturns * share;
-                const portCurrent = p.totalInvested + portReturns;
-                const sortedAssets = sortAssetsByPercentage(p.assets);
-                const assetProj = sortedAssets.map(a => {
-                    const cat = getAssetCategory(a.name);
-                    const r = rates[cat];
-                    return {
-                        ...a,
-                        category: cat,
-                        rate: r,
-                        y5: calculateFutureValue(a.amount, r, 5),
-                        y10: calculateFutureValue(a.amount, r, 10),
-                        y15: calculateFutureValue(a.amount, r, 15)
-                    };
-                });
-                const portWCagr = assetProj.reduce((s,a) => s + (a.rate * (a.amount / p.totalInvested)), 0) || 0;
-                const pY5 = calculateFutureValue(portCurrent, portWCagr, 5);
-                const pY10 = calculateFutureValue(portCurrent, portWCagr, 10);
-                const pY15 = calculateFutureValue(portCurrent, portWCagr, 15);
-                grand.current += portCurrent;
-                grand.y5 += pY5;
-                grand.y10 += pY10;
-                grand.y15 += pY15;
-                grand.wCagr += portWCagr * (portCurrent / (grand.current || 1));
-                const assetSumY5 = assetProj.reduce((s,a)=>s+a.y5, 0);
-                const assetSumY10 = assetProj.reduce((s,a)=>s+a.y10, 0);
-                const assetSumY15 = assetProj.reduce((s,a)=>s+a.y15, 0);
-                return { name: p.name, portCurrent, portWCagr, pY5, pY10, pY15, assetProj, assetSumY5, assetSumY10, assetSumY15, totalInvested: p.totalInvested };
-            });
-            if (grand.current > 0) {
-                grand.wCagr = 0;
-                portfolioProjections.forEach(proj => {
-                    grand.wCagr += proj.portWCagr * (proj.portCurrent / grand.current);
-                });
-            }
-            const grandHtml = `
-                <div class="card-glass-static p-4 mb-4">
-                    <h5 class="fw-semibold mb-3">Total Family Wealth Projection (Compounded from Today)</h5>
-                    <div class="table-responsive">
-                        <table class="table table-dark-custom mb-0">
-                            <thead><tr><th>Metric</th><th class="text-end">Current Value</th><th class="text-end">5 Years</th><th class="text-end">10 Years</th><th class="text-end">15 Years</th></tr></thead>
-                            <tbody>
-                                <tr class="bg-accent-subtle">
-                                    <td class="fw-semibold">All Portfolios</td>
-                                    <td class="text-end fw-medium">${formatCurrency(grand.current)}</td>
-                                    <td class="text-end fw-medium text-success-custom">${formatCurrency(grand.y5)}</td>
-                                    <td class="text-end fw-medium text-success-custom">${formatCurrency(grand.y10)}</td>
-                                    <td class="text-end fw-medium text-success-custom">${formatCurrency(grand.y15)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mt-4 pt-3 border-top border-secondary">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="fw-semibold">Family Weighted Expected CAGR</span>
-                            <span class="fs-5 fw-bold text-accent">${grand.current > 0 ? grand.wCagr.toFixed(1) : '—'}%</span>
-                        </div>
-                        <small class="text-muted-custom d-block mt-1">Weighted average of each portfolio's expected CAGR (by current value allocation)</small>
-                    </div>
-                    <small class="text-muted-custom d-block mt-4">
-                        • Starting from current net worth: ${formatCurrency(getCurrentValue())}<br>
-                        • Each portfolio compounds at its own weighted expected CAGR
-                    </small>
-                </div>
-            `;
-            const html = portfolioProjections.map(proj => `
-                <div class="card-glass-static p-4 mb-4">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="fw-semibold mb-0">${escapeHtml(proj.name)}</h5>
-                        <span class="text-muted-custom small">Weighted CAGR: <span class="text-accent fw-medium">${proj.portWCagr.toFixed(1)}%</span></span>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-dark-custom mb-0">
-                            <thead><tr><th>Asset</th><th class="text-end">Category</th><th class="text-end">CAGR</th><th class="text-end">Invested</th><th class="text-end">5 Yr</th><th class="text-end">10 Yr</th><th class="text-end">15 Yr</th></tr></thead>
-                            <tbody>
-                                ${proj.assetProj.map((a, i) => `
-                                    <tr>
-                                        <td>${escapeHtml(a.name)}</td>
-                                        <td class="text-end text-muted-custom">${a.category}</td>
-                                        <td class="text-end text-accent">${a.rate}%</td>
-                                        <td class="text-end text-muted-custom">${formatCurrency(a.amount)}</td>
-                                        <td class="text-end">${formatCurrency(a.y5)}</td>
-                                        <td class="text-end">${formatCurrency(a.y10)}</td>
-                                        <td class="text-end">${formatCurrency(a.y15)}</td>
-                                    </tr>
-                                `).join('')}
-                                <tr class="bg-dark">
-                                    <td colspan="3" class="fw-semibold">Asset-level totals (from invested)</td>
-                                    <td class="text-end fw-semibold">${formatCurrency(proj.totalInvested)}</td>
-                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.assetSumY5)}</td>
-                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.assetSumY10)}</td>
-                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.assetSumY15)}</td>
-                                </tr>
-                                <tr class="bg-accent-subtle">
-                                    <td colspan="3" class="fw-semibold">Portfolio projection (from current value)</td>
-                                    <td class="text-end fw-semibold">${formatCurrency(proj.portCurrent)}</td>
-                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.pY5)}</td>
-                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.pY10)}</td>
-                                    <td class="text-end fw-semibold text-success-custom">${formatCurrency(proj.pY15)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <small class="text-muted-custom d-block mt-3">
-                        • Future values compound today's current value (${formatCurrency(proj.portCurrent)}) at ${proj.portWCagr.toFixed(1)}% weighted CAGR<br>
-                        • Past returns already included in current value
-                    </small>
-                </div>
-            `).join('');
-            container.innerHTML = grandHtml + html;
-        }
+    });
 
-        // ───────────────────── UPDATED SIP / LUMPSUM CALCULATOR (GROWW STYLE) ─────────────────────
-        function calculateSipLumpsum() {
-            const type = document.getElementById('investType').value;
-            const rate = parseFloat(document.getElementById('returnRate').value) / 100 || 0;
-            const years = parseInt(document.getElementById('periodYears').value) || 0;
-            const months = years * 12;
+    renderDashboard();
+    renderProjections();
+    calcSip();
+    calcStepSip();
+};
 
-            let invested = 0;
-            let fv = 0;
+// ──────────────────────────────────────────────────────────
+// AUTH HELPERS
+// ──────────────────────────────────────────────────────────
+document.getElementById('googleSignInBtn').addEventListener('click', () => window._signInWithGoogle());
+window.signOut = () => window._fbSignOut();
 
-            if (type === 'lumpsum') {
-                const principal = parseFloat(document.getElementById('lumpsumAmt').value) || 0;
-                invested = principal;
-                fv = principal * Math.pow(1 + rate, years);               // true annual compounding
-            } else {
-                // ─── SIP (Groww / realistic effective monthly rate) ───
-                const monthly = parseFloat(document.getElementById('monthlyAmt').value) || 0;
-                invested = monthly * months;
-                fv = invested;
+// ──────────────────────────────────────────────────────────
+// TAB NAVIGATION
+// ──────────────────────────────────────────────────────────
+window.showTab = (tab, btn, src='desktop') => {
+    document.querySelectorAll('.tab-pane-pp').forEach(p => p.style.display='none');
+    document.getElementById('tab-'+tab).style.display='block';
 
-                if (rate > 0) {
-                    const r = Math.pow(1 + rate, 1/12) - 1;                // effective monthly rate from annual CAGR
-                    fv = monthly * ((Math.pow(1 + r, months) - 1) / r) * (1 + r);  // beginning-of-month convention (standard in India)
-                }
-            }
-
-            const returns = fv - invested;
-            document.getElementById('investedAmt').textContent = formatCurrency(invested);
-            document.getElementById('estReturns').textContent = formatCurrency(returns);
-            document.getElementById('totalValue').textContent = formatCurrency(fv);
-            document.getElementById('sipResults').classList.remove('d-none');
-            renderCalculatorChart('sipChart', invested, returns);
-        }
-
-        function calculateStepUpSip() {
-            const monthly = parseFloat(document.getElementById('stepMonthlyAmt').value) || 0;
-            const step = parseFloat(document.getElementById('stepUpPct').value) / 100 || 0;
-            const rate = parseFloat(document.getElementById('stepReturnRate').value) / 100 || 0;
-            const years = parseInt(document.getElementById('stepPeriodYears').value) || 0;
-
-            let invested = 0;
-            let fv = 0;
-            const totalMonths = years * 12;
-            const r = rate > 0 ? Math.pow(1 + rate, 1/12) - 1 : 0;   // effective monthly rate
-
-            for (let month = 0; month < totalMonths; month++) {
-                const year = Math.floor(month / 12);
-                const sipAmount = monthly * Math.pow(1 + step, year);
-                invested += sipAmount;
-                const growthPeriods = totalMonths - month;          // now matches regular SIP (beginning-of-month convention)
-                fv += sipAmount * Math.pow(1 + r, growthPeriods);
-            }
-
-            const returns = fv - invested;
-            document.getElementById('stepInvestedAmt').textContent = formatCurrency(invested);
-            document.getElementById('stepEstReturns').textContent = formatCurrency(returns);
-            document.getElementById('stepTotalValue').textContent = formatCurrency(fv);
-            document.getElementById('stepSipResults').classList.remove('d-none');
-            renderCalculatorChart('stepSipChart', invested, returns);
-        }
-        // ─────────────────────────────────────────────────────────────────────────────────────
-
-        function renderCalculatorChart(chartId, invested, returns) {
-            const canvas = document.getElementById(chartId);
-            if (chartInstances[chartId]) chartInstances[chartId].destroy();
-            chartInstances[chartId] = new Chart(canvas, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Invested Amount', 'Est. Returns'],
-                    datasets: [{
-                        data: [invested, returns],
-                        backgroundColor: ['#6b7280', '#22c55e'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    cutout: '70%',
-                    plugins: {
-                        legend: { display: false }
-                    }
-                }
-            });
-        }
-        // ────────────────────────────────────────────────
-        // Start: password first
-        // ────────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', () => {
-            checkOrSetPassword();
+    if (src === 'mob') {
+        document.querySelectorAll('.mob-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // sync desktop
+        document.querySelectorAll('.nav-pill').forEach((b,i) => {
+            const tabs=['dashboard','projections','sip'];
+            b.classList.toggle('active', tabs[i]===tab);
         });
-        window.openAddPortfolio = openAddPortfolio;
-        window.editPortfolio = editPortfolio;
-        window.deletePortfolio = deletePortfolio;
-        window.addAssetRow = addAssetRow;
-        window.removeAssetRow = removeAssetRow;
-        window.updateAllocationTotal = updateAllocationTotal;
-        window.savePortfolio = savePortfolio;
-        window.saveReturns = saveReturns;
-    </script>
+    } else {
+        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // sync mobile
+        const tabs=['dashboard','projections','sip'];
+        document.querySelectorAll('.mob-tab').forEach((b,i) => b.classList.toggle('active', tabs[i]===tab));
+    }
+
+    if (tab === 'projections') renderProjections();
+};
+
+// ──────────────────────────────────────────────────────────
+// DASHBOARD
+// ──────────────────────────────────────────────────────────
+function totalInvested() { return state.portfolios.reduce((s,p)=>s+(p.totalInvested||0),0); }
+function currentValue() { return totalInvested() + state.totalReturns; }
+function returnPct() { const i=totalInvested(); return i>0 ? (state.totalReturns/i)*100 : 0; }
+
+function renderDashboard() {
+    const inv = totalInvested();
+    const cur = currentValue();
+    const pct = returnPct();
+    const pos = pct >= 0;
+
+    document.getElementById('heroValue').textContent = fmt(cur);
+    document.getElementById('heroInvested').textContent = fmt(inv);
+    const badge = document.getElementById('heroBadge');
+    badge.className = 'badge-return ' + (pos ? 'badge-green' : 'badge-red');
+    badge.innerHTML = `<i class="bi bi-${pos?'arrow-up':'arrow-down'}-short"></i>${pos?'+':''}${pct.toFixed(2)}%`;
+
+    const grid = document.getElementById('portfoliosGrid');
+    if (!state.portfolios.length) {
+        grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
+            <div class="empty-icon"><i class="bi bi-briefcase"></i></div>
+            <div class="empty-title">No Portfolios Yet</div>
+            <p style="color:var(--muted);margin-bottom:20px;font-size:.9rem;">Start by adding your first family portfolio to track wealth across asset classes.</p>
+            <button class="btn-primary-pp" onclick="openAddPortfolio()"><i class="bi bi-plus-lg"></i>Add Portfolio</button>
+        </div>`;
+        return;
+    }
+
+    grid.innerHTML = state.portfolios.map(p => {
+        const sorted = sortAssets(p.assets);
+        return `<div class="port-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                <div class="port-name">${escHtml(p.name)}</div>
+                <div style="position:relative;">
+                    <button class="port-menu-btn" onclick="toggleDropdown('dd-${p.id}')"><i class="bi bi-three-dots-vertical"></i></button>
+                    <div class="dropdown-pp" id="dd-${p.id}">
+                        <button onclick="editPortfolio('${p.id}');toggleDropdown('dd-${p.id}')"><i class="bi bi-pencil"></i>Edit</button>
+                        <button class="danger" onclick="deletePortfolio('${p.id}');toggleDropdown('dd-${p.id}')"><i class="bi bi-trash"></i>Delete</button>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;">Total Invested</p>
+            <div class="port-amount" style="margin-bottom:20px;">${fmt(p.totalInvested)}</div>
+            <div style="display:flex;gap:16px;align-items:flex-start;">
+                <div class="chart-wrap flex-shrink-0"><canvas id="pc-${p.id}"></canvas></div>
+                <div style="flex:1;min-width:0;">
+                    <p style="font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;">Allocation</p>
+                    ${sorted.map((a,i) => `
+                        <div class="asset-row-display">
+                            <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+                                <span class="asset-dot" style="background:${assetColor(assetCat(a.name),i)};"></span>
+                                <span class="asset-name-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.name)}</span>
+                            </div>
+                            <div style="text-align:right;flex-shrink:0;margin-left:8px;">
+                                <span class="asset-pct">${a.percentage}%</span>
+                                <span class="asset-amt-text" style="margin-left:6px;">(${fmt(a.amount)})</span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+
+    setTimeout(() => state.portfolios.forEach(p => renderPieChart(p)), 50);
+}
+
+function renderPieChart(portfolio) {
+    const canvas = document.getElementById(`pc-${portfolio.id}`);
+    if (!canvas) return;
+    if (chartInstances[portfolio.id]) { chartInstances[portfolio.id].destroy(); }
+    const sorted = sortAssets(portfolio.assets);
+    chartInstances[portfolio.id] = new Chart(canvas, {
+        type:'doughnut',
+        data: {
+            labels: sorted.map(a=>a.name),
+            datasets: [{
+                data: sorted.map(a=>a.percentage),
+                backgroundColor: sorted.map((a,i) => assetColor(assetCat(a.name),i)),
+                borderColor: '#111318',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive:true, maintainAspectRatio:true, cutout:'65%',
+            plugins:{ legend:{display:false} }
+        }
+    });
+}
+
+// ──────────────────────────────────────────────────────────
+// DROPDOWN
+// ──────────────────────────────────────────────────────────
+window.toggleDropdown = id => {
+    document.querySelectorAll('.dropdown-pp').forEach(d => { if (d.id !== id) d.classList.remove('open'); });
+    document.getElementById(id)?.classList.toggle('open');
+};
+document.addEventListener('click', e => {
+    if (!e.target.closest('.port-menu-btn') && !e.target.closest('.dropdown-pp')) {
+        document.querySelectorAll('.dropdown-pp').forEach(d=>d.classList.remove('open'));
+    }
+});
+
+// ──────────────────────────────────────────────────────────
+// MODAL HELPERS
+// ──────────────────────────────────────────────────────────
+window.closeModal = id => document.getElementById(id).classList.remove('open');
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+// close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => {
+    if (e.target === o) o.classList.remove('open');
+}));
+
+// ──────────────────────────────────────────────────────────
+// PORTFOLIO MODAL
+// ──────────────────────────────────────────────────────────
+window.openAddPortfolio = () => {
+    document.getElementById('portModalTitle').textContent = 'Add Portfolio';
+    document.getElementById('editingId').value = '';
+    document.getElementById('portName').value = '';
+    document.getElementById('portAmount').value = '';
+    document.getElementById('portError').style.display = 'none';
+    document.getElementById('assetsContainer').innerHTML = '';
+    addAssetRow();
+    openModal('portfolioModal');
+};
+window.editPortfolio = id => {
+    const p = state.portfolios.find(x=>x.id===id);
+    if (!p) return;
+    document.getElementById('portModalTitle').textContent = 'Edit Portfolio';
+    document.getElementById('editingId').value = id;
+    document.getElementById('portName').value = p.name;
+    document.getElementById('portAmount').value = p.totalInvested;
+    document.getElementById('portError').style.display = 'none';
+    document.getElementById('assetsContainer').innerHTML = '';
+    p.assets.forEach(a => addAssetRow(a.name, a.percentage));
+    recalcAmounts();
+    openModal('portfolioModal');
+};
+window.addAssetRow = (name='', pct='') => {
+    const id = genId();
+    const total = +document.getElementById('portAmount').value || 0;
+    const amt = (+pct/100*total);
+    const row = document.createElement('div');
+    row.className = 'asset-edit-row';
+    row.id = `ar-${id}`;
+    row.innerHTML = `
+        <input type="text" class="field-input asset-name" placeholder="e.g. Equity MF" value="${escHtml(name)}" style="font-size:.85rem;padding:8px 10px;">
+        <input type="number" class="field-input asset-pct text-center" placeholder="%" min="0" max="100" value="${pct}" style="font-size:.85rem;padding:8px 6px;text-align:center;" oninput="updateAllocBadge()">
+        <input type="text" class="field-input" value="${amt>0?fmt(amt):''}" disabled style="font-size:.75rem;padding:8px 8px;text-align:right;color:var(--muted);">
+        <button class="asset-del-btn" onclick="removeAssetRow('${id}')"><i class="bi bi-dash-circle"></i></button>`;
+    document.getElementById('assetsContainer').appendChild(row);
+    updateAllocBadge();
+};
+window.removeAssetRow = id => {
+    const rows = document.querySelectorAll('.asset-edit-row');
+    if (rows.length > 1) { document.getElementById(`ar-${id}`)?.remove(); updateAllocBadge(); }
+};
+window.updateAllocBadge = () => {
+    let t = 0;
+    document.querySelectorAll('.asset-pct').forEach(el => t += +el.value || 0);
+    const ok = Math.abs(t-100) <= 0.01;
+    const b = document.getElementById('allocBadge');
+    b.textContent = `${t.toFixed(1)}%`;
+    b.className = 'allocation-badge ' + (ok ? 'alloc-ok' : 'alloc-bad');
+    recalcAmounts();
+};
+window.recalcAmounts = () => {
+    const total = +document.getElementById('portAmount').value || 0;
+    document.querySelectorAll('.asset-edit-row').forEach(row => {
+        const pct = +row.querySelector('.asset-pct').value || 0;
+        const amt = pct/100*total;
+        row.querySelectorAll('input')[2].value = amt>0 ? fmt(amt) : '';
+    });
+};
+window.savePortfolio = async () => {
+    const err = document.getElementById('portError');
+    err.style.display = 'none';
+    const id = document.getElementById('editingId').value;
+    const name = document.getElementById('portName').value.trim();
+    const totalInv = +document.getElementById('portAmount').value;
+    if (!name) { err.textContent='Portfolio name is required'; err.style.display='block'; return; }
+    if (!totalInv || totalInv<=0) { err.textContent='Invested amount must be > 0'; err.style.display='block'; return; }
+    let assets = [];
+    document.querySelectorAll('.asset-edit-row').forEach(row => {
+        const n = row.querySelector('.asset-name').value.trim();
+        const p = +row.querySelector('.asset-pct').value || 0;
+        if (n && p > 0) assets.push({ id:genId(), name:n, percentage:p, amount:p/100*totalInv });
+    });
+    if (!assets.length) { err.textContent='Add at least one asset'; err.style.display='block'; return; }
+    const sum = assets.reduce((s,a)=>s+a.percentage,0);
+    if (Math.abs(sum-100)>0.01) { err.textContent=`Allocation must total 100% (currently ${sum.toFixed(1)}%)`; err.style.display='block'; return; }
+    assets = sortAssets(assets);
+    const portfolio = { id: id||genId(), name, totalInvested:totalInv, assets };
+    if (id) {
+        const idx = state.portfolios.findIndex(p=>p.id===id);
+        if (idx!==-1) state.portfolios[idx] = portfolio;
+    } else {
+        state.portfolios.push(portfolio);
+    }
+    await saveState();
+    renderDashboard();
+    renderProjections();
+    closeModal('portfolioModal');
+};
+window.deletePortfolio = async id => {
+    if (!confirm('Delete this portfolio?')) return;
+    state.portfolios = state.portfolios.filter(p=>p.id!==id);
+    if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+    await saveState();
+    renderDashboard();
+    renderProjections();
+};
+
+// ──────────────────────────────────────────────────────────
+// RETURNS MODAL
+// ──────────────────────────────────────────────────────────
+window.openReturnsModal = () => {
+    document.getElementById('returnsInput').value = state.totalReturns;
+    previewReturns();
+    openModal('returnsModal');
+};
+window.previewReturns = () => {
+    const ret = +document.getElementById('returnsInput').value || 0;
+    const inv = totalInvested();
+    const val = inv + ret;
+    const pct = inv>0 ? (ret/inv)*100 : 0;
+    const pos = ret>=0;
+    document.getElementById('retPreviewInvested').textContent = fmt(inv);
+    document.getElementById('retPreviewReturns').textContent = `${pos?'+':''}${fmt(ret)}`;
+    document.getElementById('retPreviewReturns').style.color = pos ? 'var(--green)' : 'var(--red)';
+    document.getElementById('retPreviewValue').textContent = fmt(val);
+    const pctEl = document.getElementById('retPreviewPct');
+    pctEl.className = 'badge-return ' + (pos?'badge-green':'badge-red');
+    pctEl.textContent = `${pos?'+':''}${pct.toFixed(2)}%`;
+};
+window.saveReturns = async () => {
+    state.totalReturns = +document.getElementById('returnsInput').value || 0;
+    await saveState();
+    renderDashboard();
+    renderProjections();
+    closeModal('returnsModal');
+};
+
+// ──────────────────────────────────────────────────────────
+// PROJECTIONS
+// ──────────────────────────────────────────────────────────
+function renderProjections() {
+    const container = document.getElementById('projectionsContainer');
+    if (!state.portfolios.length) {
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="bi bi-graph-up-arrow"></i></div><div class="empty-title">No Portfolios</div><p style="color:var(--muted);font-size:.9rem;">Add portfolios in Dashboard to see projections.</p></div>`;
+        return;
+    }
+    const rates = state.cagrAssumptions;
+    let grandCur=0, grandY5=0, grandY10=0, grandY15=0;
+
+    const projections = state.portfolios.map(p => {
+        const share = totalInvested()>0 ? p.totalInvested/totalInvested() : 0;
+        const portReturns = state.totalReturns * share;
+        const portCur = p.totalInvested + portReturns;
+        const sorted = sortAssets(p.assets);
+        const ap = sorted.map(a => {
+            const cat = assetCat(a.name);
+            const r = rates[cat];
+            return { ...a, cat, r, y5:fv(a.amount,r,5), y10:fv(a.amount,r,10), y15:fv(a.amount,r,15) };
+        });
+        const wCagr = ap.reduce((s,a)=>s+(a.r*(a.amount/p.totalInvested)),0)||0;
+        const pY5 = fv(portCur,wCagr,5), pY10 = fv(portCur,wCagr,10), pY15 = fv(portCur,wCagr,15);
+        grandCur+=portCur; grandY5+=pY5; grandY10+=pY10; grandY15+=pY15;
+        return { ...p, portCur, wCagr, pY5, pY10, pY15, ap, assetY5:ap.reduce((s,a)=>s+a.y5,0), assetY10:ap.reduce((s,a)=>s+a.y10,0), assetY15:ap.reduce((s,a)=>s+a.y15,0) };
+    });
+
+    let grandCagr = grandCur>0 ? projections.reduce((s,p)=>s+(p.wCagr*(p.portCur/grandCur)),0) : 0;
+
+    const grandHtml = `
+    <div class="grand-card" style="margin-bottom:28px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;">Family Wealth Projection</div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:.78rem;color:var(--muted);">Weighted CAGR</span>
+                <span style="font-size:1.1rem;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace;">${grandCur>0?grandCagr.toFixed(1):'—'}%</span>
+            </div>
+        </div>
+        <div class="proj-table-wrap" style="margin-bottom:0;">
+            <table class="pp-table">
+                <thead><tr><th>Portfolio</th><th>Today</th><th>5 Years</th><th>10 Years</th><th>15 Years</th></tr></thead>
+                <tbody>
+                    ${projections.map(p=>`<tr>
+                        <td>${escHtml(p.name)}</td>
+                        <td>${fmt(p.portCur)}</td>
+                        <td style="color:var(--green)">${fmt(p.pY5)}</td>
+                        <td style="color:var(--green)">${fmt(p.pY10)}</td>
+                        <td style="color:var(--green)">${fmt(p.pY15)}</td>
+                    </tr>`).join('')}
+                    <tr class="grand">
+                        <td>All Portfolios</td>
+                        <td>${fmt(grandCur)}</td>
+                        <td style="color:var(--green)">${fmt(grandY5)}</td>
+                        <td style="color:var(--green)">${fmt(grandY10)}</td>
+                        <td style="color:var(--green)">${fmt(grandY15)}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+
+    const detailHtml = projections.map(p => `
+    <div class="proj-table-wrap" style="margin-bottom:20px;">
+        <div style="padding:18px 20px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">${escHtml(p.name)}</div>
+            <span style="font-size:.78rem;color:var(--muted);">Weighted CAGR: <span style="color:var(--gold);font-weight:700;">${p.wCagr.toFixed(1)}%</span></span>
+        </div>
+        <table class="pp-table">
+            <thead><tr><th>Asset</th><th>Category</th><th>CAGR</th><th>Invested</th><th>5 Yr</th><th>10 Yr</th><th>15 Yr</th></tr></thead>
+            <tbody>
+                ${p.ap.map(a=>`<tr>
+                    <td>${escHtml(a.name)}</td>
+                    <td style="color:var(--muted);text-align:right;font-family:'DM Sans',sans-serif;">${a.cat}</td>
+                    <td style="color:var(--gold);">${a.r}%</td>
+                    <td style="color:var(--muted);">${fmt(a.amount)}</td>
+                    <td>${fmt(a.y5)}</td>
+                    <td>${fmt(a.y10)}</td>
+                    <td>${fmt(a.y15)}</td>
+                </tr>`).join('')}
+                <tr style="background:rgba(255,255,255,0.03);">
+                    <td colspan="3" style="font-weight:600;font-family:'DM Sans',sans-serif;">Asset-level totals</td>
+                    <td style="font-weight:600;">${fmt(p.totalInvested)}</td>
+                    <td style="color:var(--green);font-weight:600;">${fmt(p.assetY5)}</td>
+                    <td style="color:var(--green);font-weight:600;">${fmt(p.assetY10)}</td>
+                    <td style="color:var(--green);font-weight:600;">${fmt(p.assetY15)}</td>
+                </tr>
+                <tr class="highlight">
+                    <td colspan="3" style="font-weight:600;font-family:'DM Sans',sans-serif;">Portfolio (from current value)</td>
+                    <td style="font-weight:600;">${fmt(p.portCur)}</td>
+                    <td style="color:var(--green);font-weight:600;">${fmt(p.pY5)}</td>
+                    <td style="color:var(--green);font-weight:600;">${fmt(p.pY10)}</td>
+                    <td style="color:var(--green);font-weight:600;">${fmt(p.pY15)}</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="padding:12px 20px;font-size:.73rem;color:var(--muted);">Past returns included in current value · Compounding at ${p.wCagr.toFixed(1)}% weighted CAGR</p>
+    </div>`).join('');
+
+    container.innerHTML = grandHtml + detailHtml;
+}
+
+// ──────────────────────────────────────────────────────────
+// SIP CALCULATORS
+// ──────────────────────────────────────────────────────────
+window.handleInvestTypeChange = () => {
+    const type = document.getElementById('investType').value;
+    document.getElementById('sipInputGroup').style.display = type==='sip'?'block':'none';
+    document.getElementById('lumpsumInputGroup').style.display = type==='lumpsum'?'block':'none';
+    calcSip();
+};
+window.calcSip = () => {
+    const type = document.getElementById('investType').value;
+    const rate = (+document.getElementById('returnRate').value/100) || 0;
+    const years = +document.getElementById('periodYears').value || 0;
+    const months = years*12;
+    let invested=0, fvAmt=0;
+    if (type==='lumpsum') {
+        invested = +document.getElementById('lumpsumAmt').value||0;
+        fvAmt = invested * Math.pow(1+rate,years);
+    } else {
+        const m = +document.getElementById('monthlyAmt').value||0;
+        invested = m*months;
+        if (rate>0) {
+            const r = Math.pow(1+rate,1/12)-1;
+            fvAmt = m*((Math.pow(1+r,months)-1)/r)*(1+r);
+        } else { fvAmt=invested; }
+    }
+    const returns = fvAmt - invested;
+    document.getElementById('sipInvested').textContent = fmt(invested);
+    document.getElementById('sipReturns').textContent = fmt(returns);
+    document.getElementById('sipTotal').textContent = fmt(fvAmt);
+    document.getElementById('sipResultsBox').style.display = 'block';
+    renderCalcChart('sipChart', invested, returns);
+};
+window.calcStepSip = () => {
+    const m = +document.getElementById('stepMonthly').value||0;
+    const step = +document.getElementById('stepPct').value/100||0;
+    const rate = +document.getElementById('stepRate').value/100||0;
+    const years = +document.getElementById('stepYears').value||0;
+    const months = years*12;
+    const r = rate>0 ? Math.pow(1+rate,1/12)-1 : 0;
+    let invested=0, fvAmt=0;
+    for (let mo=0;mo<months;mo++) {
+        const yr = Math.floor(mo/12);
+        const sip = m*Math.pow(1+step,yr);
+        invested+=sip;
+        fvAmt+=sip*Math.pow(1+r,months-mo);
+    }
+    const returns=fvAmt-invested;
+    document.getElementById('stepInvested').textContent = fmt(invested);
+    document.getElementById('stepReturns').textContent = fmt(returns);
+    document.getElementById('stepTotal').textContent = fmt(fvAmt);
+    document.getElementById('stepResultsBox').style.display = 'block';
+    renderCalcChart('stepSipChart', invested, returns);
+};
+function renderCalcChart(id, invested, returns) {
+    const canvas = document.getElementById(id);
+    if (!canvas) return;
+    if (chartInstances[id]) chartInstances[id].destroy();
+    chartInstances[id] = new Chart(canvas, {
+        type:'doughnut',
+        data: {
+            labels:['Invested','Est. Returns'],
+            datasets:[{ data:[invested,returns], backgroundColor:['#3a3d45','#3ECF8E'], borderWidth:0 }]
+        },
+        options: { responsive:true, cutout:'72%', plugins:{ legend:{display:false} } }
+    });
+}
+</script>
 </body>
 </html>
