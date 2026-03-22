@@ -3,402 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#C9A84C">
+    <meta name="theme-color" content="#2dd4bf">
     <meta name="description" content="Portfolio Pro – Family Wealth Dashboard">
     <title>Portfolio Pro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <style>
     :root {
-        --gold:       #C9A84C;
-        --gold-light: #E5C97E;
-        --gold-dim:   rgba(201,168,76,0.18);
-        --gold-glow:  rgba(201,168,76,0.08);
-        --bg:         #0B0C0E;
-        --surface:    #111318;
-        --surface2:   #181C22;
-        --border:     rgba(255,255,255,0.07);
-        --border-gold:rgba(201,168,76,0.25);
-        --text:       #F2EDE6;
-        --muted:      #6B6D75;
-        --green:      #3ECF8E;
-        --red:        #F26B6B;
-        --radius:     14px;
-        --radius-sm:  8px;
-        --shadow:     0 8px 32px rgba(0,0,0,0.55);
+        --accent:      #2dd4bf;
+        --accent-dark: #14b8a6;
+        --accent-dim:  rgba(45,212,191,0.12);
+        --accent-glow: rgba(45,212,191,0.06);
+        --bg:          #0d1117;
+        --surface:     #161b22;
+        --surface2:    #21262d;
+        --border:      #30363d;
+        --border-acc:  rgba(45,212,191,0.25);
+        --text:        #f0f6fc;
+        --muted:       #8b949e;
+        --green:       #22c55e;
+        --red:         #ef4444;
+        --radius:      14px;
+        --radius-sm:   8px;
+        --shadow:      0 8px 32px rgba(0,0,0,0.55);
     }
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     html { scroll-behavior:smooth; }
     body {
-        font-family:'DM Sans', system-ui, sans-serif;
-        background: var(--bg);
+        font-family:'Inter', system-ui, sans-serif;
+        background: linear-gradient(135deg, #0d1117 0%, #090c10 50%, #0a0e14 100%);
         color: var(--text);
         min-height:100vh;
         overflow-x:hidden;
         -webkit-font-smoothing: antialiased;
     }
-
-    /* ── noise texture overlay ── */
     body::before {
         content:'';
         position:fixed; inset:0;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-        pointer-events:none; z-index:0; opacity:.55;
+        pointer-events:none; z-index:0; opacity:.45;
     }
     .layer { position:relative; z-index:1; }
 
-    /* ──────────── AUTH SCREEN ──────────── */
+    /* ── AUTH ── */
     #authScreen {
         min-height:100vh;
         display:flex; align-items:center; justify-content:center;
-        background: radial-gradient(ellipse 80% 80% at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 70%), var(--bg);
+        background: radial-gradient(ellipse 80% 80% at 50% 0%, rgba(45,212,191,0.07) 0%, transparent 70%);
     }
     .auth-card {
         width:100%; max-width:400px;
         background: var(--surface);
-        border:1px solid var(--border-gold);
+        border:1px solid var(--border-acc);
         border-radius:24px;
         padding:48px 40px;
-        box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(201,168,76,0.1);
+        box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(45,212,191,0.08);
         text-align:center;
     }
     .auth-logo {
         width:64px; height:64px;
-        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
         border-radius:18px;
         display:flex; align-items:center; justify-content:center;
         margin:0 auto 24px;
-        box-shadow: 0 8px 24px rgba(201,168,76,0.3);
+        box-shadow: 0 8px 24px rgba(45,212,191,0.3);
     }
-    .auth-logo svg { width:36px; height:36px; }
-    .auth-title {
-        font-family:'Playfair Display', serif;
-        font-size:1.75rem;
-        font-weight:700;
-        color:var(--text);
-        margin-bottom:8px;
-    }
-    .auth-sub { color:var(--muted); font-size:.9rem; margin-bottom:32px; }
+    .auth-title { font-size:1.6rem; font-weight:700; color:var(--text); margin-bottom:8px; letter-spacing:-.02em; }
+    .auth-sub { color:var(--muted); font-size:.875rem; margin-bottom:32px; }
     .btn-google {
-        width:100%;
-        background: #fff;
-        color: #1F1F1F;
-        border:none;
-        border-radius:12px;
-        padding:14px 24px;
-        font-family:'DM Sans', sans-serif;
-        font-weight:600;
-        font-size:.95rem;
+        width:100%; background:#fff; color:#1f1f1f;
+        border:none; border-radius:12px; padding:14px 24px;
+        font-family:'Inter',sans-serif; font-weight:600; font-size:.95rem;
         display:flex; align-items:center; justify-content:center; gap:12px;
-        cursor:pointer;
-        transition: box-shadow .2s, transform .2s;
+        cursor:pointer; transition:box-shadow .2s, transform .2s;
         box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     }
     .btn-google:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.35); }
-    .btn-google:active { transform:translateY(0); }
     .google-icon { width:20px; height:20px; flex-shrink:0; }
-    .auth-note { color:var(--muted); font-size:.78rem; margin-top:20px; line-height:1.5; }
-    .auth-divider { border-color:var(--border); margin:20px 0; }
+    .auth-note { color:var(--muted); font-size:.75rem; margin-top:20px; line-height:1.6; }
     #authError { color:var(--red); font-size:.82rem; margin-top:12px; display:none; }
 
-    /* ──────────── NAV ──────────── */
+    /* ── TOPBAR ── */
     #appShell { display:none; }
     .topbar {
         position:sticky; top:0; z-index:100;
-        background: rgba(11,12,14,0.85);
+        background: rgba(13,17,23,0.85);
         backdrop-filter: blur(20px) saturate(180%);
         border-bottom:1px solid var(--border);
-        padding:0 24px;
-        height:64px;
+        padding:0 24px; height:64px;
         display:flex; align-items:center; justify-content:space-between;
     }
-    .brand {
-        display:flex; align-items:center; gap:12px;
-        text-decoration:none;
-    }
+    .brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
     .brand-mark {
         width:38px; height:38px;
-        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
         border-radius:10px;
         display:flex; align-items:center; justify-content:center;
-        box-shadow:0 4px 12px rgba(201,168,76,0.25);
+        box-shadow:0 4px 12px rgba(45,212,191,0.25);
     }
-    .brand-mark svg { width:22px; height:22px; }
-    .brand-name {
-        font-family:'Playfair Display', serif;
-        font-size:1.1rem;
-        font-weight:700;
-        color:var(--text);
-    }
-    .brand-tagline { font-size:.7rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+    .brand-name { font-size:1.05rem; font-weight:700; color:var(--text); letter-spacing:-.02em; }
+    .brand-tagline { font-size:.65rem; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
     .nav-pills-custom {
         display:flex; gap:4px;
-        background:var(--surface2);
-        border-radius:10px;
-        padding:4px;
+        background:var(--surface2); border-radius:10px; padding:4px;
         border:1px solid var(--border);
     }
     .nav-pill {
-        padding:7px 18px;
-        border-radius:7px;
-        border:none;
-        background:transparent;
-        color:var(--muted);
-        font-family:'DM Sans', sans-serif;
-        font-size:.85rem;
-        font-weight:500;
-        cursor:pointer;
-        transition:all .2s;
-        white-space:nowrap;
+        padding:7px 18px; border-radius:7px; border:none;
+        background:transparent; color:var(--muted);
+        font-family:'Inter',sans-serif; font-size:.82rem; font-weight:500;
+        cursor:pointer; transition:all .2s; white-space:nowrap;
     }
     .nav-pill:hover { color:var(--text); }
     .nav-pill.active {
-        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
-        color:#0B0C0E;
-        font-weight:600;
-        box-shadow:0 2px 8px rgba(201,168,76,0.3);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+        color:#0d1117; font-weight:600;
+        box-shadow:0 2px 8px rgba(45,212,191,0.3);
     }
     .user-pill {
         display:flex; align-items:center; gap:10px;
-        background:var(--surface2);
-        border:1px solid var(--border);
-        border-radius:999px;
-        padding:6px 14px 6px 6px;
-        cursor:pointer;
+        background:var(--surface2); border:1px solid var(--border);
+        border-radius:999px; padding:6px 14px 6px 6px;
         transition:border-color .2s;
     }
-    .user-pill:hover { border-color:var(--border-gold); }
+    .user-pill:hover { border-color:var(--border-acc); }
     .user-avatar {
-        width:30px; height:30px;
-        border-radius:50%;
-        overflow:hidden;
-        border:1.5px solid var(--border-gold);
+        width:30px; height:30px; border-radius:50%; overflow:hidden;
+        border:1.5px solid var(--border-acc);
         display:flex; align-items:center; justify-content:center;
-        background:var(--surface);
-        color:var(--gold);
+        background:var(--surface); color:var(--accent);
         font-size:.8rem; font-weight:600;
     }
     .user-avatar img { width:100%; height:100%; object-fit:cover; }
     .user-name { font-size:.82rem; font-weight:500; max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .signout-btn {
-        background:transparent; border:none;
-        color:var(--muted); font-size:.78rem;
-        cursor:pointer; padding:4px 8px; border-radius:6px;
-        transition:color .15s;
+        background:transparent; border:none; color:var(--muted);
+        font-size:.78rem; cursor:pointer; padding:4px 8px;
+        border-radius:6px; transition:color .15s;
     }
     .signout-btn:hover { color:var(--red); }
 
-    /* ──────────── MAIN ──────────── */
-    .main-container {
-        max-width:1200px;
-        margin:0 auto;
-        padding:32px 24px 80px;
-    }
-
-    /* ──────────── TAB PANES ──────────── */
-    .tab-pane-pp { display:none; }
+    /* ── LAYOUT ── */
+    .main-container { max-width:1200px; margin:0 auto; padding:32px 24px 80px; }
+    .tab-pane-pp { display:none; animation:fadeUp .25s ease both; }
     .tab-pane-pp.active { display:block; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-    /* ──────────── HERO CARD ──────────── */
+    /* ── HERO ── */
     .hero-card {
-        background: linear-gradient(135deg, var(--surface) 0%, #0E1015 100%);
-        border:1px solid var(--border-gold);
-        border-radius:20px;
-        padding:40px 44px;
-        margin-bottom:28px;
-        position:relative;
-        overflow:hidden;
+        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+        border:1px solid var(--border-acc);
+        border-radius:20px; padding:40px 44px;
+        margin-bottom:28px; position:relative; overflow:hidden;
         box-shadow: var(--shadow);
     }
     .hero-card::before {
-        content:'';
-        position:absolute; top:-60px; right:-60px;
+        content:''; position:absolute; top:-60px; right:-60px;
         width:300px; height:300px;
-        background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(45,212,191,0.1) 0%, transparent 70%);
         pointer-events:none;
     }
-    .hero-label {
-        font-size:.72rem; letter-spacing:.12em; text-transform:uppercase;
-        color:var(--gold); font-weight:600; margin-bottom:10px;
-    }
+    .hero-label { font-size:.68rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent); font-weight:600; margin-bottom:10px; }
     .hero-value {
-        font-family:'Playfair Display', serif;
-        font-size:3.2rem;
-        font-weight:700;
-        color:var(--text);
-        line-height:1;
-        margin-bottom:20px;
+        font-size:3rem; font-weight:700; letter-spacing:-.03em;
+        background: linear-gradient(135deg, var(--accent) 0%, #5eead4 100%);
+        -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+        line-height:1; margin-bottom:20px;
     }
-    .hero-sub { display:flex; gap:32px; flex-wrap:wrap; }
-    .hero-sub-item label { font-size:.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:4px; }
-    .hero-sub-item .val { font-size:1.05rem; font-weight:600; font-variant-numeric:tabular-nums; }
+    .hero-sub { display:flex; gap:32px; flex-wrap:wrap; margin-bottom:28px; }
+    .hero-sub-item label { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.08em; display:block; margin-bottom:4px; }
+    .hero-sub-item .val { font-size:1rem; font-weight:600; }
     .badge-return {
         display:inline-flex; align-items:center; gap:5px;
-        padding:5px 13px;
-        border-radius:999px;
+        padding:5px 13px; border-radius:999px;
         font-size:.8rem; font-weight:600;
-        font-variant-numeric:tabular-nums;
     }
-    .badge-green { background:rgba(62,207,142,0.15); color:var(--green); border:1px solid rgba(62,207,142,0.25); }
-    .badge-red   { background:rgba(242,107,107,0.15); color:var(--red);   border:1px solid rgba(242,107,107,0.25); }
+    .badge-green { background:rgba(34,197,94,0.15); color:var(--green); border:1px solid rgba(34,197,94,0.25); }
+    .badge-red   { background:rgba(239,68,68,0.15);  color:var(--red);   border:1px solid rgba(239,68,68,0.25); }
     .hero-actions { display:flex; gap:12px; flex-wrap:wrap; }
 
-    /* ──────────── BUTTONS ──────────── */
+    /* ── BUTTONS ── */
     .btn-primary-pp {
-        background: linear-gradient(135deg, var(--gold) 0%, #a0772a 100%);
-        color:#0B0C0E;
-        border:none;
-        padding:10px 22px;
-        border-radius:10px;
-        font-family:'DM Sans', sans-serif;
-        font-weight:600;
-        font-size:.9rem;
-        cursor:pointer;
-        display:inline-flex; align-items:center; gap:8px;
-        transition:all .2s;
-        box-shadow:0 2px 12px rgba(201,168,76,0.25);
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+        color:#0d1117; border:none; padding:10px 22px; border-radius:10px;
+        font-family:'Inter',sans-serif; font-weight:600; font-size:.875rem;
+        cursor:pointer; display:inline-flex; align-items:center; gap:8px;
+        transition:all .2s; box-shadow:0 2px 12px rgba(45,212,191,0.2);
     }
-    .btn-primary-pp:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(201,168,76,0.4); }
+    .btn-primary-pp:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(45,212,191,0.35); }
     .btn-ghost-pp {
-        background:transparent;
-        color:var(--text);
-        border:1px solid var(--border);
-        padding:10px 22px;
-        border-radius:10px;
-        font-family:'DM Sans', sans-serif;
-        font-weight:500;
-        font-size:.9rem;
-        cursor:pointer;
-        display:inline-flex; align-items:center; gap:8px;
+        background:transparent; color:var(--text);
+        border:1px solid var(--border); padding:10px 22px; border-radius:10px;
+        font-family:'Inter',sans-serif; font-weight:500; font-size:.875rem;
+        cursor:pointer; display:inline-flex; align-items:center; gap:8px;
         transition:all .2s;
     }
-    .btn-ghost-pp:hover { border-color:var(--border-gold); color:var(--gold); }
+    .btn-ghost-pp:hover { border-color:var(--border-acc); color:var(--accent); }
 
-    /* ──────────── PORTFOLIO CARDS ──────────── */
-    .portfolio-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(400px, 1fr)); gap:20px; }
-    @media(max-width:600px) { .portfolio-grid { grid-template-columns:1fr; } }
+    /* ── PORTFOLIO CARDS ── */
+    .portfolio-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(400px,1fr)); gap:20px; }
+    @media(max-width:600px){ .portfolio-grid{grid-template-columns:1fr;} }
     .port-card {
-        background:var(--surface);
-        border:1px solid var(--border);
-        border-radius:var(--radius);
-        padding:24px;
-        transition:all .25s;
-        position:relative;
-        overflow:hidden;
+        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+        border:1px solid var(--border); border-radius:var(--radius);
+        padding:24px; transition:all .25s; position:relative; overflow:hidden;
     }
     .port-card::after {
-        content:'';
-        position:absolute; bottom:0; left:0; right:0;
-        height:2px;
-        background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        opacity:0;
-        transition:opacity .25s;
+        content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+        background:linear-gradient(90deg,transparent,var(--accent),transparent);
+        opacity:0; transition:opacity .25s;
     }
-    .port-card:hover { border-color:var(--border-gold); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
+    .port-card:hover { border-color:var(--border-acc); transform:translateY(-3px); box-shadow:0 12px 40px rgba(0,0,0,0.4); }
     .port-card:hover::after { opacity:1; }
-    .port-name {
-        font-family:'Playfair Display', serif;
-        font-size:1.15rem;
-        font-weight:600;
-        color:var(--text);
-    }
-    .port-amount { font-size:1.5rem; font-weight:700; font-variant-numeric:tabular-nums; }
+    .port-name { font-size:1.05rem; font-weight:700; color:var(--text); letter-spacing:-.01em; }
     .port-menu-btn {
-        background:transparent; border:none;
-        color:var(--muted); cursor:pointer;
-        padding:4px 6px; border-radius:6px;
+        background:transparent; border:none; color:var(--muted);
+        cursor:pointer; padding:4px 6px; border-radius:6px;
         transition:color .15s, background .15s;
     }
     .port-menu-btn:hover { color:var(--text); background:var(--surface2); }
     .asset-row-display {
         display:flex; justify-content:space-between; align-items:center;
-        padding:6px 0;
-        border-bottom:1px solid rgba(255,255,255,0.04);
+        padding:6px 0; border-bottom:1px solid rgba(48,54,61,0.5);
     }
     .asset-row-display:last-child { border-bottom:none; }
     .asset-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
-    .asset-name-text { font-size:.83rem; color:var(--text); }
-    .asset-pct { font-size:.8rem; font-weight:600; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
-    .asset-amt-text { font-size:.75rem; color:var(--muted); font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
     .chart-wrap { width:110px; height:110px; flex-shrink:0; }
 
-    /* ──────────── EMPTY STATE ──────────── */
+    /* ── EMPTY STATE ── */
     .empty-state {
         text-align:center; padding:80px 20px;
-        border:1px dashed var(--border);
-        border-radius:var(--radius);
+        border:1px dashed var(--border); border-radius:var(--radius);
         background:var(--surface);
     }
     .empty-icon { font-size:3rem; color:var(--muted); margin-bottom:16px; }
-    .empty-title { font-family:'Playfair Display',serif; font-size:1.4rem; margin-bottom:8px; }
+    .empty-title { font-size:1.3rem; font-weight:700; margin-bottom:8px; letter-spacing:-.01em; }
 
-    /* ──────────── MODALS ──────────── */
+    /* ── MODALS ── */
     .modal-overlay {
         display:none; position:fixed; inset:0; z-index:1000;
-        background:rgba(0,0,0,0.7);
-        backdrop-filter:blur(6px);
-        align-items:center; justify-content:center;
-        padding:20px;
+        background:rgba(0,0,0,0.72); backdrop-filter:blur(6px);
+        align-items:center; justify-content:center; padding:20px;
     }
     .modal-overlay.open { display:flex; }
     .modal-box {
-        background: var(--surface);
-        border:1px solid var(--border-gold);
-        border-radius:20px;
-        width:100%; max-width:560px;
-        max-height:90vh; overflow-y:auto;
+        background: linear-gradient(145deg, #161b22 0%, #0d1117 100%);
+        border:1px solid var(--border-acc); border-radius:20px;
+        width:100%; max-width:580px; max-height:90vh; overflow-y:auto;
         box-shadow:0 32px 80px rgba(0,0,0,0.7);
         animation: modalIn .22s ease;
     }
-    @keyframes modalIn {
-        from { opacity:0; transform:scale(.96) translateY(8px); }
-        to   { opacity:1; transform:scale(1) translateY(0); }
-    }
-    .modal-header-pp {
-        padding:24px 28px 0;
-        display:flex; justify-content:space-between; align-items:center;
-    }
-    .modal-title-pp {
-        font-family:'Playfair Display',serif;
-        font-size:1.25rem; font-weight:700;
-    }
-    .modal-close {
-        background:transparent; border:none;
-        color:var(--muted); cursor:pointer; font-size:1.1rem;
-        padding:6px; border-radius:6px; transition:color .15s;
-    }
+    @keyframes modalIn { from{opacity:0;transform:scale(.96) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+    .modal-header-pp { padding:24px 28px 0; display:flex; justify-content:space-between; align-items:center; }
+    .modal-title-pp { font-size:1.15rem; font-weight:700; letter-spacing:-.01em; }
+    .modal-close { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:1rem; padding:6px; border-radius:6px; transition:color .15s; }
     .modal-close:hover { color:var(--text); }
     .modal-body-pp { padding:20px 28px; }
     .modal-footer-pp { padding:0 28px 24px; display:flex; justify-content:flex-end; gap:10px; }
 
-    /* ──────────── FORM ──────────── */
-    .field-label { font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:6px; display:block; }
+    /* ── FORMS ── */
+    .field-label { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:6px; display:block; }
     .field-input {
-        width:100%;
-        background:var(--surface2);
-        border:1px solid var(--border);
-        border-radius:var(--radius-sm);
-        color:var(--text);
-        font-family:'DM Sans',sans-serif;
-        font-size:.9rem;
-        padding:10px 14px;
-        outline:none;
-        transition:border-color .2s, box-shadow .2s;
+        width:100%; background:var(--surface2); border:1px solid var(--border);
+        border-radius:var(--radius-sm); color:var(--text);
+        font-family:'Inter',sans-serif; font-size:.875rem;
+        padding:10px 14px; outline:none; transition:border-color .2s, box-shadow .2s;
     }
-    .field-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,168,76,0.12); }
+    .field-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(45,212,191,0.12); }
     .field-input::placeholder { color:var(--muted); }
     .field-group { margin-bottom:18px; }
     .select-input { appearance:none; }
 
-    /* ──────────── ASSET ROWS IN MODAL ──────────── */
+    /* ── ASSET ROWS IN MODAL: name | amount | % | del ── */
     .asset-edit-row {
-        display:grid; grid-template-columns:1fr 80px 90px 32px;
-        gap:8px; align-items:center;
-        margin-bottom:8px;
+        display:grid; grid-template-columns:1fr 120px 52px 32px;
+        gap:8px; align-items:center; margin-bottom:8px;
     }
     .asset-edit-row input { font-size:.85rem; padding:8px 10px; }
     .asset-del-btn {
@@ -408,168 +290,140 @@
         display:flex; align-items:center; justify-content:center;
     }
     .asset-del-btn:hover { color:var(--red); }
-    .allocation-badge {
-        display:inline-flex; align-items:center;
-        font-size:.78rem; font-weight:600;
-        padding:3px 10px; border-radius:999px;
+    .pct-badge {
+        font-size:.72rem; font-weight:600;
+        padding:4px 6px; border-radius:6px; text-align:center;
+        background:var(--surface); color:var(--muted); border:1px solid var(--border);
+        white-space:nowrap;
     }
-    .alloc-ok  { background:rgba(62,207,142,0.15); color:var(--green); }
-    .alloc-bad { background:rgba(242,107,107,0.12); color:var(--red); }
     .add-asset-btn {
         background:transparent; border:1px dashed var(--border);
         color:var(--muted); border-radius:var(--radius-sm);
         padding:8px 14px; font-size:.82rem; cursor:pointer;
         transition:all .2s; width:100%;
-        font-family:'DM Sans',sans-serif;
+        font-family:'Inter',sans-serif;
     }
-    .add-asset-btn:hover { border-color:var(--gold); color:var(--gold); }
+    .add-asset-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .col-header-row {
+        display:grid; grid-template-columns:1fr 120px 52px 32px;
+        gap:8px; margin-bottom:6px; padding:0 2px;
+    }
+    .col-hdr { font-size:.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; }
+    .col-hdr.right  { text-align:right; }
+    .col-hdr.center { text-align:center; }
     .err-msg { color:var(--red); font-size:.82rem; margin-top:8px; display:none; }
-
-    /* ──────────── PROJECTIONS ──────────── */
-    .section-title {
-        font-family:'Playfair Display',serif;
-        font-size:1.3rem; font-weight:700;
-        margin-bottom:20px;
+    .total-row {
+        display:flex; justify-content:space-between; align-items:center;
+        padding:10px 0; border-top:1px solid var(--border); margin-top:4px;
     }
+    .total-label { font-size:.78rem; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.06em; }
+    .total-value { font-size:1rem; font-weight:700; color:var(--accent); font-variant-numeric:tabular-nums; }
+
+    /* ── PROJECTIONS ── */
+    .section-title { font-size:1.15rem; font-weight:700; letter-spacing:-.01em; margin-bottom:20px; }
     .proj-table-wrap {
-        overflow-x:auto;
-        background:var(--surface);
-        border:1px solid var(--border);
-        border-radius:var(--radius);
-        margin-bottom:24px;
+        overflow-x:auto; background:var(--surface);
+        border:1px solid var(--border); border-radius:var(--radius); margin-bottom:20px;
     }
     table.pp-table { width:100%; border-collapse:collapse; }
     table.pp-table th {
-        font-size:.72rem; text-transform:uppercase; letter-spacing:.08em;
-        color:var(--muted); font-weight:600;
-        padding:14px 18px;
-        border-bottom:1px solid var(--border);
-        text-align:right; white-space:nowrap;
+        font-size:.68rem; text-transform:uppercase; letter-spacing:.08em;
+        color:var(--muted); font-weight:600; padding:14px 18px;
+        border-bottom:1px solid var(--border); text-align:right; white-space:nowrap;
     }
     table.pp-table th:first-child { text-align:left; }
     table.pp-table td {
-        padding:12px 18px;
-        font-size:.85rem;
-        border-bottom:1px solid rgba(255,255,255,0.04);
-        text-align:right;
-        font-variant-numeric:tabular-nums;
-        font-family:'JetBrains Mono',monospace;
+        padding:11px 18px; font-size:.84rem;
+        border-bottom:1px solid rgba(48,54,61,0.5);
+        text-align:right; font-variant-numeric:tabular-nums;
     }
-    table.pp-table td:first-child { text-align:left; font-family:'DM Sans',sans-serif; }
+    table.pp-table td:first-child { text-align:left; }
     table.pp-table tr:last-child td { border-bottom:none; }
-    table.pp-table tr.highlight td { background:var(--gold-glow); }
-    table.pp-table tr.grand td { background:var(--gold-dim); font-weight:700; }
-    .cagr-grid {
-        display:grid; grid-template-columns:repeat(auto-fill, minmax(160px,1fr));
-        gap:14px; margin-bottom:28px;
-    }
-    .cagr-card {
-        background:var(--surface);
-        border:1px solid var(--border);
-        border-radius:var(--radius-sm);
-        padding:14px 16px;
-    }
-    .cagr-card label { display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:8px; }
-    .cagr-hint { font-size:.73rem; color:var(--muted); margin-top:16px; }
+    table.pp-table tr.highlight td { background:rgba(45,212,191,0.05); }
+    table.pp-table tr.grand td { background:rgba(45,212,191,0.12); font-weight:700; }
+    .cagr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; margin-bottom:28px; }
+    .cagr-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px 16px; }
+    .cagr-card label { display:block; font-size:.68rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); font-weight:600; margin-bottom:8px; }
+    .cagr-hint { font-size:.72rem; color:var(--muted); margin-top:16px; }
 
-    /* ──────────── SIP ──────────── */
-    .sip-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:20px; }
-    .sip-card {
-        background:var(--surface);
-        border:1px solid var(--border);
-        border-radius:var(--radius);
-        padding:28px;
-    }
-    .sip-card-title { font-family:'Playfair Display',serif; font-size:1.1rem; font-weight:700; margin-bottom:22px; }
-    .result-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    /* ── SIP ── */
+    .sip-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:20px; }
+    .sip-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:28px; }
+    .sip-card-title { font-size:1.05rem; font-weight:700; letter-spacing:-.01em; margin-bottom:22px; }
+    .result-row { display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(48,54,61,0.5); }
     .result-row:last-of-type { border-bottom:none; }
     .result-label { font-size:.84rem; color:var(--muted); }
-    .result-val { font-size:.9rem; font-weight:600; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
-    .result-total { font-size:1.15rem; color:var(--gold); font-family:'Playfair Display',serif; }
-    .sip-note { font-size:.73rem; color:var(--muted); line-height:1.6; margin-top:14px; border-top:1px solid var(--border); padding-top:14px; }
+    .result-val { font-size:.9rem; font-weight:600; font-variant-numeric:tabular-nums; }
+    .result-total { font-size:1.1rem; color:var(--accent); font-weight:700; }
+    .sip-note { font-size:.72rem; color:var(--muted); line-height:1.6; margin-top:14px; border-top:1px solid var(--border); padding-top:14px; }
 
-    /* ──────────── DROPDOWN ──────────── */
+    /* ── DROPDOWN ── */
     .dropdown-pp {
         position:absolute; right:0; top:100%;
-        background:var(--surface2);
-        border:1px solid var(--border);
-        border-radius:10px;
-        min-width:150px;
+        background:var(--surface2); border:1px solid var(--border);
+        border-radius:10px; min-width:150px;
         box-shadow:0 12px 32px rgba(0,0,0,0.5);
-        z-index:50;
-        overflow:hidden;
-        display:none;
+        z-index:50; overflow:hidden; display:none;
     }
     .dropdown-pp.open { display:block; }
     .dropdown-pp button {
         display:flex; align-items:center; gap:8px;
         width:100%; padding:10px 16px;
-        background:transparent; border:none;
-        color:var(--text); font-family:'DM Sans',sans-serif; font-size:.85rem;
-        cursor:pointer; transition:background .15s;
-        text-align:left;
+        background:transparent; border:none; color:var(--text);
+        font-family:'Inter',sans-serif; font-size:.84rem;
+        cursor:pointer; transition:background .15s; text-align:left;
     }
     .dropdown-pp button:hover { background:var(--surface); }
     .dropdown-pp button.danger { color:var(--red); }
 
-    /* ──────────── GRAND TOTAL CARD ──────────── */
+    /* ── PREVIEW CARD ── */
     .grand-card {
-        background: linear-gradient(135deg, var(--surface) 0%, rgba(201,168,76,0.04) 100%);
-        border:1px solid var(--border-gold);
-        border-radius:var(--radius);
-        padding:24px 28px;
-        margin-bottom:24px;
+        background: rgba(45,212,191,0.04);
+        border:1px solid var(--border-acc); border-radius:var(--radius);
+        padding:20px 24px; margin-bottom:24px;
     }
-    .grand-card-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+    .grand-card-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(48,54,61,0.4); }
     .grand-card-row:last-child { border-bottom:none; }
     .grand-card-row .lbl { font-size:.82rem; color:var(--muted); }
-    .grand-card-row .vl { font-size:.9rem; font-weight:600; font-variant-numeric:tabular-nums; font-family:'JetBrains Mono',monospace; }
+    .grand-card-row .vl  { font-size:.9rem; font-weight:600; font-variant-numeric:tabular-nums; }
 
-    /* ──────────── SPINNER ──────────── */
-    .spinner { width:20px; height:20px; border:2px solid rgba(11,12,14,0.3); border-top-color:#0B0C0E; border-radius:50%; animation:spin .6s linear infinite; }
-    @keyframes spin { to { transform:rotate(360deg); } }
-
-    /* ──────────── LOADING ──────────── */
+    /* ── LOADING ── */
     #loadingOverlay {
-        position:fixed; inset:0; z-index:200;
-        background:var(--bg);
+        position:fixed; inset:0; z-index:200; background:var(--bg);
         display:flex; align-items:center; justify-content:center;
         flex-direction:column; gap:16px;
     }
-    .loading-logo { width:56px; height:56px; background:linear-gradient(135deg,var(--gold),#a0772a); border-radius:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(201,168,76,0.3); }
+    .loading-logo { width:56px; height:56px; background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border-radius:16px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(45,212,191,0.3); }
     .loading-bar { width:160px; height:2px; background:var(--surface2); border-radius:999px; overflow:hidden; }
-    .loading-bar-fill { height:100%; background:var(--gold); border-radius:999px; animation:loadbar 1.4s ease-in-out infinite; }
+    .loading-bar-fill { height:100%; background:var(--accent); border-radius:999px; animation:loadbar 1.4s ease-in-out infinite; }
     @keyframes loadbar { 0%{width:0%;margin-left:0} 50%{width:70%;margin-left:0} 100%{width:0%;margin-left:160px} }
 
-    /* ──────────── RESPONSIVE ──────────── */
-    @media(max-width:768px) {
+    /* ── MOBILE ── */
+    @media(max-width:768px){
         .hero-value { font-size:2.2rem; }
         .topbar { padding:0 16px; }
-        .main-container { padding:20px 16px 60px; }
+        .main-container { padding:20px 16px 70px; }
         .nav-pills-custom { display:none; }
         .mobile-tab-bar {
             display:flex; position:fixed; bottom:0; left:0; right:0; z-index:90;
-            background:rgba(11,12,14,0.95); backdrop-filter:blur(20px);
+            background:rgba(13,17,23,0.95); backdrop-filter:blur(20px);
             border-top:1px solid var(--border);
             padding:10px 0 max(10px,env(safe-area-inset-bottom));
         }
         .mob-tab {
             flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;
             background:transparent; border:none; color:var(--muted);
-            font-family:'DM Sans',sans-serif; font-size:.68rem; font-weight:500;
+            font-family:'Inter',sans-serif; font-size:.65rem; font-weight:500;
             cursor:pointer; padding:4px 8px; transition:color .2s;
         }
         .mob-tab i { font-size:1.2rem; }
-        .mob-tab.active { color:var(--gold); }
+        .mob-tab.active { color:var(--accent); }
         .auth-card { padding:36px 28px; }
+        .hero-card  { padding:28px 24px; }
+        .asset-edit-row { grid-template-columns:1fr 95px 48px 28px; }
+        .col-header-row { grid-template-columns:1fr 95px 48px 28px; }
     }
-    @media(min-width:769px) {
-        .mobile-tab-bar { display:none; }
-    }
-
-    /* ──────────── TRANSITIONS ──────────── */
-    .tab-pane-pp { animation:fadeUp .25s ease both; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @media(min-width:769px){ .mobile-tab-bar{display:none;} }
     </style>
 </head>
 <body>
@@ -578,33 +432,33 @@
 <div id="loadingOverlay">
     <div class="loading-logo">
         <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-            <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0B0C0E" stroke-width="10" stroke-linejoin="round"/>
-            <rect x="65" y="110" width="12" height="30" rx="2" fill="#0B0C0E"/>
-            <rect x="85" y="90" width="12" height="50" rx="2" fill="#0B0C0E"/>
-            <rect x="105" y="75" width="12" height="65" rx="2" fill="#0B0C0E"/>
-            <rect x="125" y="60" width="12" height="80" rx="2" fill="#0B0C0E"/>
-            <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="#0B0C0E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0d1117" stroke-width="10" stroke-linejoin="round"/>
+            <rect x="65" y="110" width="12" height="30" rx="2" fill="#0d1117"/>
+            <rect x="85" y="90" width="12" height="50" rx="2" fill="#0d1117"/>
+            <rect x="105" y="75" width="12" height="65" rx="2" fill="#0d1117"/>
+            <rect x="125" y="60" width="12" height="80" rx="2" fill="#0d1117"/>
+            <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="#0d1117" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
 </div>
 
-<!-- AUTH SCREEN -->
+<!-- AUTH -->
 <div id="authScreen" class="layer" style="display:none;">
     <div class="auth-card">
         <div class="auth-logo">
-            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0B0C0E" stroke-width="10" stroke-linejoin="round"/>
-                <rect x="65" y="110" width="12" height="30" rx="2" fill="#0B0C0E"/>
-                <rect x="85" y="90" width="12" height="50" rx="2" fill="#0B0C0E"/>
-                <rect x="105" y="75" width="12" height="65" rx="2" fill="#0B0C0E"/>
-                <rect x="125" y="60" width="12" height="80" rx="2" fill="#0B0C0E"/>
+            <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
+                <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0d1117" stroke-width="10" stroke-linejoin="round"/>
+                <rect x="65" y="110" width="12" height="30" rx="2" fill="#0d1117"/>
+                <rect x="85" y="90" width="12" height="50" rx="2" fill="#0d1117"/>
+                <rect x="105" y="75" width="12" height="65" rx="2" fill="#0d1117"/>
+                <rect x="125" y="60" width="12" height="80" rx="2" fill="#0d1117"/>
             </svg>
         </div>
         <div class="auth-title">Portfolio Pro</div>
         <div class="auth-sub">Your family's private wealth dashboard</div>
         <button class="btn-google" id="googleSignInBtn">
-            <svg class="google-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <svg class="google-icon" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
                 <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
@@ -619,17 +473,16 @@
 
 <!-- APP SHELL -->
 <div id="appShell" class="layer">
-    <!-- Topbar -->
     <nav class="topbar">
         <a class="brand" href="#">
             <div class="brand-mark">
                 <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0B0C0E" stroke-width="10" stroke-linejoin="round"/>
-                    <rect x="65" y="110" width="12" height="30" rx="2" fill="#0B0C0E"/>
-                    <rect x="85" y="90" width="12" height="50" rx="2" fill="#0B0C0E"/>
-                    <rect x="105" y="75" width="12" height="65" rx="2" fill="#0B0C0E"/>
-                    <rect x="125" y="60" width="12" height="80" rx="2" fill="#0B0C0E"/>
-                    <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="#0B0C0E" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M100 20L169 60V140L100 180L31 140V60Z" stroke="#0d1117" stroke-width="10" stroke-linejoin="round"/>
+                    <rect x="65" y="110" width="12" height="30" rx="2" fill="#0d1117"/>
+                    <rect x="85" y="90" width="12" height="50" rx="2" fill="#0d1117"/>
+                    <rect x="105" y="75" width="12" height="65" rx="2" fill="#0d1117"/>
+                    <rect x="125" y="60" width="12" height="80" rx="2" fill="#0d1117"/>
+                    <path d="M60 100L95 65L140 30M140 30H120M140 30V50" stroke="#0d1117" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
             </div>
             <div>
@@ -643,7 +496,7 @@
             <button class="nav-pill" onclick="showTab('sip',this)">SIP Calculator</button>
         </div>
         <div style="display:flex;align-items:center;gap:10px;">
-            <div class="user-pill" id="userPill">
+            <div class="user-pill">
                 <div class="user-avatar" id="userAvatar">?</div>
                 <span class="user-name" id="userName">Loading…</span>
             </div>
@@ -651,28 +504,20 @@
         </div>
     </nav>
 
-    <!-- Mobile Tab Bar -->
     <div class="mobile-tab-bar">
-        <button class="mob-tab active" onclick="showTab('dashboard',this,'mob')">
-            <i class="bi bi-grid-3x3-gap-fill"></i><span>Dashboard</span>
-        </button>
-        <button class="mob-tab" onclick="showTab('projections',this,'mob')">
-            <i class="bi bi-graph-up-arrow"></i><span>Projections</span>
-        </button>
-        <button class="mob-tab" onclick="showTab('sip',this,'mob')">
-            <i class="bi bi-calculator"></i><span>SIP</span>
-        </button>
+        <button class="mob-tab active" onclick="showTab('dashboard',this,'mob')"><i class="bi bi-grid-3x3-gap-fill"></i><span>Dashboard</span></button>
+        <button class="mob-tab" onclick="showTab('projections',this,'mob')"><i class="bi bi-graph-up-arrow"></i><span>Projections</span></button>
+        <button class="mob-tab" onclick="showTab('sip',this,'mob')"><i class="bi bi-calculator"></i><span>SIP</span></button>
     </div>
 
-    <!-- Main content -->
     <div class="main-container">
 
-        <!-- ── DASHBOARD TAB ── -->
+        <!-- DASHBOARD -->
         <div id="tab-dashboard" class="tab-pane-pp active">
             <div class="hero-card">
                 <div class="hero-label">Family Net Worth</div>
                 <div class="hero-value" id="heroValue">₹0</div>
-                <div class="hero-sub mb-4">
+                <div class="hero-sub">
                     <div class="hero-sub-item">
                         <label>Total Invested</label>
                         <span class="val" id="heroInvested">₹0</span>
@@ -690,35 +535,22 @@
             <div id="portfoliosGrid" class="portfolio-grid"></div>
         </div>
 
-        <!-- ── PROJECTIONS TAB ── -->
+        <!-- PROJECTIONS -->
         <div id="tab-projections" class="tab-pane-pp" style="display:none;">
             <div class="section-title">CAGR Assumptions</div>
             <div class="cagr-grid">
-                <div class="cagr-card">
-                    <label>Equity (%)</label>
-                    <input type="number" class="field-input" id="cagrEquity" step="0.5" min="0" max="30" value="13">
-                </div>
-                <div class="cagr-card">
-                    <label>Debt (%)</label>
-                    <input type="number" class="field-input" id="cagrDebt" step="0.5" min="0" max="15" value="7.5">
-                </div>
-                <div class="cagr-card">
-                    <label>Gold (%)</label>
-                    <input type="number" class="field-input" id="cagrGold" step="0.5" min="0" max="20" value="9">
-                </div>
-                <div class="cagr-card">
-                    <label>Others (%)</label>
-                    <input type="number" class="field-input" id="cagrOthers" step="0.5" min="-5" max="15" value="2">
-                </div>
+                <div class="cagr-card"><label>Equity (%)</label><input type="number" class="field-input" id="cagrEquity" step="0.5" min="0" max="30" value="13"></div>
+                <div class="cagr-card"><label>Debt (%)</label><input type="number" class="field-input" id="cagrDebt" step="0.5" min="0" max="15" value="7.5"></div>
+                <div class="cagr-card"><label>Gold (%)</label><input type="number" class="field-input" id="cagrGold" step="0.5" min="0" max="20" value="9"></div>
+                <div class="cagr-card"><label>Others (%)</label><input type="number" class="field-input" id="cagrOthers" step="0.5" min="-5" max="15" value="2"></div>
             </div>
-            <p class="cagr-hint">Keywords detected: equity/stock/mf → Equity · debt/fd/ppf → Debt · gold/sgb → Gold · else → Others</p>
+            <p class="cagr-hint">Keywords: equity/stock/mf → Equity · debt/fd/ppf → Debt · gold/sgb → Gold · else → Others</p>
             <div id="projectionsContainer" style="margin-top:28px;"></div>
         </div>
 
-        <!-- ── SIP TAB ── -->
+        <!-- SIP -->
         <div id="tab-sip" class="tab-pane-pp" style="display:none;">
             <div class="sip-grid">
-                <!-- Regular SIP -->
                 <div class="sip-card">
                     <div class="sip-card-title">SIP / Lumpsum Calculator</div>
                     <div class="field-group">
@@ -744,15 +576,14 @@
                         <label class="field-label">Investment Period (Years)</label>
                         <input type="number" class="field-input" id="periodYears" min="1" value="10" oninput="calcSip()">
                     </div>
-                    <div id="sipResultsBox" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+                    <div id="sipResultsBox" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
                         <div class="result-row"><span class="result-label">Invested Amount</span><span class="result-val" id="sipInvested">₹0</span></div>
                         <div class="result-row"><span class="result-label">Est. Returns</span><span class="result-val" style="color:var(--green);" id="sipReturns">₹0</span></div>
                         <div class="result-row"><span class="result-label" style="font-weight:600;color:var(--text);">Total Value</span><span class="result-val result-total" id="sipTotal">₹0</span></div>
-                        <div style="height:180px; margin-top:16px;"><canvas id="sipChart"></canvas></div>
+                        <div style="height:180px;margin-top:16px;"><canvas id="sipChart"></canvas></div>
                     </div>
                     <p class="sip-note">Beginning-of-month convention · Effective monthly rate from annual CAGR · No taxes/exit load</p>
                 </div>
-                <!-- Step-up SIP -->
                 <div class="sip-card">
                     <div class="sip-card-title">Step-up SIP Calculator</div>
                     <div class="field-group">
@@ -771,19 +602,20 @@
                         <label class="field-label">Investment Period (Years)</label>
                         <input type="number" class="field-input" id="stepYears" min="1" value="10" oninput="calcStepSip()">
                     </div>
-                    <div id="stepResultsBox" style="display:none; margin-top:20px; border-top:1px solid var(--border); padding-top:16px;">
+                    <div id="stepResultsBox" style="display:none;margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
                         <div class="result-row"><span class="result-label">Invested Amount</span><span class="result-val" id="stepInvested">₹0</span></div>
                         <div class="result-row"><span class="result-label">Est. Returns</span><span class="result-val" style="color:var(--green);" id="stepReturns">₹0</span></div>
                         <div class="result-row"><span class="result-label" style="font-weight:600;color:var(--text);">Total Value</span><span class="result-val result-total" id="stepTotal">₹0</span></div>
-                        <div style="height:180px; margin-top:16px;"><canvas id="stepSipChart"></canvas></div>
+                        <div style="height:180px;margin-top:16px;"><canvas id="stepSipChart"></canvas></div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
-<!-- ── PORTFOLIO MODAL ── -->
+<!-- PORTFOLIO MODAL -->
 <div class="modal-overlay" id="portfolioModal">
     <div class="modal-box">
         <div class="modal-header-pp">
@@ -795,35 +627,31 @@
                 <label class="field-label">Portfolio Name</label>
                 <input type="text" class="field-input" id="portName" placeholder="e.g. Retirement Fund">
             </div>
-            <div class="field-group">
-                <label class="field-label">Total Invested (₹)</label>
-                <input type="number" class="field-input" id="portAmount" placeholder="0" min="1" oninput="recalcAmounts()">
-            </div>
-            <div style="margin-bottom:12px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                    <label class="field-label" style="margin:0;">Asset Allocation</label>
-                    <span id="allocBadge" class="allocation-badge alloc-bad">0%</span>
-                </div>
-                <div style="display:grid; grid-template-columns:1fr 80px 90px 32px; gap:8px; margin-bottom:6px; padding:0 2px;">
-                    <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Asset Name</span>
-                    <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:center;">%</span>
-                    <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;text-align:right;">Amount</span>
+            <div style="margin-bottom:4px;">
+                <div class="col-header-row">
+                    <span class="col-hdr">Asset Name</span>
+                    <span class="col-hdr right">Amount (₹)</span>
+                    <span class="col-hdr center">%</span>
                     <span></span>
                 </div>
                 <div id="assetsContainer"></div>
                 <button class="add-asset-btn" onclick="addAssetRow()" style="margin-top:8px;"><i class="bi bi-plus"></i> Add Asset</button>
+                <div class="total-row">
+                    <span class="total-label">Total Invested</span>
+                    <span class="total-value" id="modalTotal">₹0</span>
+                </div>
             </div>
             <div class="err-msg" id="portError"></div>
             <input type="hidden" id="editingId">
         </div>
         <div class="modal-footer-pp">
             <button class="btn-ghost-pp" onclick="closeModal('portfolioModal')">Cancel</button>
-            <button class="btn-primary-pp" onclick="savePortfolio()">Save Portfolio</button>
+            <button class="btn-primary-pp" onclick="savePortfolio()"><i class="bi bi-check-lg"></i>Save Portfolio</button>
         </div>
     </div>
 </div>
 
-<!-- ── RETURNS MODAL ── -->
+<!-- RETURNS MODAL -->
 <div class="modal-overlay" id="returnsModal">
     <div class="modal-box" style="max-width:420px;">
         <div class="modal-header-pp">
@@ -834,12 +662,12 @@
             <div class="field-group">
                 <label class="field-label">Profit / Loss Across All Portfolios (₹)</label>
                 <input type="number" class="field-input" id="returnsInput" placeholder="Positive = profit · Negative = loss" oninput="previewReturns()">
-                <p style="font-size:.75rem; color:var(--muted); margin-top:6px;">Enter the total unrealised gain or loss across your entire family portfolio.</p>
+                <p style="font-size:.75rem;color:var(--muted);margin-top:6px;">Total unrealised gain or loss across the family portfolio.</p>
             </div>
             <div class="grand-card">
                 <div class="grand-card-row"><span class="lbl">Total Invested</span><span class="vl" id="retPreviewInvested">₹0</span></div>
                 <div class="grand-card-row"><span class="lbl">Returns</span><span class="vl" id="retPreviewReturns" style="color:var(--green)">+₹0</span></div>
-                <div class="grand-card-row"><span class="lbl" style="font-weight:600;color:var(--text);">Current Value</span><span class="vl" style="font-size:1.05rem;color:var(--gold);" id="retPreviewValue">₹0</span></div>
+                <div class="grand-card-row"><span class="lbl" style="font-weight:600;color:var(--text);">Current Value</span><span class="vl" style="font-size:1.05rem;color:var(--accent);" id="retPreviewValue">₹0</span></div>
                 <div class="grand-card-row"><span class="lbl">Return %</span><span id="retPreviewPct" class="badge-return badge-green" style="font-size:.8rem;">+0.00%</span></div>
             </div>
         </div>
@@ -857,52 +685,41 @@ import { getFirestore, doc, getDoc, setDoc, enableIndexedDbPersistence } from "h
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut as fbSignOut } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
-    authDomain: "portfolio-f938c.firebaseapp.com",
-    projectId: "portfolio-f938c",
-    storageBucket: "portfolio-f938c.firebasestorage.app",
+    apiKey:            "AIzaSyAin_GBduiKa7le4avmVcHdwEoNL5EdAko",
+    authDomain:        "portfolio-f938c.firebaseapp.com",
+    projectId:         "portfolio-f938c",
+    storageBucket:     "portfolio-f938c.firebasestorage.app",
     messagingSenderId: "963544931671",
-    appId: "1:963544931671:web:ff0210cc532428ea227212",
-    databaseURL: "https://portfolio-f938c-default-rtdb.asia-southeast1.firebasedatabase.app"
+    appId:             "1:963544931671:web:ff0210cc532428ea227212",
+    databaseURL:       "https://portfolio-f938c-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-
 enableIndexedDbPersistence(db).catch(()=>{});
 
-// ── expose to global scope ──
 window._fbSignOut = () => fbSignOut(auth);
 window._signInWithGoogle = async () => {
-    try {
-        await signInWithPopup(auth, provider);
-    } catch(e) {
+    try { await signInWithPopup(auth, provider); }
+    catch(e) {
         const el = document.getElementById('authError');
         el.textContent = e.message || 'Sign-in failed. Please try again.';
         el.style.display = 'block';
     }
 };
 
-// ── auth state ──
 onAuthStateChanged(auth, async user => {
     document.getElementById('loadingOverlay').style.display = 'none';
     if (user) {
-        // Set user info in nav
         document.getElementById('userName').textContent = user.displayName?.split(' ')[0] || user.email;
-        const avatar = document.getElementById('userAvatar');
-        if (user.photoURL) {
-            avatar.innerHTML = `<img src="${user.photoURL}" alt="">`;
-        } else {
-            avatar.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
-        }
+        const av = document.getElementById('userAvatar');
+        if (user.photoURL) av.innerHTML = `<img src="${user.photoURL}" alt="">`;
+        else av.textContent = (user.displayName||user.email||'?')[0].toUpperCase();
         document.getElementById('authScreen').style.display = 'none';
         document.getElementById('appShell').style.display = 'block';
-        const DOC_REF = doc(db, 'shared', 'family-portfolio-data');
-        window._DOC_REF = DOC_REF;
-        window._db = db;
-        await window.initApp(DOC_REF, db);
+        const docRef = doc(db, 'shared', 'family-portfolio-data');
+        await window.initApp(docRef);
     } else {
         document.getElementById('authScreen').style.display = 'flex';
         document.getElementById('appShell').style.display = 'none';
@@ -911,17 +728,15 @@ onAuthStateChanged(auth, async user => {
 </script>
 
 <script>
-// ──────────────────────────────────────────────────────────
-// HELPERS
-// ──────────────────────────────────────────────────────────
-const fmt = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Math.round(n));
-const genId = () => Math.random().toString(36).slice(2,9);
-const escHtml = t => { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; };
-const sortAssets = a => [...a].sort((x,y)=>y.percentage-x.percentage);
+// ── HELPERS ──────────────────────────────────────────
+const fmt    = n => new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(Math.round(n));
+const genId  = () => Math.random().toString(36).slice(2,9);
+const escHtml= t => { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; };
+const sortAssets = a => [...a].sort((x,y) => y.amount - x.amount);
 
-const CATEGORY_COLORS = { equity:'#F26B6B', debt:'#3ECF8E', gold:'#C9A84C' };
-const OTHERS_COLORS = ['#6B6D75','#9CA3AF','#64748B','#475569','#334155'];
-function assetColor(cat, idx=0) { return CATEGORY_COLORS[cat] || OTHERS_COLORS[idx % OTHERS_COLORS.length]; }
+const CAT_COLORS = { equity:'#ef4444', debt:'#22c55e', gold:'#eab308' };
+const OTHER_COLS = ['#6b7280','#9ca3af','#64748b','#475569','#334155'];
+const assetColor = (cat,i=0) => CAT_COLORS[cat] || OTHER_COLS[i % OTHER_COLS.length];
 function assetCat(name) {
     const n = name.toLowerCase();
     if (/equity|stock|share|mf|mutual fund|nifty|sensex|midcap|smallcap/.test(n)) return 'equity';
@@ -929,141 +744,109 @@ function assetCat(name) {
     if (/gold|sgb|gold etf|gold fund|digital gold/.test(n)) return 'gold';
     return 'others';
 }
-function fv(p, r, y) { return p * Math.pow(1 + r/100, y); }
+const fvCalc = (p,r,y) => p * Math.pow(1+r/100, y);
 
-// ──────────────────────────────────────────────────────────
-// APP STATE
-// ──────────────────────────────────────────────────────────
-let state = {
-    portfolios: [],
-    totalReturns: 0,
-    cagrAssumptions: { equity:13, debt:7.5, gold:9, others:2 }
-};
-let chartInstances = {};
+// ── STATE ─────────────────────────────────────────────
+let state = { portfolios:[], totalReturns:0, cagrAssumptions:{equity:13,debt:7.5,gold:9,others:2} };
+let charts = {};
 let isSaving = false;
-let docRef, firestoreDb;
+let docRef;
 
-// ──────────────────────────────────────────────────────────
-// FIRESTORE
-// ──────────────────────────────────────────────────────────
+// ── FIRESTORE ─────────────────────────────────────────
 async function loadState() {
     try {
         const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
         const snap = await getDoc(docRef);
         if (snap.exists()) {
             const d = snap.data();
-            state.portfolios = (d.portfolios||[]).map(p=>({...p,assets:sortAssets(p.assets)}));
-            state.totalReturns = d.totalReturns || 0;
+            state.portfolios      = (d.portfolios||[]).map(p=>({...p,assets:sortAssets(p.assets||[])}));
+            state.totalReturns    = d.totalReturns || 0;
             state.cagrAssumptions = d.cagrAssumptions || state.cagrAssumptions;
         }
-    } catch(e) { console.error('loadState', e); }
+    } catch(e){ console.error(e); }
 }
 async function saveState() {
     if (isSaving) return; isSaving=true;
     try {
         const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
         await setDoc(docRef, state);
-    } catch(e) { console.error('saveState', e); }
-    finally { isSaving=false; }
+    } catch(e){ console.error(e); } finally { isSaving=false; }
 }
 async function saveCagr() {
     if (isSaving) return; isSaving=true;
     try {
         const { setDoc } = await import("https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js");
-        await setDoc(docRef, { cagrAssumptions: state.cagrAssumptions }, { merge:true });
-    } catch(e) { console.error('saveCagr', e); }
-    finally { isSaving=false; }
+        await setDoc(docRef, {cagrAssumptions:state.cagrAssumptions},{merge:true});
+    } catch(e){ console.error(e); } finally { isSaving=false; }
 }
 
-// ──────────────────────────────────────────────────────────
-// INIT
-// ──────────────────────────────────────────────────────────
-window.initApp = async (ref, db) => {
+// ── INIT ──────────────────────────────────────────────
+window.initApp = async (ref) => {
     docRef = ref;
-    firestoreDb = db;
     await loadState();
-
-    // bind cagr inputs
-    document.getElementById('cagrEquity').value = state.cagrAssumptions.equity;
-    document.getElementById('cagrDebt').value = state.cagrAssumptions.debt;
-    document.getElementById('cagrGold').value = state.cagrAssumptions.gold;
-    document.getElementById('cagrOthers').value = state.cagrAssumptions.others;
+    document.getElementById('cagrEquity').value  = state.cagrAssumptions.equity;
+    document.getElementById('cagrDebt').value    = state.cagrAssumptions.debt;
+    document.getElementById('cagrGold').value    = state.cagrAssumptions.gold;
+    document.getElementById('cagrOthers').value  = state.cagrAssumptions.others;
     ['cagrEquity','cagrDebt','cagrGold','cagrOthers'].forEach(id => {
         document.getElementById(id).addEventListener('input', async () => {
             state.cagrAssumptions = {
                 equity: +document.getElementById('cagrEquity').value || 13,
-                debt:   +document.getElementById('cagrDebt').value  || 7.5,
-                gold:   +document.getElementById('cagrGold').value  || 9,
-                others: +document.getElementById('cagrOthers').value|| 2
+                debt:   +document.getElementById('cagrDebt').value   || 7.5,
+                gold:   +document.getElementById('cagrGold').value   || 9,
+                others: +document.getElementById('cagrOthers').value || 2
             };
             renderProjections();
             await saveCagr();
         });
     });
-
     renderDashboard();
     renderProjections();
     calcSip();
     calcStepSip();
 };
 
-// ──────────────────────────────────────────────────────────
-// AUTH HELPERS
-// ──────────────────────────────────────────────────────────
+// ── AUTH ──────────────────────────────────────────────
 document.getElementById('googleSignInBtn').addEventListener('click', () => window._signInWithGoogle());
 window.signOut = () => window._fbSignOut();
 
-// ──────────────────────────────────────────────────────────
-// TAB NAVIGATION
-// ──────────────────────────────────────────────────────────
+// ── TABS ──────────────────────────────────────────────
 window.showTab = (tab, btn, src='desktop') => {
-    document.querySelectorAll('.tab-pane-pp').forEach(p => p.style.display='none');
-    document.getElementById('tab-'+tab).style.display='block';
-
-    if (src === 'mob') {
-        document.querySelectorAll('.mob-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane-pp').forEach(p=>p.style.display='none');
+    document.getElementById('tab-'+tab).style.display = 'block';
+    if (src==='mob') {
+        document.querySelectorAll('.mob-tab').forEach(b=>b.classList.remove('active'));
         btn.classList.add('active');
-        // sync desktop
-        document.querySelectorAll('.nav-pill').forEach((b,i) => {
-            const tabs=['dashboard','projections','sip'];
-            b.classList.toggle('active', tabs[i]===tab);
-        });
-    } else {
-        document.querySelectorAll('.nav-pill').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        // sync mobile
         const tabs=['dashboard','projections','sip'];
-        document.querySelectorAll('.mob-tab').forEach((b,i) => b.classList.toggle('active', tabs[i]===tab));
+        document.querySelectorAll('.nav-pill').forEach((b,i)=>b.classList.toggle('active',tabs[i]===tab));
+    } else {
+        document.querySelectorAll('.nav-pill').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        const tabs=['dashboard','projections','sip'];
+        document.querySelectorAll('.mob-tab').forEach((b,i)=>b.classList.toggle('active',tabs[i]===tab));
     }
-
-    if (tab === 'projections') renderProjections();
+    if (tab==='projections') renderProjections();
 };
 
-// ──────────────────────────────────────────────────────────
-// DASHBOARD
-// ──────────────────────────────────────────────────────────
-function totalInvested() { return state.portfolios.reduce((s,p)=>s+(p.totalInvested||0),0); }
-function currentValue() { return totalInvested() + state.totalReturns; }
-function returnPct() { const i=totalInvested(); return i>0 ? (state.totalReturns/i)*100 : 0; }
+// ── DASHBOARD ─────────────────────────────────────────
+const totalInvested = () => state.portfolios.reduce((s,p)=>s+(p.totalInvested||0),0);
+const currentValue  = () => totalInvested() + state.totalReturns;
+const returnPct     = () => { const i=totalInvested(); return i>0?(state.totalReturns/i)*100:0; };
 
 function renderDashboard() {
-    const inv = totalInvested();
-    const cur = currentValue();
-    const pct = returnPct();
-    const pos = pct >= 0;
-
-    document.getElementById('heroValue').textContent = fmt(cur);
-    document.getElementById('heroInvested').textContent = fmt(inv);
+    const pct=returnPct(), pos=pct>=0;
+    document.getElementById('heroValue').textContent    = fmt(currentValue());
+    document.getElementById('heroInvested').textContent = fmt(totalInvested());
     const badge = document.getElementById('heroBadge');
-    badge.className = 'badge-return ' + (pos ? 'badge-green' : 'badge-red');
-    badge.innerHTML = `<i class="bi bi-${pos?'arrow-up':'arrow-down'}-short"></i>${pos?'+':''}${pct.toFixed(2)}%`;
+    badge.className = 'badge-return '+(pos?'badge-green':'badge-red');
+    badge.innerHTML = `<i class="bi bi-arrow-${pos?'up':'down'}-short"></i>${pos?'+':''}${pct.toFixed(2)}%`;
 
     const grid = document.getElementById('portfoliosGrid');
     if (!state.portfolios.length) {
         grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
             <div class="empty-icon"><i class="bi bi-briefcase"></i></div>
             <div class="empty-title">No Portfolios Yet</div>
-            <p style="color:var(--muted);margin-bottom:20px;font-size:.9rem;">Start by adding your first family portfolio to track wealth across asset classes.</p>
+            <p style="color:var(--muted);margin-bottom:20px;font-size:.875rem;">Add your first portfolio to start tracking family wealth.</p>
             <button class="btn-primary-pp" onclick="openAddPortfolio()"><i class="bi bi-plus-lg"></i>Add Portfolio</button>
         </div>`;
         return;
@@ -1071,173 +854,154 @@ function renderDashboard() {
 
     grid.innerHTML = state.portfolios.map(p => {
         const sorted = sortAssets(p.assets);
+        const total  = p.totalInvested || 0;
         return `<div class="port-card">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
                 <div class="port-name">${escHtml(p.name)}</div>
                 <div style="position:relative;">
-                    <button class="port-menu-btn" onclick="toggleDropdown('dd-${p.id}')"><i class="bi bi-three-dots-vertical"></i></button>
+                    <button class="port-menu-btn" onclick="toggleDd('dd-${p.id}')"><i class="bi bi-three-dots-vertical"></i></button>
                     <div class="dropdown-pp" id="dd-${p.id}">
-                        <button onclick="editPortfolio('${p.id}');toggleDropdown('dd-${p.id}')"><i class="bi bi-pencil"></i>Edit</button>
-                        <button class="danger" onclick="deletePortfolio('${p.id}');toggleDropdown('dd-${p.id}')"><i class="bi bi-trash"></i>Delete</button>
+                        <button onclick="editPortfolio('${p.id}');toggleDd('dd-${p.id}')"><i class="bi bi-pencil"></i>Edit</button>
+                        <button class="danger" onclick="deletePortfolio('${p.id}');toggleDd('dd-${p.id}')"><i class="bi bi-trash"></i>Delete</button>
                     </div>
                 </div>
             </div>
-            <p style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;">Total Invested</p>
-            <div class="port-amount" style="margin-bottom:20px;">${fmt(p.totalInvested)}</div>
             <div style="display:flex;gap:16px;align-items:flex-start;">
                 <div class="chart-wrap flex-shrink-0"><canvas id="pc-${p.id}"></canvas></div>
                 <div style="flex:1;min-width:0;">
-                    <p style="font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;">Allocation</p>
-                    ${sorted.map((a,i) => `
-                        <div class="asset-row-display">
+                    <p style="font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px;">Allocation</p>
+                    ${sorted.map((a,i)=>{
+                        const pct = total>0 ? (a.amount/total*100).toFixed(1) : '0.0';
+                        return `<div class="asset-row-display">
                             <div style="display:flex;align-items:center;gap:8px;min-width:0;">
                                 <span class="asset-dot" style="background:${assetColor(assetCat(a.name),i)};"></span>
-                                <span class="asset-name-text" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escHtml(a.name)}</span>
+                                <span style="font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(a.name)}</span>
                             </div>
                             <div style="text-align:right;flex-shrink:0;margin-left:8px;">
-                                <span class="asset-pct">${a.percentage}%</span>
-                                <span class="asset-amt-text" style="margin-left:6px;">(${fmt(a.amount)})</span>
+                                <span style="font-size:.82rem;font-weight:600;font-variant-numeric:tabular-nums;">${fmt(a.amount)}</span>
+                                <span style="font-size:.72rem;color:var(--muted);margin-left:5px;">${pct}%</span>
                             </div>
-                        </div>
-                    `).join('')}
+                        </div>`;
+                    }).join('')}
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid rgba(48,54,61,0.5);margin-top:4px;">
+                        <span style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;">Total</span>
+                        <span style="font-size:.95rem;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;">${fmt(total)}</span>
+                    </div>
                 </div>
             </div>
         </div>`;
     }).join('');
 
-    setTimeout(() => state.portfolios.forEach(p => renderPieChart(p)), 50);
+    setTimeout(()=>state.portfolios.forEach(p=>renderPieChart(p)),50);
 }
 
-function renderPieChart(portfolio) {
-    const canvas = document.getElementById(`pc-${portfolio.id}`);
+function renderPieChart(p) {
+    const canvas = document.getElementById(`pc-${p.id}`);
     if (!canvas) return;
-    if (chartInstances[portfolio.id]) { chartInstances[portfolio.id].destroy(); }
-    const sorted = sortAssets(portfolio.assets);
-    chartInstances[portfolio.id] = new Chart(canvas, {
+    if (charts[p.id]) charts[p.id].destroy();
+    const sorted = sortAssets(p.assets);
+    charts[p.id] = new Chart(canvas, {
         type:'doughnut',
-        data: {
-            labels: sorted.map(a=>a.name),
-            datasets: [{
-                data: sorted.map(a=>a.percentage),
-                backgroundColor: sorted.map((a,i) => assetColor(assetCat(a.name),i)),
-                borderColor: '#111318',
-                borderWidth: 2
-            }]
+        data:{
+            labels:sorted.map(a=>a.name),
+            datasets:[{ data:sorted.map(a=>a.amount), backgroundColor:sorted.map((a,i)=>assetColor(assetCat(a.name),i)), borderColor:'#161b22', borderWidth:2 }]
         },
-        options: {
-            responsive:true, maintainAspectRatio:true, cutout:'65%',
-            plugins:{ legend:{display:false} }
-        }
+        options:{ responsive:true, maintainAspectRatio:true, cutout:'65%', plugins:{legend:{display:false}} }
     });
 }
 
-// ──────────────────────────────────────────────────────────
-// DROPDOWN
-// ──────────────────────────────────────────────────────────
-window.toggleDropdown = id => {
-    document.querySelectorAll('.dropdown-pp').forEach(d => { if (d.id !== id) d.classList.remove('open'); });
+// ── DROPDOWN ──────────────────────────────────────────
+window.toggleDd = id => {
+    document.querySelectorAll('.dropdown-pp').forEach(d=>{ if(d.id!==id) d.classList.remove('open'); });
     document.getElementById(id)?.classList.toggle('open');
 };
-document.addEventListener('click', e => {
-    if (!e.target.closest('.port-menu-btn') && !e.target.closest('.dropdown-pp')) {
+document.addEventListener('click', e=>{
+    if (!e.target.closest('.port-menu-btn') && !e.target.closest('.dropdown-pp'))
         document.querySelectorAll('.dropdown-pp').forEach(d=>d.classList.remove('open'));
-    }
 });
 
-// ──────────────────────────────────────────────────────────
-// MODAL HELPERS
-// ──────────────────────────────────────────────────────────
+// ── MODAL HELPERS ─────────────────────────────────────
 window.closeModal = id => document.getElementById(id).classList.remove('open');
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-// close on overlay click
-document.querySelectorAll('.modal-overlay').forEach(o => o.addEventListener('click', e => {
-    if (e.target === o) o.classList.remove('open');
-}));
+const openModal   = id => document.getElementById(id).classList.add('open');
+document.querySelectorAll('.modal-overlay').forEach(o=>o.addEventListener('click',e=>{ if(e.target===o) o.classList.remove('open'); }));
 
-// ──────────────────────────────────────────────────────────
-// PORTFOLIO MODAL
-// ──────────────────────────────────────────────────────────
+// ── PORTFOLIO MODAL ───────────────────────────────────
 window.openAddPortfolio = () => {
     document.getElementById('portModalTitle').textContent = 'Add Portfolio';
     document.getElementById('editingId').value = '';
     document.getElementById('portName').value = '';
-    document.getElementById('portAmount').value = '';
     document.getElementById('portError').style.display = 'none';
     document.getElementById('assetsContainer').innerHTML = '';
     addAssetRow();
+    updateModalTotal();
     openModal('portfolioModal');
 };
+
 window.editPortfolio = id => {
     const p = state.portfolios.find(x=>x.id===id);
     if (!p) return;
     document.getElementById('portModalTitle').textContent = 'Edit Portfolio';
     document.getElementById('editingId').value = id;
     document.getElementById('portName').value = p.name;
-    document.getElementById('portAmount').value = p.totalInvested;
     document.getElementById('portError').style.display = 'none';
     document.getElementById('assetsContainer').innerHTML = '';
-    p.assets.forEach(a => addAssetRow(a.name, a.percentage));
-    recalcAmounts();
+    sortAssets(p.assets).forEach(a => addAssetRow(a.name, a.amount));
+    updateModalTotal();
     openModal('portfolioModal');
 };
-window.addAssetRow = (name='', pct='') => {
+
+window.addAssetRow = (name='', amount='') => {
     const id = genId();
-    const total = +document.getElementById('portAmount').value || 0;
-    const amt = (+pct/100*total);
     const row = document.createElement('div');
     row.className = 'asset-edit-row';
     row.id = `ar-${id}`;
     row.innerHTML = `
-        <input type="text" class="field-input asset-name" placeholder="e.g. Equity MF" value="${escHtml(name)}" style="font-size:.85rem;padding:8px 10px;">
-        <input type="number" class="field-input asset-pct text-center" placeholder="%" min="0" max="100" value="${pct}" style="font-size:.85rem;padding:8px 6px;text-align:center;" oninput="updateAllocBadge()">
-        <input type="text" class="field-input" value="${amt>0?fmt(amt):''}" disabled style="font-size:.75rem;padding:8px 8px;text-align:right;color:var(--muted);">
+        <input type="text" class="field-input asset-name" placeholder="e.g. Equity MF" value="${escHtml(String(name))}" style="font-size:.85rem;padding:8px 10px;">
+        <input type="number" class="field-input asset-amount" placeholder="0" min="0" value="${amount||''}" style="font-size:.85rem;padding:8px 10px;text-align:right;" oninput="updateModalTotal()">
+        <span class="pct-badge" id="pct-${id}">—</span>
         <button class="asset-del-btn" onclick="removeAssetRow('${id}')"><i class="bi bi-dash-circle"></i></button>`;
     document.getElementById('assetsContainer').appendChild(row);
-    updateAllocBadge();
+    updateModalTotal();
 };
+
 window.removeAssetRow = id => {
     const rows = document.querySelectorAll('.asset-edit-row');
-    if (rows.length > 1) { document.getElementById(`ar-${id}`)?.remove(); updateAllocBadge(); }
+    if (rows.length > 1) { document.getElementById(`ar-${id}`)?.remove(); updateModalTotal(); }
 };
-window.updateAllocBadge = () => {
-    let t = 0;
-    document.querySelectorAll('.asset-pct').forEach(el => t += +el.value || 0);
-    const ok = Math.abs(t-100) <= 0.01;
-    const b = document.getElementById('allocBadge');
-    b.textContent = `${t.toFixed(1)}%`;
-    b.className = 'allocation-badge ' + (ok ? 'alloc-ok' : 'alloc-bad');
-    recalcAmounts();
-};
-window.recalcAmounts = () => {
-    const total = +document.getElementById('portAmount').value || 0;
+
+window.updateModalTotal = () => {
+    let total = 0;
+    document.querySelectorAll('.asset-amount').forEach(el => total += +el.value || 0);
+    document.getElementById('modalTotal').textContent = fmt(total);
     document.querySelectorAll('.asset-edit-row').forEach(row => {
-        const pct = +row.querySelector('.asset-pct').value || 0;
-        const amt = pct/100*total;
-        row.querySelectorAll('input')[2].value = amt>0 ? fmt(amt) : '';
+        const amt = +row.querySelector('.asset-amount').value || 0;
+        const pct = total>0 ? (amt/total*100).toFixed(1)+'%' : '—';
+        const bid = row.id.replace('ar-','pct-');
+        const b = document.getElementById(bid);
+        if (b) b.textContent = pct;
     });
 };
+
 window.savePortfolio = async () => {
     const err = document.getElementById('portError');
-    err.style.display = 'none';
-    const id = document.getElementById('editingId').value;
+    err.style.display='none';
+    const id   = document.getElementById('editingId').value;
     const name = document.getElementById('portName').value.trim();
-    const totalInv = +document.getElementById('portAmount').value;
     if (!name) { err.textContent='Portfolio name is required'; err.style.display='block'; return; }
-    if (!totalInv || totalInv<=0) { err.textContent='Invested amount must be > 0'; err.style.display='block'; return; }
     let assets = [];
     document.querySelectorAll('.asset-edit-row').forEach(row => {
         const n = row.querySelector('.asset-name').value.trim();
-        const p = +row.querySelector('.asset-pct').value || 0;
-        if (n && p > 0) assets.push({ id:genId(), name:n, percentage:p, amount:p/100*totalInv });
+        const a = +row.querySelector('.asset-amount').value || 0;
+        if (n && a>0) assets.push({ id:genId(), name:n, amount:a });
     });
-    if (!assets.length) { err.textContent='Add at least one asset'; err.style.display='block'; return; }
-    const sum = assets.reduce((s,a)=>s+a.percentage,0);
-    if (Math.abs(sum-100)>0.01) { err.textContent=`Allocation must total 100% (currently ${sum.toFixed(1)}%)`; err.style.display='block'; return; }
+    if (!assets.length) { err.textContent='Add at least one asset with an amount > 0'; err.style.display='block'; return; }
+    const totalInv = assets.reduce((s,a)=>s+a.amount,0);
+    assets = assets.map(a=>({...a, percentage:+(a.amount/totalInv*100).toFixed(2)}));
     assets = sortAssets(assets);
-    const portfolio = { id: id||genId(), name, totalInvested:totalInv, assets };
+    const portfolio = { id:id||genId(), name, totalInvested:totalInv, assets };
     if (id) {
         const idx = state.portfolios.findIndex(p=>p.id===id);
-        if (idx!==-1) state.portfolios[idx] = portfolio;
+        if (idx!==-1) state.portfolios[idx]=portfolio; else state.portfolios.push(portfolio);
     } else {
         state.portfolios.push(portfolio);
     }
@@ -1246,134 +1010,105 @@ window.savePortfolio = async () => {
     renderProjections();
     closeModal('portfolioModal');
 };
+
 window.deletePortfolio = async id => {
     if (!confirm('Delete this portfolio?')) return;
     state.portfolios = state.portfolios.filter(p=>p.id!==id);
-    if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+    if (charts[id]) { charts[id].destroy(); delete charts[id]; }
     await saveState();
     renderDashboard();
     renderProjections();
 };
 
-// ──────────────────────────────────────────────────────────
-// RETURNS MODAL
-// ──────────────────────────────────────────────────────────
+// ── RETURNS MODAL ─────────────────────────────────────
 window.openReturnsModal = () => {
     document.getElementById('returnsInput').value = state.totalReturns;
     previewReturns();
     openModal('returnsModal');
 };
 window.previewReturns = () => {
-    const ret = +document.getElementById('returnsInput').value || 0;
-    const inv = totalInvested();
-    const val = inv + ret;
-    const pct = inv>0 ? (ret/inv)*100 : 0;
-    const pos = ret>=0;
+    const ret=+document.getElementById('returnsInput').value||0;
+    const inv=totalInvested(), val=inv+ret, pct=inv>0?(ret/inv)*100:0, pos=ret>=0;
     document.getElementById('retPreviewInvested').textContent = fmt(inv);
-    document.getElementById('retPreviewReturns').textContent = `${pos?'+':''}${fmt(ret)}`;
-    document.getElementById('retPreviewReturns').style.color = pos ? 'var(--green)' : 'var(--red)';
-    document.getElementById('retPreviewValue').textContent = fmt(val);
-    const pctEl = document.getElementById('retPreviewPct');
-    pctEl.className = 'badge-return ' + (pos?'badge-green':'badge-red');
-    pctEl.textContent = `${pos?'+':''}${pct.toFixed(2)}%`;
+    document.getElementById('retPreviewReturns').textContent  = `${pos?'+':''}${fmt(ret)}`;
+    document.getElementById('retPreviewReturns').style.color  = pos?'var(--green)':'var(--red)';
+    document.getElementById('retPreviewValue').textContent    = fmt(val);
+    const pEl = document.getElementById('retPreviewPct');
+    pEl.className = 'badge-return '+(pos?'badge-green':'badge-red');
+    pEl.textContent = `${pos?'+':''}${pct.toFixed(2)}%`;
 };
 window.saveReturns = async () => {
-    state.totalReturns = +document.getElementById('returnsInput').value || 0;
+    state.totalReturns = +document.getElementById('returnsInput').value||0;
     await saveState();
     renderDashboard();
     renderProjections();
     closeModal('returnsModal');
 };
 
-// ──────────────────────────────────────────────────────────
-// PROJECTIONS
-// ──────────────────────────────────────────────────────────
+// ── PROJECTIONS ───────────────────────────────────────
 function renderProjections() {
     const container = document.getElementById('projectionsContainer');
     if (!state.portfolios.length) {
-        container.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="bi bi-graph-up-arrow"></i></div><div class="empty-title">No Portfolios</div><p style="color:var(--muted);font-size:.9rem;">Add portfolios in Dashboard to see projections.</p></div>`;
+        container.innerHTML = `<div class="empty-state"><div class="empty-icon"><i class="bi bi-graph-up-arrow"></i></div><div class="empty-title">No Portfolios</div><p style="color:var(--muted);font-size:.875rem;">Add portfolios in Dashboard to see projections.</p></div>`;
         return;
     }
     const rates = state.cagrAssumptions;
-    let grandCur=0, grandY5=0, grandY10=0, grandY15=0;
-
-    const projections = state.portfolios.map(p => {
+    let grandCur=0,grandY5=0,grandY10=0,grandY15=0;
+    const projections = state.portfolios.map(p=>{
         const share = totalInvested()>0 ? p.totalInvested/totalInvested() : 0;
-        const portReturns = state.totalReturns * share;
-        const portCur = p.totalInvested + portReturns;
+        const portRet = state.totalReturns*share;
+        const portCur = p.totalInvested+portRet;
         const sorted = sortAssets(p.assets);
-        const ap = sorted.map(a => {
-            const cat = assetCat(a.name);
-            const r = rates[cat];
-            return { ...a, cat, r, y5:fv(a.amount,r,5), y10:fv(a.amount,r,10), y15:fv(a.amount,r,15) };
+        const ap = sorted.map(a=>{
+            const cat=assetCat(a.name), r=rates[cat];
+            return {...a, cat, r, y5:fvCalc(a.amount,r,5), y10:fvCalc(a.amount,r,10), y15:fvCalc(a.amount,r,15)};
         });
         const wCagr = ap.reduce((s,a)=>s+(a.r*(a.amount/p.totalInvested)),0)||0;
-        const pY5 = fv(portCur,wCagr,5), pY10 = fv(portCur,wCagr,10), pY15 = fv(portCur,wCagr,15);
+        const pY5=fvCalc(portCur,wCagr,5), pY10=fvCalc(portCur,wCagr,10), pY15=fvCalc(portCur,wCagr,15);
         grandCur+=portCur; grandY5+=pY5; grandY10+=pY10; grandY15+=pY15;
-        return { ...p, portCur, wCagr, pY5, pY10, pY15, ap, assetY5:ap.reduce((s,a)=>s+a.y5,0), assetY10:ap.reduce((s,a)=>s+a.y10,0), assetY15:ap.reduce((s,a)=>s+a.y15,0) };
+        return {...p, portCur, wCagr, pY5, pY10, pY15, ap, assetY5:ap.reduce((s,a)=>s+a.y5,0), assetY10:ap.reduce((s,a)=>s+a.y10,0), assetY15:ap.reduce((s,a)=>s+a.y15,0)};
     });
+    const grandCagr = grandCur>0 ? projections.reduce((s,p)=>s+(p.wCagr*(p.portCur/grandCur)),0) : 0;
 
-    let grandCagr = grandCur>0 ? projections.reduce((s,p)=>s+(p.wCagr*(p.portCur/grandCur)),0) : 0;
-
-    const grandHtml = `
-    <div class="grand-card" style="margin-bottom:28px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-            <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;">Family Wealth Projection</div>
-            <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:.78rem;color:var(--muted);">Weighted CAGR</span>
-                <span style="font-size:1.1rem;font-weight:700;color:var(--gold);font-family:'JetBrains Mono',monospace;">${grandCur>0?grandCagr.toFixed(1):'—'}%</span>
-            </div>
+    const grandHtml = `<div class="proj-table-wrap" style="border-color:var(--border-acc);margin-bottom:28px;">
+        <div style="padding:18px 20px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="font-size:1rem;font-weight:700;">Family Wealth Projection</div>
+            <div style="font-size:.8rem;color:var(--muted);">Weighted CAGR: <span style="color:var(--accent);font-weight:700;">${grandCur>0?grandCagr.toFixed(1):'—'}%</span></div>
         </div>
-        <div class="proj-table-wrap" style="margin-bottom:0;">
-            <table class="pp-table">
-                <thead><tr><th>Portfolio</th><th>Today</th><th>5 Years</th><th>10 Years</th><th>15 Years</th></tr></thead>
-                <tbody>
-                    ${projections.map(p=>`<tr>
-                        <td>${escHtml(p.name)}</td>
-                        <td>${fmt(p.portCur)}</td>
-                        <td style="color:var(--green)">${fmt(p.pY5)}</td>
-                        <td style="color:var(--green)">${fmt(p.pY10)}</td>
-                        <td style="color:var(--green)">${fmt(p.pY15)}</td>
-                    </tr>`).join('')}
-                    <tr class="grand">
-                        <td>All Portfolios</td>
-                        <td>${fmt(grandCur)}</td>
-                        <td style="color:var(--green)">${fmt(grandY5)}</td>
-                        <td style="color:var(--green)">${fmt(grandY10)}</td>
-                        <td style="color:var(--green)">${fmt(grandY15)}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <table class="pp-table">
+            <thead><tr><th>Portfolio</th><th>Today</th><th>5 Years</th><th>10 Years</th><th>15 Years</th></tr></thead>
+            <tbody>
+                ${projections.map(p=>`<tr><td>${escHtml(p.name)}</td><td>${fmt(p.portCur)}</td><td style="color:var(--green)">${fmt(p.pY5)}</td><td style="color:var(--green)">${fmt(p.pY10)}</td><td style="color:var(--green)">${fmt(p.pY15)}</td></tr>`).join('')}
+                <tr class="grand"><td>All Portfolios</td><td>${fmt(grandCur)}</td><td style="color:var(--green)">${fmt(grandY5)}</td><td style="color:var(--green)">${fmt(grandY10)}</td><td style="color:var(--green)">${fmt(grandY15)}</td></tr>
+            </tbody>
+        </table>
     </div>`;
 
-    const detailHtml = projections.map(p => `
+    const detailHtml = projections.map(p=>`
     <div class="proj-table-wrap" style="margin-bottom:20px;">
         <div style="padding:18px 20px 0;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <div style="font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;">${escHtml(p.name)}</div>
-            <span style="font-size:.78rem;color:var(--muted);">Weighted CAGR: <span style="color:var(--gold);font-weight:700;">${p.wCagr.toFixed(1)}%</span></span>
+            <div style="font-size:.95rem;font-weight:700;">${escHtml(p.name)}</div>
+            <span style="font-size:.78rem;color:var(--muted);">CAGR: <span style="color:var(--accent);font-weight:700;">${p.wCagr.toFixed(1)}%</span></span>
         </div>
         <table class="pp-table">
             <thead><tr><th>Asset</th><th>Category</th><th>CAGR</th><th>Invested</th><th>5 Yr</th><th>10 Yr</th><th>15 Yr</th></tr></thead>
             <tbody>
                 ${p.ap.map(a=>`<tr>
                     <td>${escHtml(a.name)}</td>
-                    <td style="color:var(--muted);text-align:right;font-family:'DM Sans',sans-serif;">${a.cat}</td>
-                    <td style="color:var(--gold);">${a.r}%</td>
-                    <td style="color:var(--muted);">${fmt(a.amount)}</td>
-                    <td>${fmt(a.y5)}</td>
-                    <td>${fmt(a.y10)}</td>
-                    <td>${fmt(a.y15)}</td>
+                    <td style="color:var(--muted)">${a.cat}</td>
+                    <td style="color:var(--accent)">${a.r}%</td>
+                    <td style="color:var(--muted)">${fmt(a.amount)}</td>
+                    <td>${fmt(a.y5)}</td><td>${fmt(a.y10)}</td><td>${fmt(a.y15)}</td>
                 </tr>`).join('')}
-                <tr style="background:rgba(255,255,255,0.03);">
-                    <td colspan="3" style="font-weight:600;font-family:'DM Sans',sans-serif;">Asset-level totals</td>
+                <tr style="background:rgba(255,255,255,0.02)">
+                    <td colspan="3" style="font-weight:600;">Asset-level totals</td>
                     <td style="font-weight:600;">${fmt(p.totalInvested)}</td>
                     <td style="color:var(--green);font-weight:600;">${fmt(p.assetY5)}</td>
                     <td style="color:var(--green);font-weight:600;">${fmt(p.assetY10)}</td>
                     <td style="color:var(--green);font-weight:600;">${fmt(p.assetY15)}</td>
                 </tr>
                 <tr class="highlight">
-                    <td colspan="3" style="font-weight:600;font-family:'DM Sans',sans-serif;">Portfolio (from current value)</td>
+                    <td colspan="3" style="font-weight:600;">Portfolio (from current value)</td>
                     <td style="font-weight:600;">${fmt(p.portCur)}</td>
                     <td style="color:var(--green);font-weight:600;">${fmt(p.pY5)}</td>
                     <td style="color:var(--green);font-weight:600;">${fmt(p.pY10)}</td>
@@ -1381,77 +1116,67 @@ function renderProjections() {
                 </tr>
             </tbody>
         </table>
-        <p style="padding:12px 20px;font-size:.73rem;color:var(--muted);">Past returns included in current value · Compounding at ${p.wCagr.toFixed(1)}% weighted CAGR</p>
+        <p style="padding:12px 20px;font-size:.72rem;color:var(--muted);">Past returns included in current value · Compounding at ${p.wCagr.toFixed(1)}% weighted CAGR</p>
     </div>`).join('');
 
     container.innerHTML = grandHtml + detailHtml;
 }
 
-// ──────────────────────────────────────────────────────────
-// SIP CALCULATORS
-// ──────────────────────────────────────────────────────────
+// ── SIP ───────────────────────────────────────────────
 window.handleInvestTypeChange = () => {
-    const type = document.getElementById('investType').value;
-    document.getElementById('sipInputGroup').style.display = type==='sip'?'block':'none';
-    document.getElementById('lumpsumInputGroup').style.display = type==='lumpsum'?'block':'none';
+    const t = document.getElementById('investType').value;
+    document.getElementById('sipInputGroup').style.display    = t==='sip'?'block':'none';
+    document.getElementById('lumpsumInputGroup').style.display= t==='lumpsum'?'block':'none';
     calcSip();
 };
 window.calcSip = () => {
-    const type = document.getElementById('investType').value;
-    const rate = (+document.getElementById('returnRate').value/100) || 0;
-    const years = +document.getElementById('periodYears').value || 0;
-    const months = years*12;
-    let invested=0, fvAmt=0;
-    if (type==='lumpsum') {
-        invested = +document.getElementById('lumpsumAmt').value||0;
-        fvAmt = invested * Math.pow(1+rate,years);
+    const type=document.getElementById('investType').value;
+    const rate=(+document.getElementById('returnRate').value/100)||0;
+    const years=+document.getElementById('periodYears').value||0;
+    const months=years*12;
+    let invested=0,fvAmt=0;
+    if(type==='lumpsum'){
+        invested=+document.getElementById('lumpsumAmt').value||0;
+        fvAmt=invested*Math.pow(1+rate,years);
     } else {
-        const m = +document.getElementById('monthlyAmt').value||0;
-        invested = m*months;
-        if (rate>0) {
-            const r = Math.pow(1+rate,1/12)-1;
-            fvAmt = m*((Math.pow(1+r,months)-1)/r)*(1+r);
-        } else { fvAmt=invested; }
-    }
-    const returns = fvAmt - invested;
-    document.getElementById('sipInvested').textContent = fmt(invested);
-    document.getElementById('sipReturns').textContent = fmt(returns);
-    document.getElementById('sipTotal').textContent = fmt(fvAmt);
-    document.getElementById('sipResultsBox').style.display = 'block';
-    renderCalcChart('sipChart', invested, returns);
-};
-window.calcStepSip = () => {
-    const m = +document.getElementById('stepMonthly').value||0;
-    const step = +document.getElementById('stepPct').value/100||0;
-    const rate = +document.getElementById('stepRate').value/100||0;
-    const years = +document.getElementById('stepYears').value||0;
-    const months = years*12;
-    const r = rate>0 ? Math.pow(1+rate,1/12)-1 : 0;
-    let invested=0, fvAmt=0;
-    for (let mo=0;mo<months;mo++) {
-        const yr = Math.floor(mo/12);
-        const sip = m*Math.pow(1+step,yr);
-        invested+=sip;
-        fvAmt+=sip*Math.pow(1+r,months-mo);
+        const m=+document.getElementById('monthlyAmt').value||0;
+        invested=m*months;
+        if(rate>0){const r=Math.pow(1+rate,1/12)-1; fvAmt=m*((Math.pow(1+r,months)-1)/r)*(1+r);}
+        else fvAmt=invested;
     }
     const returns=fvAmt-invested;
-    document.getElementById('stepInvested').textContent = fmt(invested);
-    document.getElementById('stepReturns').textContent = fmt(returns);
-    document.getElementById('stepTotal').textContent = fmt(fvAmt);
-    document.getElementById('stepResultsBox').style.display = 'block';
-    renderCalcChart('stepSipChart', invested, returns);
+    document.getElementById('sipInvested').textContent=fmt(invested);
+    document.getElementById('sipReturns').textContent=fmt(returns);
+    document.getElementById('sipTotal').textContent=fmt(fvAmt);
+    document.getElementById('sipResultsBox').style.display='block';
+    renderCalcChart('sipChart',invested,returns);
 };
-function renderCalcChart(id, invested, returns) {
-    const canvas = document.getElementById(id);
-    if (!canvas) return;
-    if (chartInstances[id]) chartInstances[id].destroy();
-    chartInstances[id] = new Chart(canvas, {
+window.calcStepSip = () => {
+    const m=+document.getElementById('stepMonthly').value||0;
+    const step=+document.getElementById('stepPct').value/100||0;
+    const rate=+document.getElementById('stepRate').value/100||0;
+    const years=+document.getElementById('stepYears').value||0;
+    const months=years*12;
+    const r=rate>0?Math.pow(1+rate,1/12)-1:0;
+    let invested=0,fvAmt=0;
+    for(let mo=0;mo<months;mo++){
+        const yr=Math.floor(mo/12),sip=m*Math.pow(1+step,yr);
+        invested+=sip; fvAmt+=sip*Math.pow(1+r,months-mo);
+    }
+    const returns=fvAmt-invested;
+    document.getElementById('stepInvested').textContent=fmt(invested);
+    document.getElementById('stepReturns').textContent=fmt(returns);
+    document.getElementById('stepTotal').textContent=fmt(fvAmt);
+    document.getElementById('stepResultsBox').style.display='block';
+    renderCalcChart('stepSipChart',invested,returns);
+};
+function renderCalcChart(id,invested,returns){
+    const canvas=document.getElementById(id); if(!canvas) return;
+    if(charts[id]) charts[id].destroy();
+    charts[id]=new Chart(canvas,{
         type:'doughnut',
-        data: {
-            labels:['Invested','Est. Returns'],
-            datasets:[{ data:[invested,returns], backgroundColor:['#3a3d45','#3ECF8E'], borderWidth:0 }]
-        },
-        options: { responsive:true, cutout:'72%', plugins:{ legend:{display:false} } }
+        data:{labels:['Invested','Est. Returns'],datasets:[{data:[invested,returns],backgroundColor:['#30363d','#22c55e'],borderWidth:0}]},
+        options:{responsive:true,cutout:'72%',plugins:{legend:{display:false}}}
     });
 }
 </script>
